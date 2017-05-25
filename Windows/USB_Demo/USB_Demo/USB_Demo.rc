@@ -1,0 +1,236 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文(中华人民共和国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
+    "LANGUAGE 4, 2\r\n"
+    "#pragma code_page(936)\r\n"
+    "#include ""res\\USBTest.rc2""  // 非 Microsoft Visual C++ 编辑的资源\r\n"
+    "#include ""afxres.rc""     // 标准组件\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\USB_Demo.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_USBTEST_DIALOG DIALOGEX 0, 0, 614, 335
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "ArduCAM_USB_CAMERA_Demo"
+FONT 9, "宋体", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "auto-open",IDC_BUTTON_INIT,112,62,50,14
+    CONTROL         "",IDC_RICHEDIT_LOG,"RichEdit20A",ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP,7,231,155,64
+    PUSHBUTTON      "play",IDC_BUTTON_PLAY,112,99,50,14
+    PUSHBUTTON      "stop",IDC_BUTTON_STOP,112,115,50,14
+    LTEXT           "frame capture count:",IDC_STATIC_FRAME_CAPTRUE_COUNT,7,301,148,8
+    LTEXT           "frame read count:",IDC_STATIC_FRAME_READ_COUNT,7,313,149,8
+    CONTROL         "",IDC_STATIC_DISPLAY,"Static",SS_BLACKFRAME | SS_REALSIZEIMAGE,203,30,226,120,WS_EX_TRANSPARENT
+    PUSHBUTTON      "close",IDC_BUTTON_CLOSE,112,78,50,14
+    LTEXT           "Width:",IDC_STATIC,7,79,25,8
+    LTEXT           "Height:",IDC_STATIC,7,95,29,8
+    EDITTEXT        IDC_EDIT1,43,77,50,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT2,43,93,50,12,ES_AUTOHSCROLL
+    LTEXT           "Bits:",IDC_STATIC,7,109,21,8
+    COMBOBOX        IDC_COMBO1,43,107,50,74,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "read",IDC_BUTTON_REG_READ,112,167,50,14
+    PUSHBUTTON      "write",IDC_BUTTON_REG_WRITE,112,183,50,14
+    LTEXT           "RegAddr:",IDC_STATIC,7,171,33,8
+    EDITTEXT        IDC_EDIT4,43,169,50,12,ES_AUTOHSCROLL
+    LTEXT           "Value:",IDC_STATIC,7,186,25,8
+    EDITTEXT        IDC_EDIT5,43,184,50,12,ES_AUTOHSCROLL
+    LTEXT           "Type:",IDC_STATIC,7,48,21,8
+    COMBOBOX        IDC_COMBO2,43,46,50,74,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "scan",IDC_BUTTON_SCAN,112,7,50,14
+    LTEXT           "Index:",IDC_STATIC,7,26,25,8
+    COMBOBOX        IDC_COMBO3,43,24,50,74,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "VID:",IDC_STATIC,7,9,17,8
+    COMBOBOX        IDC_COMBO4,43,7,50,74,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "open",IDC_BUTTON_OPEN,112,46,50,14
+    PUSHBUTTON      "RAWMode(RG)",IDC_BUTTON_BYTE_CONV,111,209,50,14
+    LTEXT           "I2C Mode:",IDC_STATIC,7,127,37,8
+    COMBOBOX        IDC_COMBO5,43,125,50,74,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "I2CAddr:",IDC_STATIC,7,143,33,8
+    EDITTEXT        IDC_EDIT3,43,141,50,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "shot",IDC_BUTTON_SHOT,112,137,50,14
+    CONTROL         "Force Display",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,210,68,10
+    COMBOBOX        IDC_COMBO6,43,62,50,74,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Sensor:",IDC_STATIC,7,64,29,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080403a8"
+        BEGIN
+            VALUE "CompanyName", "TODO: <公司名>"
+            VALUE "FileDescription", "TODO: <文件说明>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "USBTest.exe"
+            VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
+            VALUE "OriginalFilename", "USBTest.exe"
+            VALUE "ProductName", "TODO: <产品名>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 936
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_USBTEST_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 607
+        VERTGUIDE, 605
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 326
+        HORZGUIDE, 231
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_USBTEST_DIALOG DLGINIT
+BEGIN
+    IDC_COMBO1, 0x403, 5, 0
+0x6238, 0x7469, "\000" 
+    IDC_COMBO1, 0x403, 6, 0
+0x3031, 0x6962, 0x0074, 
+    IDC_COMBO1, 0x403, 6, 0
+0x3231, 0x6962, 0x0074, 
+    IDC_COMBO1, 0x403, 6, 0
+0x3431, 0x6962, 0x0074, 
+    IDC_COMBO1, 0x403, 6, 0
+0x3631, 0x6962, 0x0074, 
+    IDC_COMBO2, 0x403, 8, 0
+0x7241, 0x7564, 0x6143, 0x006d, 
+    IDC_COMBO4, 0x403, 7, 0
+0x7830, 0x3235, 0x4243, "\000" 
+    IDC_COMBO5, 0x403, 4, 0
+0x2c38, 0x0038, 
+    IDC_COMBO5, 0x403, 5, 0
+0x2c38, 0x3631, "\000" 
+    IDC_COMBO5, 0x403, 5, 0
+0x3631, 0x382c, "\000" 
+    IDC_COMBO5, 0x403, 6, 0
+0x3631, 0x312c, 0x0036, 
+    0
+END
+
+#endif    // 中文(中华人民共和国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE 4, 2
+#pragma code_page(936)
+#include "res\USB_Demo.rc2"  // 非 Microsoft Visual C++ 编辑的资源
+#include "afxres.rc"     // 标准组件
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,58 @@
+#ifndef _AR0134_H_
+#define _AR0134_H_
+
+
+#ifdef AR0134
+const struct sensor_reg reg_setting_AR0134[] =
+{
+	//[PLL_settings]
+	{0x3028, 0x0010},		//ROW_SPEED = 16
+	{0x302A, 0x0010},		//VT_PIX_CLK_DIV = 16
+	{0x302C, 0x0001},		//VT_SYS_CLK_DIV = 1
+	{0x302E, 0x0002},		//PRE_PLL_CLK_DIV = 2
+	{0x3030, 0x0028},		//PLL_MULTIPLIER = 40
+	{0x3032, 0x0000},		//DIGITAL_BINNING = 0
+	{0x30B0, 0x0080},		//DIGITAL_TEST = 128
+
+
+	//[Timing_settings]
+	{0x301A, 0x00D8},		//RESET_REGISTER = 216
+	{0x301A, 0x10DC},		//RESET_REGISTER = 4316
+	{0x3002, 0x0000},		//Y_ADDR_START = 0
+	{0x3004, 0x0000},		//X_ADDR_START = 0
+	{0x3006, 0x03BF},		//Y_ADDR_END = 959
+	{0x3008, 0x04FF},		//X_ADDR_END = 1279
+	{0x300A, 0x0488},		//FRAME_LENGTH_LINES = 1160
+	{0x300C, 0x056C},		//LINE_LENGTH_PCK = 1388
+	{0x3012, 0x00D8},		//COARSE_INTEGRATION_TIME = 216
+	{0x3014, 0x00C0},		//FINE_INTEGRATION_TIME = 192
+	{0x30A6, 0x0001},		//Y_ODD_INC = 1
+	{0x308C, 0x0000},		//Y_ADDR_START_CB = 0
+	{0x308A, 0x0000},		//X_ADDR_START_CB = 0
+	{0x3090, 0x03BF},		//Y_ADDR_END_CB = 959
+	{0x308E, 0x04FF},		//X_ADDR_END_CB = 1279
+	{0x30AA, 0x0488},		//FRAME_LENGTH_LINES_CB = 1160
+	{0x3016, 0x00D8},		//COARSE_INTEGRATION_TIME_CB = 216
+	{0x3018, 0x00C0},		//FINE_INTEGRATION_TIME_CB = 192
+	{0x30A8, 0x0001},		//Y_ODD_INC_CB = 1
+	{0x3040, 0x0000},		//READ_MODE = 0
+	{0x3064, 0x1982},		//EMBEDDED_DATA_CTRL = 6530
+	{0x31C6, 0x8008},		//HISPI_CONTROL_STATUS = 32776
+
+	{0x3002, 0}, // Y_ADDR_START
+	{0x3012, 100},
+	{0x3056, 74},
+	{0x3058, 112},
+	{0x305a, 112},
+	{0x305c, 74},
+
+	{0x3046, 0x0100},		//en_flash/Flash indicator
+
+	{0x301a, 0x10DC},
+
+	{0xffff, 0xffff},
+	{0xffff, 0xffff},
+};
+#endif;
+
+#endif;
