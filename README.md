@@ -27,6 +27,7 @@ More info can be found from [arducam website](http://www.arducam.com/arducam-usb
 This USB camera shield has no onboard frame buffer. The transfer reliability highly depends the USB bandwidth.  
 If multiple USB devices are connected to a single USB root hub, it will cause bandwidth racing and cause drop frames.  
 It is recommended to preserved enough bandwidth for the camera on USB port, or reduce the frame rate and Pixel clock of the image sensor once continuously dropping frames happens.  
+This USB camera shield isn't UVC compliant, for Windows you have to install our USB driver, for Linux you can use libusb which is also plug-and-play.
 
 ### PC
 Basically the PC is fast enough to run ArduCAM USB camera shield without dropping frames.  
