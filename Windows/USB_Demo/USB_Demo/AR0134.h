@@ -5,6 +5,7 @@
 #ifdef AR0134
 const struct sensor_reg reg_setting_AR0134[] =
 {
+
 	//[PLL_settings]
 	{0x3028, 0x0010},		//ROW_SPEED = 16
 	{0x302A, 0x0010},		//VT_PIX_CLK_DIV = 16
@@ -35,20 +36,27 @@ const struct sensor_reg reg_setting_AR0134[] =
 	{0x3016, 0x00D8},		//COARSE_INTEGRATION_TIME_CB = 216
 	{0x3018, 0x00C0},		//FINE_INTEGRATION_TIME_CB = 192
 	{0x30A8, 0x0001},		//Y_ODD_INC_CB = 1
-	{0x3040, 0x0000},		//READ_MODE = 0
-	{0x3064, 0x1982},		//EMBEDDED_DATA_CTRL = 6530
+	{0x3040, 0x4000},		//READ_MODE = 0
+	//{0x3064, 0x1982},		//EMBEDDED_DATA_CTRL = 6530
+	{0x3064, 0x1802},
 	{0x31C6, 0x8008},		//HISPI_CONTROL_STATUS = 32776
+	{0x301E, 0x0000},		//data_pedestal
+	//{0x3100, 0x0001},		//auto exposure
 
-	{0x3002, 0}, // Y_ADDR_START
-	{0x3012, 100},
-	{0x3056, 74},
-	{0x3058, 112},
-	{0x305a, 112},
-	{0x305c, 74},
+	{0x3002, 0},			// Y_ADDR_START
+	{0x3012, 150},
+	
+	{0x3056, 0x0024},		// Gr_GAIN 
+	{0x3058, 0x002D},		// BLUE_GAIN
+	{0x305a, 0x0028},		// RED_GAIN 
+	{0x305c, 0x0024},		// Gb_GAIN 
 
 	{0x3046, 0x0100},		//en_flash/Flash indicator
 
 	{0x301a, 0x10DC},
+
+	//{0x3006, 599},		//Y_ADDR_END = 959
+	//{0x3008, 799},		//X_ADDR_END = 1279
 
 	{0xffff, 0xffff},
 	{0xffff, 0xffff},

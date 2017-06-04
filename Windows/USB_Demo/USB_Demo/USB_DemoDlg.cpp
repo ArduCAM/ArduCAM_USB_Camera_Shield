@@ -23,6 +23,7 @@
 // CUSBTestDlg 对话框
 
 UINT _FrameCaptureThread( LPVOID lParam );							// 图像采集线程
+//UINT _IMUCaptureThread( LPVOID lParam );							// IMU采集线程
 UINT _FrameReadThread( LPVOID lParam );								// 图像读取显示线程
 
 
@@ -64,9 +65,18 @@ void CUSBTestDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BUTTON_BYTE_CONV, m_btRawMode);
 	DDX_Control(pDX, IDC_COMBO5, m_cmbI2cMode);
 	DDX_Control(pDX, IDC_EDIT3, m_edtShipAddr);
-
+	//DDX_Control(pDX, IDC_BUTTON_SHOT, m_btShot);
+	//DDX_Control(pDX, IDC_STATIC_SHOT_TIME, m_sttShotTime);
 	DDX_Control(pDX, IDC_CHECK1, m_chkForceDisp);
-
+	/*DDX_Control(pDX, IDC_STATIC_IMU_INDEX, m_sttIMUIdx);
+	DDX_Control(pDX, IDC_STATIC_IMU_TIME, m_sttIMUTime);
+	DDX_Control(pDX, IDC_STATIC_IMU_ACCX, m_sttIMUAccX);
+	DDX_Control(pDX, IDC_STATIC_IMU_ACCY, m_sttIMUAccY);
+	DDX_Control(pDX, IDC_STATIC_IMU_ACCZ, m_sttIMUAccZ);
+	DDX_Control(pDX, IDC_STATIC_IMU_GYROX, m_sttIMUGyroX);
+	DDX_Control(pDX, IDC_STATIC_IMU_GYROY, m_sttIMUGyroY);
+	DDX_Control(pDX, IDC_STATIC_IMU_GYROZ, m_sttIMUGyroZ);
+	DDX_Control(pDX, IDC_STATIC_IMU_TIMP, m_sttIMUTemp);*/
 	DDX_Control(pDX, IDC_COMBO6, m_cmbSensor);
 }
  
@@ -142,16 +152,14 @@ BOOL CUSBTestDlg::OnInitDialog()
 	m_cmbSensor.AddString("MT9J001");
 	m_cmbSensor.AddString("MT9F002");
 	m_cmbSensor.AddString("MT9N001");
-
+	
 
 	m_cmbSensor.SetCurSel(MT9V034);
 	OnCbnSelchangeCombo6();
 
 	SetTimer( DISP_INF_TIMER, 1000, NULL );
 
-
 	m_u32ShotFlag  = 0;
-
 	m_u32CaptFlag  = 0;
 
 	m_u32FrameLeftloc  = 250;
@@ -617,7 +625,11 @@ void CUSBTestDlg::ReadFrame( void )
 			{
 				m_u32FrameReadCnt++;
 
+				//Uint8* pu8OutRgb24 = ( Uint8* )malloc( stTmpFramePara.u32Width * stTmpFramePara.u32Height * 3 + 64 );
+				
 				Raw2rgb24( m_pu8OutRgb24, pu8TmpFrameData, stTmpFramePara.u32Width, stTmpFramePara.u32Height, m_u32RawMode, stTmpFramePara.u8PixelBits );
+
+				
 
 				if (m_u32ShotFlag)
 				{
@@ -680,6 +692,29 @@ void CUSBTestDlg::ReadFrame( void )
 				}
 
 				FrameDisplay( m_pu8OutRgb24, stTmpFramePara.u32Width, stTmpFramePara.u32Height );
+
+				//if ( pu8OutRgb24 != NULL )		free( pu8OutRgb24 );
+				
+				/*CString csTmpString;
+
+				csTmpString.Format( "索 引 号：0x%x", pstTmpIMUData->u16Index );
+				m_sttIMUIdx.SetWindowText( csTmpString );
+				csTmpString.Format( "时 间 戳：0x%x", pstTmpIMUData->u32TimeStamp );
+				m_sttIMUTime.SetWindowText( csTmpString );
+				csTmpString.Format( "加速度 X：0x%x", pstTmpIMUData->u16AccX );
+				m_sttIMUAccX.SetWindowText( csTmpString );
+				csTmpString.Format( "加速度 Y：0x%x", pstTmpIMUData->u16AccY );
+				m_sttIMUAccY.SetWindowText( csTmpString );
+				csTmpString.Format( "加速度 Z：0x%x", pstTmpIMUData->u16AccZ );
+				m_sttIMUAccZ.SetWindowText( csTmpString );
+				csTmpString.Format( "姿态角 X：0x%x", pstTmpIMUData->u16GyroX );
+				m_sttIMUGyroX.SetWindowText( csTmpString );
+				csTmpString.Format( "姿态角 Y：0x%x", pstTmpIMUData->u16GyroY );
+				m_sttIMUGyroY.SetWindowText( csTmpString );
+				csTmpString.Format( "姿态角 Z：0x%x", pstTmpIMUData->u16GyroZ );
+				m_sttIMUGyroZ.SetWindowText( csTmpString );
+				csTmpString.Format( "温    度：0x%x", pstTmpIMUData->u16Temp );
+				m_sttIMUTemp.SetWindowText( csTmpString );*/
 
 				ArduCam_del( m_cUsbCameraHd );
 			} 
@@ -901,11 +936,17 @@ void CUSBTestDlg::OnBnClickedButtonPlay()
 	// TODO: 在此添加控件通知处理程序代码
 	if ( m_u8PlayState != STATE_PLAY )
 	{
+		//ArduCam_writeSensorReg( m_cUsbCameraHd, 0x07, 904 );
+		
 		m_u8PlayState = STATE_PLAY;
 		
 		m_u32FrameCaptureThreadEn = THREAD_ENABLE;												
 		m_ptdFrameCaptureThread   = AfxBeginThread( _FrameCaptureThread, this );
 		SetThreadAffinityMask( m_ptdFrameCaptureThread->m_hThread, 0x22 );
+
+		/*m_u32IMUCaptureThreadEn = THREAD_ENABLE;												
+		m_ptdIMUCaptureThread   = AfxBeginThread( _IMUCaptureThread, this );
+		SetThreadAffinityMask( m_ptdIMUCaptureThread->m_hThread, 0x11 );*/
 
 		//GetDlgItem( IDOK )->EnableWindow( FALSE );
 		m_btPlay.EnableWindow( FALSE );
@@ -941,6 +982,17 @@ void CUSBTestDlg::OnBnClickedButtonStop()
 		//m_u32FrameReadCntBak    = 0;
 
 		//GetDlgItem( IDOK )->EnableWindow( TRUE );
+		/*
+		while ( m_u32CaptFlag > 0 )
+		{			
+			m_u32CaptFlag++;
+			Sleep(100);
+			
+			if ( m_u32CaptFlag > 50 )
+			{
+				m_u32CaptFlag = 0;
+			}
+		}*/
 
 		m_btPlay.EnableWindow( TRUE );
 		m_btStop.EnableWindow( FALSE );
@@ -1084,6 +1136,7 @@ void CUSBTestDlg::OnLButtonDown(UINT nFlags, CPoint point)
 		 && ( point.y >= m_u32FrameUploc    )
 		 && ( point.y <= m_u32FrameDownloc  ) )
 	{
+		if ( m_u8PlayState != STATE_PLAY )		return;
 		m_s32LocXMoved = point.x;
 		m_s32LocYMoved = point.y;
 
@@ -1109,6 +1162,7 @@ void CUSBTestDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		 && ( point.y >= m_u32FrameUploc    )
 		 && ( point.y <= m_u32FrameDownloc  ) )
 	{
+		if ( m_u8PlayState != STATE_PLAY )		return;
 		ArduCamCfg	stTmpFramePara;
 		ArduCam_getSensorCfg( m_cUsbCameraHd, &stTmpFramePara );
 		
@@ -1156,6 +1210,7 @@ BOOL CUSBTestDlg::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		 && ( pt.y >= m_u32FrameUploc    )
 		 && ( pt.y <= m_u32FrameDownloc  ) )
 	{	
+		if ( m_u8PlayState != STATE_PLAY )		return CDialog::OnMouseWheel(nFlags, zDelta, pt);
 		ArduCamCfg	stTmpFramePara;
 		ArduCam_getSensorCfg( m_cUsbCameraHd, &stTmpFramePara );
 		
@@ -1290,7 +1345,7 @@ void CUSBTestDlg::OnCbnSelchangeCombo6()
 		break;
 	case AR0134:
 		m_edtWidth.SetWindowText( "1280" );
-		m_edtHeight.SetWindowText( "964" );
+		m_edtHeight.SetWindowText( "960" );
 		m_cmbI2cMode.SetCurSel(3);
 		m_edtShipAddr.SetWindowText( "32" );
 
@@ -1309,8 +1364,8 @@ void CUSBTestDlg::OnCbnSelchangeCombo6()
 		reg_setting = (sensor_reg*) &reg_setting_MT9J001[0];
 		break;
 	case MT9F002:
-		m_edtWidth.SetWindowText( "4384" );
-		m_edtHeight.SetWindowText( "3288" );
+		m_edtWidth.SetWindowText( "4384" );//4384
+		m_edtHeight.SetWindowText( "3288" );//3288
 		m_cmbI2cMode.SetCurSel(3);
 		m_edtShipAddr.SetWindowText( "32" );
 
