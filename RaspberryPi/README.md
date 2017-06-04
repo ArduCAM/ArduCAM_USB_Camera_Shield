@@ -4,7 +4,7 @@ Python demo code for the following cameras:
 
 - MT9V034 (0.36MP Global Shutter Camera)
 - AR0134 (1.2MP Global Shutter Camera)
-- MT9F002 （14MP Rolling Camera)
+- MT9F002 （14MP Rolling Shutter Camera)
 
 
 # Usuage
@@ -32,6 +32,13 @@ The realtime preview mode support zoom in/out cwith control the keyboard
 - Quit key ' q '
 
 # Troubleshooting
+## Window control doesn't work
+
 The keyboard event number might not match your system, using the following command to determine which is your keyboard event
 
 ``` cat /proc/bus/input/devices ```
+
+## Frame rate is too slow
+
+The realtime preview performance is not so good on Raspberry Pi board due to the processing power on RAW2RGB convertion and opencv imshow function. In this case the realtime preview is used only for viewfinder purpose, it is recommend to do image processing without realtime display.
+
