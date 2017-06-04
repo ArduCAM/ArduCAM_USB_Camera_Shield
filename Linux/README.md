@@ -24,4 +24,14 @@ Python demo code for the following cameras:
 
 --name : file name without extension
 
+## Window Control
+The realtime preview mode support zoom in/out cwith control the keyboard
 
+- Zoom in key ' <- '
+- Zoom out key ' -> '
+- Quit key ' q '
+
+# Troubleshooting
+The keyboard event number might not match your system, using the following command to determine which is your keyboard event
+
+``` cat /proc/bus/input/devices ```
