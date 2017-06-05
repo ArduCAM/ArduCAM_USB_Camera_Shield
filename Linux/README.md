@@ -25,7 +25,7 @@ Python demo code for the following cameras:
 --name : file name without extension
 
 ## Window Control
-The realtime preview mode support zoom in/out cwith control the keyboard
+The realtime preview mode supports zoom in/out with control the keyboard
 
 - Zoom in key ' <- '
 - Zoom out key ' -> '
