@@ -26,7 +26,7 @@ Windows demo code for the following cameras:
 
 
 ## Window Control
-The realtime preview mode supports zoom in/out with control the mouse
+Using mice's scroll wheel to do video zoom in/out.
 
 
 # Troubleshooting
@@ -35,5 +35,5 @@ Please install the Microsoft Visual C++ 2010 SP1 Redistributable Package from
 
 ``` \x64\Release\vcredist_x86.exe ```
 
-or from [Microsoft] (https://www.microsoft.com/en-US/download/details.aspx?id=8328)
+or from [Microsoft](https://www.microsoft.com/en-US/download/details.aspx?id=8328).
 
