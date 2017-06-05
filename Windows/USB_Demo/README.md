@@ -10,9 +10,12 @@ Windows demo code for the following cameras:
 
 # Usuage
 
-1. Run the demo excutable file from :
+1. Run the demo excutable file from : ``` \x64\Release\USB_Demo.exe ```
 
-``` \x64\Release\USB_Demo.exe ```
+![Demo][Demo]
+
+[Demo]:http://www.arducam.com/wp-content/uploads/2017/06/USB_Camera_Demo.jpg "Demo"
+
 
 2. Select the Sensor type from the drop list.
 
