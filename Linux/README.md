@@ -6,6 +6,27 @@ Python demo code for the following cameras:
 - AR0134 (1.2MP Global Shutter Camera)
 - MT9F002 （14MP Rolling Camera)
 
+# Install library and OpenCV Environment
+
+Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
+
+Unzip `tar -jxvf  libusb-1.0.21.tar.bz2`
+
+Then configure `./configure` or `./configure --disable-udev`
+
+Install the libusb library `sudo make install` 
+
+Install Python 2.7 `sudo apt-get install python2.7-dev`
+
+Install Python Dependence libraries 
+
+`sudo apt-get install python-pip`
+
+`sudo apt-get install python-opencv`
+
+`sudo apt-get install python-imaging`
+
+`sudo pip install evdev`
 
 # Usuage
 
