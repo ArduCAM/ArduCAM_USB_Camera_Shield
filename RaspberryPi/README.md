@@ -20,6 +20,8 @@ Install Python 2.7 `sudo apt-get install python2.7-dev`
 
 Install Python Dependence libraries 
 
+`sudo apt-get install python-pip`
+
 `sudo apt-get install python-opencv`
 
 `sudo apt-get install python-imaging`
