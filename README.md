@@ -29,6 +29,9 @@ If multiple USB devices are connected to a single USB root hub, it will cause ba
 It is recommended to preserved enough bandwidth for the camera on USB port, or reduce the frame rate and Pixel clock of the image sensor once continuously dropping frames happens.  
 This USB camera shield isn't UVC compliant, for Windows you have to install our USB driver, for Linux you can use libusb which is also plug-and-play.
 
+###USB Driver
+The USB host driver plays very important roles on image data trasfer. ArduCAM USB shield use Bulk endpoint for the image transfer, the nature of the USB bulk tranfer only promise the the correctness of the transfer,but the bandwidth is not promised. So for a given USB root hub there will be bandwidth racing between each device attached. Even if only one device is attached when some device is doing burst while the USB driver is not ready to response, the data dropping happens.
+
 ### PC
 Basically the PC is fast enough to run ArduCAM USB camera shield without dropping frames.  
 If you want to connect more than one ArduCAM USB camera shield to a single PC, you have to connect them seperately to the different USB root hub of the PC.
@@ -36,7 +39,9 @@ If you want to connect more than one ArduCAM USB camera shield to a single PC, y
 ### Raspberry Pi
 Raspberry Pi is far less processing power than PC, it is not fast enough to display the captured video by the ARM processor.  
 And there is only one USB root hub on Raspberry Pi board, everything shares the USB bandwidth like the onboard ethernet and 4 USB ports.  
-Running ArduCAM USB camera shield on Raspberry Pi might not as good as PC, It is recommended to do image processing without display the captured video in real time.  
+Running ArduCAM USB camera shield on Raspberry Pi might not as good as PC, It is recommended to do image processing without display the captured video in real time.  
+
+
 
 
 
