@@ -29,7 +29,7 @@ If multiple USB devices are connected to a single USB root hub, it will cause ba
 It is recommended to preserved enough bandwidth for the camera on USB port, or reduce the frame rate and Pixel clock of the image sensor once continuously dropping frames happens.  
 This USB camera shield isn't UVC compliant, for Windows you have to install our USB driver, for Linux you can use libusb which is also plug-and-play.
 
-###USB Driver
+### USB Driver
 The USB host driver plays very important roles on image data trasfer. ArduCAM USB shield use Bulk endpoint for the image transfer, the nature of the USB bulk tranfer only promise the the correctness of the transfer,but the bandwidth is not promised. So for a given USB root hub there will be bandwidth racing between each device attached. Even if only one device is attached when some device is doing burst while the USB driver is not ready to response, the data dropping happens.
 
 ### PC
