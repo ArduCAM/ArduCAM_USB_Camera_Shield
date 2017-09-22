@@ -24,7 +24,7 @@ Windows demo code for the following cameras:
 [Demo]:http://www.arducam.com/wp-content/uploads/2017/09/USB_Camera_Demo.jpg "Demo"
 
 
-2. Select the Sensor type from the configuration file from the drop list.
+2. Select the Sensor type from the configuration file drop list.
 
 3. Click "auto-Open" or "scan" then "open" button to open the camera.
 
@@ -34,11 +34,12 @@ Windows demo code for the following cameras:
 
 6. Save option "Display" only display realtime video, "Save Image" only save continuous BMP/JPEG images, "Save Data" only save RAW images.
 
-7. Fill in "RegAddr" and "Value" text box in decimal format to read and write sensor register value.
+7. Fill in "RegAddr" and "Value" text box in decimal or hex(start with 0x) format to read and write sensor register value.
 
 
 ## Window Control
 Using mice's scroll wheel to do video zoom in/out.
+Checkthe "Full Screen" to display the video in full window.
 
 
 # Troubleshooting
