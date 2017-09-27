@@ -47,6 +47,8 @@ You might come across missing MSVCF100.DLL file or similar.
 Please install the Microsoft Visual C++ 2010 SP1 Redistributable Package from
 
 ``` \x64\Release\vcredist_x86.exe ```
+or
+``` \x64\Release\vcredist_x64.exe ```
 
 or from [Microsoft](https://www.microsoft.com/en-US/download/details.aspx?id=8328).
 
