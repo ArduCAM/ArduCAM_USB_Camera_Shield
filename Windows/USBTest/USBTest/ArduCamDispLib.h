@@ -8,6 +8,8 @@
 #define  ARDUCAMDISP_API extern "C" _declspec(dllimport)
 #endif
 
+typedef  Uint32* ArduCamRecordHandle;
+
 #define DISP_PROC_OK			0
 #define DISP_PROC_ERROR			0xFFFFFFFF
 
@@ -27,3 +29,7 @@ ARDUCAMDISP_API void ArduCamDisp_FrameDisplayJPG( CDC *pcdDC, CRect* pcrRect, Ui
 ARDUCAMDISP_API void ArduCamDisp_RecordImageBMP( CString csFileName, Uint8* pu8BmpData, Uint32 u32Width, Uint32 u32Height );
 ARDUCAMDISP_API void ArduCamDisp_RecordImageJPG( CString csFileName, Uint8* pu8JpgData, Uint32 u32JpgSize );
 ARDUCAMDISP_API void ArduCamDisp_RecordImageData( CString csFileName, Uint8* pu8Data, Uint32 u32Size );
+
+ARDUCAMDISP_API Uint32 ArduCamDisp_StartRecordVideo( ArduCamRecordHandle &useHandle, CString csRecordPath );
+ARDUCAMDISP_API Uint32 ArduCamDisp_RecordVideo( ArduCamRecordHandle useHandle, Uint8* pu8Data, ArduCamCfg* pstUseCfg );
+ARDUCAMDISP_API Uint32 ArduCamDisp_EndRecordVideo( ArduCamRecordHandle useHandle );

@@ -19,7 +19,9 @@ CUSBTestDlg::CUSBTestDlg(CWnd* pParent /*=NULL*/)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
-	m_cUsbCameraHd = NULL;
+	m_cUsbCameraHd       = NULL;
+	m_cUsbCameraCfgHd    = NULL;
+	m_cUsbCameraRecordHd = NULL;
 
 	GetModuleFileName( NULL, m_csCfgFileName.GetBuffer(512), 512 );									
 	m_csCfgFileName.ReleaseBuffer();
@@ -87,6 +89,7 @@ void CUSBTestDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT13, m_edtWidth);
 	DDX_Control(pDX, IDC_CHECK_FULL_SCREEN, m_chkFullScreen);
 	DDX_Control(pDX, IDC_EDIT6, m_edtType);
+	DDX_Control(pDX, IDC_CHECK_IRCUT, m_chkIRcut);
 }
  
 
@@ -123,6 +126,7 @@ BEGIN_MESSAGE_MAP(CUSBTestDlg, CDialog)
 	ON_BN_CLICKED(IDC_RADIO_SAVE_DATA, &CUSBTestDlg::OnBnClickedRadioSaveData)
 	ON_BN_CLICKED(IDC_RADIO_SAVE_IMAGE, &CUSBTestDlg::OnBnClickedRadioSaveImage)
 	ON_BN_CLICKED(IDC_RADIO_SAVE_VIDEO, &CUSBTestDlg::OnBnClickedRadioSaveVideo)
+	ON_BN_CLICKED(IDC_CHECK_IRCUT, &CUSBTestDlg::OnBnClickedCheckIrcut)
 END_MESSAGE_MAP()
 
 
@@ -164,6 +168,7 @@ BOOL CUSBTestDlg::OnInitDialog()
 	m_u32RecordIndex     = 0;
 
 	m_chkForceDisp.EnableWindow( FALSE );
+	m_chkIRcut.EnableWindow( FALSE );
 
 	HANDLE hdFile;  
 	WIN32_FIND_DATA fdFileData;
@@ -527,6 +532,26 @@ void CUSBTestDlg::ReadFrame( void )
 					csTmpString = CreateDataFileName( &( pstTmpFrameData->stImagePara ) ); 
 					ArduCamDisp_RecordImageData( csTmpString, pstTmpFrameData->pu8ImageData, pstTmpFrameData->stImagePara.u32Size );
 				}
+				else if ( m_u8RecordEn == RECORD_VIDEO )
+				{
+					switch ( pstTmpFrameData->stImagePara.emImageFmtMode )
+					{
+					case FORMAT_MODE_RAW:
+						ArduCamDisp_Raw2rgb24( m_pu8OutRgb24, pstTmpFrameData->pu8ImageData, pstTmpFrameData->stImagePara.u32Width, pstTmpFrameData->stImagePara.u32Height, m_u32RawMode, pstTmpFrameData->stImagePara.u8PixelBits );
+						break;
+					case FORMAT_MODE_RGB: 
+						ArduCamDisp_Rgb5652rgb24( m_pu8OutRgb24, pstTmpFrameData->pu8ImageData, pstTmpFrameData->stImagePara.u32Width, pstTmpFrameData->stImagePara.u32Height, m_u32RgbMode );
+						break;
+					case FORMAT_MODE_YUV:
+						ArduCamDisp_Yuv4222rgb24( m_pu8OutRgb24, pstTmpFrameData->pu8ImageData, pstTmpFrameData->stImagePara.u32Width, pstTmpFrameData->stImagePara.u32Height, m_u32YuvMode );
+						break;
+					case FORMAT_MODE_JPG:
+						m_u32JpgSize = pstTmpFrameData->stImagePara.u32Size;
+						memcpy( m_pu8OutRgb24, pstTmpFrameData->pu8ImageData, pstTmpFrameData->stImagePara.u32Size * sizeof( Uint8 ) );
+						break;
+					}
+					ArduCamDisp_RecordVideo( m_cUsbCameraRecordHd, m_pu8OutRgb24, &pstTmpFrameData->stImagePara );
+				}
 
 				if ( m_u32ShotTimeFlag == 1 )
 				{
@@ -568,6 +593,9 @@ void CUSBTestDlg::ReadFrame( void )
 	return;
 }
   
+
+
+
 
 
 

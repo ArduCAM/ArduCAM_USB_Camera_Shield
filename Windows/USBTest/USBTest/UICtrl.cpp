@@ -111,7 +111,10 @@ void CUSBTestDlg::OnBnClickedButtonOpen()
 		( ( CButton* )GetDlgItem( IDC_RADIO_DISPLAY    ) )->EnableWindow( TRUE );
 		( ( CButton* )GetDlgItem( IDC_RADIO_SAVE_DATA  ) )->EnableWindow( TRUE );
 		( ( CButton* )GetDlgItem( IDC_RADIO_SAVE_IMAGE ) )->EnableWindow( TRUE );
-		//( ( CButton* )GetDlgItem( IDC_RADIO_SAVE_VIDEO ) )->EnableWindow( TRUE );
+		( ( CButton* )GetDlgItem( IDC_RADIO_SAVE_VIDEO ) )->EnableWindow( TRUE );
+
+		m_chkIRcut.EnableWindow( TRUE );
+		m_chkIRcut.SetCheck( FALSE );
 
 		if ( stTmpUsbCameraCfg.emImageFmtMode != FORMAT_MODE_JPG )
 		{
@@ -206,7 +209,10 @@ void CUSBTestDlg::OnBnClickedButtonInit()
 		( ( CButton* )GetDlgItem( IDC_RADIO_DISPLAY    ) )->EnableWindow( TRUE );
 		( ( CButton* )GetDlgItem( IDC_RADIO_SAVE_DATA  ) )->EnableWindow( TRUE );
 		( ( CButton* )GetDlgItem( IDC_RADIO_SAVE_IMAGE ) )->EnableWindow( TRUE );
-		//( ( CButton* )GetDlgItem( IDC_RADIO_SAVE_VIDEO ) )->EnableWindow( TRUE );
+		( ( CButton* )GetDlgItem( IDC_RADIO_SAVE_VIDEO ) )->EnableWindow( TRUE );
+
+		m_chkIRcut.EnableWindow( TRUE );
+		m_chkIRcut.SetCheck( FALSE );
 
 		if ( stTmpUsbCameraCfg.emImageFmtMode != FORMAT_MODE_JPG )
 		{
@@ -522,7 +528,9 @@ void CUSBTestDlg::OnBnClickedButtonClose()
 	( ( CButton* )GetDlgItem( IDC_RADIO_DISPLAY    ) )->EnableWindow( FALSE );
 	( ( CButton* )GetDlgItem( IDC_RADIO_SAVE_DATA  ) )->EnableWindow( FALSE );
 	( ( CButton* )GetDlgItem( IDC_RADIO_SAVE_IMAGE ) )->EnableWindow( FALSE );
-	//( ( CButton* )GetDlgItem( IDC_RADIO_SAVE_VIDEO ) )->EnableWindow( FALSE );
+	( ( CButton* )GetDlgItem( IDC_RADIO_SAVE_VIDEO ) )->EnableWindow( FALSE );
+
+	if ( m_u8RecordEn == RECORD_VIDEO )		ArduCamDisp_EndRecordVideo( m_cUsbCameraRecordHd );
 
 	m_u8RecordEn = RECORD_NULL;
 	( ( CButton* )GetDlgItem( IDC_RADIO_DISPLAY    ) )->SetCheck( TRUE );
@@ -530,6 +538,7 @@ void CUSBTestDlg::OnBnClickedButtonClose()
 	( ( CButton* )GetDlgItem( IDC_RADIO_SAVE_IMAGE ) )->SetCheck( FALSE );
 	( ( CButton* )GetDlgItem( IDC_RADIO_SAVE_VIDEO ) )->SetCheck( FALSE );
 
+	m_chkIRcut.EnableWindow( FALSE );
 	m_chkForceDisp.EnableWindow( FALSE );
 }
  
@@ -791,6 +800,8 @@ BOOL CUSBTestDlg::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 void CUSBTestDlg::OnBnClickedRadioDisplay()
 {
 	// TODO: Add your control notification handler code here
+	if ( m_u8RecordEn == RECORD_VIDEO )			ArduCamDisp_EndRecordVideo( m_cUsbCameraRecordHd );
+
 	m_u8RecordEn = RECORD_NULL;
 }
 
@@ -798,6 +809,8 @@ void CUSBTestDlg::OnBnClickedRadioDisplay()
 void CUSBTestDlg::OnBnClickedRadioSaveData()
 {
 	// TODO: Add your control notification handler code here
+	if ( m_u8RecordEn == RECORD_VIDEO )			ArduCamDisp_EndRecordVideo( m_cUsbCameraRecordHd );
+	
 	m_u8RecordEn = RECORD_DATA;
 
 	SYSTEMTIME tiTmpTime;
@@ -812,6 +825,8 @@ void CUSBTestDlg::OnBnClickedRadioSaveData()
 void CUSBTestDlg::OnBnClickedRadioSaveImage()
 {
 	// TODO: Add your control notification handler code here
+	if ( m_u8RecordEn == RECORD_VIDEO )			ArduCamDisp_EndRecordVideo( m_cUsbCameraRecordHd );
+
 	m_u8RecordEn = RECORD_IMAGE;
 
 	SYSTEMTIME tiTmpTime;
@@ -826,7 +841,11 @@ void CUSBTestDlg::OnBnClickedRadioSaveImage()
 void CUSBTestDlg::OnBnClickedRadioSaveVideo()
 {
 	// TODO: Add your control notification handler code here
+	if ( m_u8RecordEn == RECORD_VIDEO )			return;
+	
 	m_u8RecordEn = RECORD_VIDEO;
+
+	ArduCamDisp_StartRecordVideo( m_cUsbCameraRecordHd, m_csRecordPath );
 }
   
   
@@ -845,6 +864,29 @@ void CUSBTestDlg::OnBnClickedCheckFullScreen()
 
 		if ( stTmpFramePara.emImageFmtMode == FORMAT_MODE_JPG )		FrameDisplayJPG( m_pu8OutRgb24, m_u32JpgSize );
 		else														FrameDisplayBMP( m_pu8OutRgb24, stTmpFramePara.u32Width, stTmpFramePara.u32Height );
+	}
+}
+  
+
+void CUSBTestDlg::OnBnClickedCheckIrcut()
+{
+	// TODO: Add your control notification handler code here
+	if ( m_cUsbCameraHd != NULL )
+	{
+		Uint32 u32TmpData;
+
+		if ( m_chkIRcut.GetCheck() == TRUE )
+		{
+			ArduCam_readReg_8_8( m_cUsbCameraHd, 0x46, 0x01, &u32TmpData );
+			u32TmpData = u32TmpData | 0x10;
+			ArduCam_writeReg_8_8( m_cUsbCameraHd, 0x46, 0x01, u32TmpData );
+		}
+		else
+		{
+			ArduCam_readReg_8_8( m_cUsbCameraHd, 0x46, 0x01, &u32TmpData );
+			u32TmpData = u32TmpData & 0xEF;
+			ArduCam_writeReg_8_8( m_cUsbCameraHd, 0x46, 0x01, u32TmpData );
+		}
 	}
 }
   

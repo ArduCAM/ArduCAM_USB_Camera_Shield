@@ -88,6 +88,7 @@ protected:
 
 	ArduCamHandle		m_cUsbCameraHd;
 	ArduCamCfgHandle	m_cUsbCameraCfgHd;
+	ArduCamRecordHandle	m_cUsbCameraRecordHd;
 
 	CWinThread	*m_ptdFrameCaptureThread;					
 	Uint32		m_u32FrameCaptureThreadEn;	
@@ -249,4 +250,6 @@ public:
 	afx_msg void OnBnClickedRadioSaveImage();
 	afx_msg void OnBnClickedRadioSaveVideo();
 	CEdit m_edtType;
+	CButton m_chkIRcut;
+	afx_msg void OnBnClickedCheckIrcut();
 };

@@ -27,10 +27,10 @@
     <ClCompile Include="USBTestDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="CommonTools.cpp">
+    <ClCompile Include="UICtrl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="UICtrl.cpp">
+    <ClCompile Include="CommonTools.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
