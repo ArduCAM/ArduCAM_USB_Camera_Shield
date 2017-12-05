@@ -9,13 +9,15 @@ More info can be found from [arducam website](http://www.arducam.com/arducam-usb
 -	OV7725		0.3MP
 -	MT9V034		0.36MP (global shutter)
 -	MT9M112		1.3MP	
--	MT9M001		1.3MP 	
+-	MT9M001		1.3MP (Monochrome/Color)	
 -	AR0134		1.2MP (global shutter)
 -	OV2640		2MP	
 -	OV5642		5MP	
 -	OV5640		5MP 
+- MT9P001   5MP
 -	MT9N001		9MP
--	MT9J001		10MP
+-	MT9J001		10MP (Monochrome)
+- MT9J003   10MP (Color)
 -	MT9F002		14MP
 
 ## Support OS 
