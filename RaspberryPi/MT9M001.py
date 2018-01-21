@@ -118,7 +118,7 @@ def readThread(threadName,read_Flag):
 	cv2.namedWindow("MT9M001",1)
 	cv2.setMouseCallback("MT9M001",mouse_callback)
 	while flag:
-		if ArducamSDK.Py_ArduCam_availiable(handle) > 0:
+		if ArducamSDK.Py_ArduCam_available(handle) > 0:
 			
 			res,data = ArducamSDK.Py_ArduCam_read(handle,Width * Height)
 			if res == 0:

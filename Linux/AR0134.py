@@ -170,7 +170,7 @@ def readThread(threadName,read_Flag):
 	cv2.namedWindow("AR0134",1)
 	cv2.setMouseCallback("AR0134",mouse_callback)
 	while flag:
-		if ArducamSDK.Py_ArduCam_availiable(handle) > 0:
+		if ArducamSDK.Py_ArduCam_available(handle) > 0:
 			
 			res,data = ArducamSDK.Py_ArduCam_read(handle,Width * Height)
 			if res == 0:
