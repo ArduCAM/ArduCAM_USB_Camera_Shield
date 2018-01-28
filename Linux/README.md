@@ -5,6 +5,8 @@ Python demo code for the following cameras:
 - MT9V034 (0.36MP Global Shutter Camera)
 - AR0134 (1.2MP Global Shutter Camera)
 - MT9M001 (1.3MP Rolling Shutter Camera)
+- MT9N001 (9MP Rolling Shutter Camera)
+- MT9J001 (10MP Rolling Shutter Camera)
 - MT9F002 （14MP Rolling Shutter Camera)
 
 # Install library and OpenCV Environment
@@ -38,6 +40,10 @@ Install Python Dependence libraries
 ``` sudo python AR0134 ```
 
 ``` sudo python MT9M001 ```
+
+``` sudo python MT9N001 ```
+
+``` sudo python MT9J001 ```
 
 - Snapshot
 
