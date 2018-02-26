@@ -89,10 +89,10 @@ regArr=[
 	[0x3002, 0],			#// Y_ADDR_START
 	[0x3012, 150],
 	
-	[0x3056, 0x0024],		#// Gr_GAIN 
-	[0x3058, 0x0028],		#// BLUE_GAIN
-	[0x305a, 0x0028],		#// RED_GAIN 
-	[0x305c, 0x0024],		#// Gb_GAIN 
+	[0x3056, 0x004A],		#// Gr_GAIN 
+	[0x3058, 0x0070],		#// BLUE_GAIN
+	[0x305a, 0x0070],		#// RED_GAIN 
+	[0x305c, 0x004A],		#// Gb_GAIN 
 
 	[0x3046, 0x0100],		#//en_flash/Flash indicator
 
@@ -129,7 +129,7 @@ def mouse_callback(event,x,y,flags,param):
 
 def detectInputKey(threadName,view_Flag):
 	global flag,W_zoom,H_zoom,saveFlag,H_value,V_value,lx,ly,data
-	dev = InputDevice("/dev/input/event3")
+	dev = InputDevice("/dev/input/event0")
 	while True:
 		select([dev],[],[])
 		for event in dev.read():
@@ -181,7 +181,7 @@ def readThread(threadName,read_Flag):
 				print "read data fail!"
 			
 		else:
-			print "is not availiable"
+			print "is not available"
 		if len(data) >= Width * Height:
 			if time1 - time0 >= 1:
 				print "%s %d %s\n"%("fps:",count,"/s")

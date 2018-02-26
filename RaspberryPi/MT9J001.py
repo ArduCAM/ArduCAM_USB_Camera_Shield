@@ -14,21 +14,21 @@ from evdev import InputDevice
 
 import ArducamSDK
 
-
-CAMERA_MT9M001 = 0x4D091031
-SensorShipAddr = 0xBA
-I2C_MODE_8_16  = 1
+COLOR_BYTE2RGB = 47
+CAMERA_MT9J001 = 0x4D091031
+SensorShipAddr = 32
+I2C_MODE_16_16  = 3
 usbVid = 0x52cb
-Width = 1280
-Height = 1024
-cfg ={"u32CameraType":CAMERA_MT9M001,
+Width = 3664
+Height = 2748
+cfg ={"u32CameraType":CAMERA_MT9J001,
       "u32Width":Width,"u32Height":Height,
       "u32UsbVersion":1,
       "u8PixelBytes":1,
       "u16Vid":0x52cb,
       "u8PixelBits":8,
       "u32SensorShipAddr":SensorShipAddr,
-      "emI2cMode":I2C_MODE_8_16 }
+      "emI2cMode":I2C_MODE_16_16 }
 
 
 global saveFlag,downFlag,flag,H_value,V_value,lx,ly,mx,my,dx,dy,W_zoom,H_zooM,handle,openFlag
@@ -39,8 +39,8 @@ flag = True
 saveFlag = False
 H_value = 0
 V_value = 0
-W_zoom = 0
-H_zoom = 0
+W_zoom = Width/10*-8
+H_zoom = Height/10*-8
 lx = 0
 ly = 0
 mx = 0
@@ -48,10 +48,105 @@ my = 0
 dx = 0
 dy = 0
 
-regArr=[[0x0009, 0x0419], #shutter speed
-	[0x0035, 0x0018], #global gain
-	[0xFFFF, 0xFFFF]
-]
+regArr=[[0x316C, 0x0429], 
+	[0x3174, 0x8000],
+	[0x3E40, 0xDC05], 
+	[0x3E42, 0x6E22], 
+	[0x3E44, 0xDC22], 
+	[0x3E46, 0xFF00], 
+	[0x3ED4, 0xF998], 
+	[0x3ED6, 0x9789], 
+	[0x3EDE, 0xE41A], 
+	[0x3EE0, 0xA43F], 
+	[0x3EE2, 0xA4BF], 
+	[0x3EEC, 0x1221], 
+	[0x3EEE, 0x1224], 
+
+	[0x0100, 0x0	], 
+	[0x0300, 0x5	], 
+	[0x0302, 0x08	], 
+	[0x0304, 0x05	], 
+	[0x0306, 0x84	], 
+	[0x0308, 0x0A	], 
+	[0x030A, 0x04	], 
+	
+	[0x3064, 0x805	], 
+	[0x0104, 0x1	], 
+	[0x3016, 0x111	], 
+	[0x0344, 0x518	], 
+	[0x0348, 0xA15	], 
+	[0x0346, 0x386	], 
+	[0x034A, 0x743	], 
+	[0x3040, 0x04C3	], 
+	[0x0400, 0x0	], 
+	[0x0404, 0x10	], 
+	[0x034C, 0x280	], 
+	[0x034E, 0x1E0	],
+	[0x0342, 0x0D12	], 
+	[0x0340, 0x0230	], 
+	[0x0202, 0x0010	], 
+	[0x3014, 0x07B2	], 
+	[0x3010, 0x0134	], 
+	[0x3018, 0x0000	], 
+	[0x30D4, 0x1080	], 
+	[0x306E, 0x90B0	], 
+	[0x3E00, 0x0010	], 
+	[0x3178, 0x0000	], 
+	[0x3ED0, 0x1B24	], 
+	[0x3EDC, 0xC3E4	], 
+	[0x3EE8, 0x0000	], 
+	[0x0104, 0x0	], 
+	[0x0100, 0x1	], 
+
+	[0x0100, 0x0	],
+	[0x0300, 0x6	],  
+	[0x0302, 0x01	],  
+	[0x0304, 0x08	],  
+	[0x0306, 0x6E	],  
+	[0x0308, 0x0C	],  
+	[0x030A, 0x01	],   
+	         
+	[0x3064, 0x805	],   
+	[0x0104, 0x1	],   
+	[0x3016, 0x111	],   
+	[0x0344, 0x070	],   
+	[0x0348, 0xEBF	],   
+	[0x0346, 0x008	],   
+	[0x034A, 0xAC3	],   
+	[0x3040, 0x0041	],   
+	[0x0400, 0x0	],   
+	[0x0404, 0x10	],  
+	[0x034C, 0xE50	],   
+	[0x034E, 0xABC	],   
+	[0x0342, 0x1D10	],  
+	[0x0340, 0x0B4D	],   
+	[0x0202, 0x0010	],   
+	[0x3014, 0x03F2	],  
+	[0x3010, 0x009C	],   
+	[0x3018, 0x0000	],   
+	[0x30D4, 0x1080	],   
+	[0x306E, 0x90B0	],   
+	[0x3E00, 0x0010	],  
+	[0x3178, 0x0000	],  
+	[0x3ED0, 0x1B24	],   
+	[0x3EDC, 0xC3E4	],  
+	[0x3EE8, 0x0000	],  
+	[0x0104, 0x0	],  
+	[0x0100, 0x1	],   
+	
+	[0x31AE, 0x0301 ], 
+
+	[0x301A, 0x0010], 
+	[0x3064, 0x0805], 
+	[0x301E, 0x00A8], 
+
+	[0x301A, 0x10DC],
+	[0x0206, 0x001a ],
+	[0x0208, 0x002a ],
+	[0x020A, 0x002a ],
+	[0x020C, 0x001a ],
+	[0x3012, 0x0200 ],
+	[0xffff, 0xffff]]
 
 
 def mouse_callback(event,x,y,flags,param):
@@ -74,6 +169,7 @@ def mouse_callback(event,x,y,flags,param):
 		if downFlag:
 			H_value = mx - dx
 			V_value = my - dy
+
 
 def detectInputKey(threadName,view_Flag):
 	global flag,W_zoom,H_zoom,saveFlag,H_value,V_value,lx,ly,data
@@ -115,8 +211,8 @@ def readThread(threadName,read_Flag):
 	time0 = time.time()
 	time1 = time.time()
 	data = {}
-	cv2.namedWindow("MT9M001",1)
-	cv2.setMouseCallback("MT9M001",mouse_callback)
+	cv2.namedWindow("MT9J001",1)
+	cv2.setMouseCallback("MT9J001",mouse_callback)
 	while flag:
 		if ArducamSDK.Py_ArduCam_available(handle) > 0:
 			
@@ -150,12 +246,8 @@ def show(bufferData):
 	image = Image.frombuffer("L",(Width,Height),bufferData)
 	img = np.array(image)
 	height,width = img.shape[:2]
-	#COLOR_BAYER_BG2RGB
-	#COLOR_BAYER_GB2RGB
-	#COLOR_BAYER_GR2RGB
-	#COLOR_BAYER_RG2RGB
-	img2 = cv2.cvtColor(img,cv2.COLOR_BAYER_BG2RGB)
-	
+	img2 = cv2.cvtColor(img,47)
+
 	if saveFlag:
 		saveFlag = False
 		saveNum += 1
@@ -164,9 +256,9 @@ def show(bufferData):
 	M = np.float32([[1,0,lx + H_value],[0,1,ly + V_value]])
 	img3 = cv2.warpAffine(img2,M,(width,height))
 	img4 = cv2.resize(img3,(width+W_zoom,height+H_zoom),interpolation = cv2.INTER_CUBIC)	
-
-	cv2.imshow("MT9M001",img4)
+	cv2.imshow("MT9J001",img4)
 	cv2.waitKey(1)
+
 
 def video():
 	global flag,regArr,handle
@@ -175,7 +267,6 @@ def video():
 	if res == 0:
 		openFlag = True
 		print "device open success!"
-		ArducamSDK.Py_ArduCam_writeReg_8_8(handle,0x46,0x01,0x25)
 		while (regArr[regNum][0] != 0xFFFF):
 			ArducamSDK.Py_ArduCam_writeSensorReg(handle,regArr[regNum][0],regArr[regNum][1])
 			regNum = regNum + 1
@@ -188,7 +279,7 @@ def video():
 				if res != 0:
 					print "capture fail!"
 					break
-				time.sleep(0.005)
+				time.sleep(0.5)
 				if flag == False:		
 					break
 		else:

@@ -129,7 +129,7 @@ def readThread(threadName,read_Flag):
 				print "read data fail!"
 			
 		else:
-			print "is not availiable"
+			print "is not available"
 		if len(data) >= Width * Height:
 			if time1 - time0 >= 1:
 				print "%s %d %s\n"%("fps:",count,"/s")
