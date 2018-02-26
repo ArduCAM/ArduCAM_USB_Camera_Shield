@@ -16,9 +16,9 @@ Then configure `./configure` or `./configure --disable-udev`
 
 Install the libusb library `sudo make install` 
 
-Install OpenCV library 'sudo apt-get install libopencv-dev'
+Install OpenCV library `sudo apt-get install libopencv-dev`
 
-Install g++ compiler 'sudo apt-get install g++-4.8'
+Install g++ compiler `sudo apt-get install g++-4.8`
 
 # Install the SDK
 Copy the libArduCamLib.so to /lib folder 
@@ -26,7 +26,7 @@ Copy the libArduCamLib.so to /lib folder
 # Compile the source code
 Replace the xxxx with the cpp souce file name
 
-'g++ xxxx_demo.cpp -o Test `pkg-config --cflags --libs opencv` -lArduCamLib -lusb-1.0  -lpthread -L. -I. -std=gnu++11'
+`g++ xxxx_demo.cpp -o Test `pkg-config --cflags --libs opencv` -lArduCamLib -lusb-1.0  -lpthread -L. -I. -std=gnu++11`
 
 
 # Usuage
@@ -37,10 +37,10 @@ Replace the xxxx with the cpp souce file name
 
 - quit
 
-Press 'q' in the terminal window
+Press `q` in the terminal window
 
 - save image
 
-Press 's' in the terminal window
+Press `s` in the terminal window
 
 
