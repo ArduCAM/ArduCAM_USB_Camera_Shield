@@ -2,14 +2,21 @@
 
 This is C/C++ demo code for the following cameras:
 
-
 - AR0134 (1.2MP Global Shutter Camera)
-
-- MT9M001 (1.3MP Rolling Shutter Camera)
 
 - MT9V022 Monochrome (0.36MP Global Shutter Camera)
 
 - MT9V034 Color (0.36MP Global Shutter Camera)
+
+- MT9M001 (1.3MP Rolling Shutter Camera)
+
+- MT9N001 Color (9MP Rolling Shutter Camera)
+
+- MT9J001 Monochrome (10MP Rolling Shutter Camera)
+
+- MT9J003 Color (10MP Rolling Shutter Camera)
+
+- MT9F002 Color (14MP Rolling Shutter Camera)
 
 # Install library and OpenCV Environment
 
