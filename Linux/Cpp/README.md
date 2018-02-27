@@ -7,6 +7,10 @@ This is C/C++ demo code for the following cameras:
 
 - MT9M001 (1.3MP Rolling Shutter Camera)
 
+- MT9V022 Monochrome (0.36MP Global Shutter Camera)
+
+- MT9V034 Color (0.36MP Global Shutter Camera)
+
 # Install library and OpenCV Environment
 
 Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
