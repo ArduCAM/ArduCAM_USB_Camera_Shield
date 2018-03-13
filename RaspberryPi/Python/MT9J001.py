@@ -242,7 +242,7 @@ thread.start_new_thread( readThread,("Thread-2", flag,))
 pass
 
 def show(bufferData):
-	global W_zoom,H_zoom,V_value,H_value,lx,ly,downFlag,saveFlag
+	global W_zoom,H_zoom,V_value,H_value,lx,ly,downFlag,saveFlag,saveNum
 	image = Image.frombuffer("L",(Width,Height),bufferData)
 	img = np.array(image)
 	height,width = img.shape[:2]
