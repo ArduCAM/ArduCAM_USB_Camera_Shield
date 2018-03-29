@@ -1,6 +1,6 @@
 # Overview
 
-This is C/C++ demo code for the following cameras:
+This is ARM64 Arch C/C++ demo code for the following cameras:
 
 - AR0134 (1.2MP Global Shutter Camera)
 
@@ -20,7 +20,7 @@ This is C/C++ demo code for the following cameras:
 
 This demo is only demonstrate how to use the Arducam SDK functions, 
 
-Tested under Raspberry Pi3 Raspbian OS Opencv 2.4.13
+Tested under Pine64 ubuntuMATE16.04 OS Opencv 2.4.13
 
 # Install library and OpenCV Environment
 
