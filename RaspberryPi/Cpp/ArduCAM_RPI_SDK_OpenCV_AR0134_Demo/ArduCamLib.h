@@ -93,6 +93,7 @@ extern "C"{
     unsigned int ArduCam_readReg_16_8( ArduCamHandle useHandle, Uint32 shipAddr, Uint32 regAddr, Uint32* pval );
     unsigned int ArduCam_writeReg_16_16( ArduCamHandle useHandle, Uint32 shipAddr, Uint32 regAddr, Uint32 val );
     unsigned int ArduCam_readReg_16_16( ArduCamHandle useHandle, Uint32 shipAddr, Uint32 regAddr, Uint32* pval );
+    unsigned int ArduCam_VRCMD(ArduCamHandle useHandle, Uint8 u8Command, Uint8 u8Direction, Uint16 u16Vvalue, Uint16 u16Index, Uint32 u32BufSize, Uint8 *pu8Buf, Uint32 *pu32DataNum );
 }
 
 #endif // ARDUCAMLIB_H

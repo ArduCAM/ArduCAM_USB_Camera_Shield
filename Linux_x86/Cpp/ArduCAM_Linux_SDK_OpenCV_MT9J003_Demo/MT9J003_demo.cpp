@@ -1,6 +1,6 @@
 //Arducam SDK multi-thread example for MT9J003 color camera
 //This demo is only demonstrate how to use the Arducam SDK functions, 
-//Tested under Pine64 ubuntuMATE16.04 OS Opencv 2.4.13
+//Tested under x86 Linux ubuntu16.04 OS Opencv 2.4.13
 //Compile with command: g++ MT9J003_demo.cpp -o Test `pkg-config --cflags --libs opencv` -lArduCamLib -lusb-1.0  -lpthread -L. -I. -std=gnu++11
 //Copy libArduCamLib.so libusb-1.0.so to /lib folder
 //Running the camera with command: sudo ./Test

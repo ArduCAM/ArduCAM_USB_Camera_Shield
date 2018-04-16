@@ -123,7 +123,8 @@ int main(int argc, char** argv )
     int number = 0;
     int i ;
     int ret;
-
+    unsigned char VRCMD_Val[3] = { 0x03, 0x04, 0x0C};
+    unsigned int size;
     static struct termios oldt, newt;
 
     tcgetattr( STDIN_FILENO, &oldt);
@@ -152,6 +153,8 @@ int main(int argc, char** argv )
 
     //3. Download the sensor register settings
     ArduCam_writeReg_8_8( useHandle, 0x46, 1, 0x05);
+    ArduCam_writeReg_8_8( useHandle, 0x46, 1, 0x05);
+    ArduCam_VRCMD(useHandle, 0xF6, 0, 0, 0, 3, VRCMD_Val, &size);
     ArduCam_writeSensorReg( useHandle, 0x03,  0x01E0 );
     ArduCam_writeSensorReg( useHandle, 0x04,  0x02F0 );
     //Change camera exposure value
