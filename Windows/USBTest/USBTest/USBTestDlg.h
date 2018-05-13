@@ -39,6 +39,7 @@
 #define DISP_INF_TIMER						1							
 #define DISP_FRAME_TIMER					2
 #define READ_FRAME_TIMER					3
+#define SCAN_TIMER							4
 
 /* -- 播放状态 -- */
 #define STATE_STOP							0								
@@ -90,6 +91,8 @@ protected:
 	ArduCamCfgHandle	m_cUsbCameraCfgHd;
 	ArduCamRecordHandle	m_cUsbCameraRecordHd;
 
+	GUID		m_uuGuid;
+
 	CWinThread	*m_ptdFrameCaptureThread;					
 	Uint32		m_u32FrameCaptureThreadEn;	
 
@@ -109,22 +112,40 @@ protected:
 
 	Uint32		m_u32TransLvl;
 
+	GainSet		m_stGainGSet;
+	GainSet		m_stGainBSet;
+	GainSet		m_stGainRSet;
+	GainSet		m_stGainG2Set;
+	GainSet		m_stGainYSet;
+	GainSet		m_stGainUSet;
+	GainSet		m_stGainVSet;
+	GainSet		m_stGainGLSet;
+
 	Uint32		m_u32ShotTimeFlag;
 	CString		m_csShotPath;
 	CFile		m_pImageShotFile;
 
 	Uint8		m_u8RecordEn;
+	Uint8		m_u8RecordEnd;
 	CString		m_csRecordPath;
 	CString		m_csRecordSubPath;
 	Uint32		m_u32RecordIndex;
 	SYSTEMTIME	m_tiBackTime;
 
 	Uint32		m_u32CaptFlag;
+	Uint32		m_u32ReadFlag;
 
 	Uint8*		m_pu8OutRgb24;
 	Uint32		m_u32JpgSize;
 
 	Uint8		m_u8FullScreenEn;
+	Uint8		m_u8DImageDispMode;
+	Uint8		m_u8WhiteBalanceEn;
+	Uint8		m_u8WhiteBalanceCfgEn;
+
+	Uint32		m_u32TestR;
+	Uint32		m_u32TestG1;
+	Uint32		m_u32TestG2;
 
 	/* ----- 图像平移与缩放 ----- */
 	RECT	m_sttDisplay_rect;
@@ -156,6 +177,8 @@ protected:
 	
 	CString CreateImageFileName( ArduCamCfg* pstUseCfg );
 	CString CreateDataFileName( ArduCamCfg* pstUseCfg );
+
+	void SetWhiteBalanceCfg( Int8 *pf64WBPara );
 
 // 实现
 protected:
@@ -252,4 +275,11 @@ public:
 	CEdit m_edtType;
 	CButton m_chkIRcut;
 	afx_msg void OnBnClickedCheckIrcut();
+	CStatic m_sttSerial;
+	CButton m_rdoHorizontal;
+	int m_rdoVertical;
+	afx_msg void OnBnClickedRadioModeHorizontal();
+	afx_msg void OnBnClickedRadioModeVertical();
+	CButton m_chkWhiteBalance;
+	afx_msg void OnBnClickedCheckWhiteBalance();
 };

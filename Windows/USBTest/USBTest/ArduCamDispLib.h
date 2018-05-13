@@ -14,8 +14,16 @@ typedef  Uint32* ArduCamRecordHandle;
 #define DISP_PROC_ERROR			0xFFFFFFFF
 
 ARDUCAMDISP_API Uint32 ArduCamDisp_Raw2rgb24( Uint8 *pu8DstBmpData, Uint8 *pu8ResRawData, Uint32 u32Width, Uint32 u32Height, Uint8 u8RawMode, Uint8 u8PixelBits );
+ARDUCAMDISP_API Uint32 ArduCamDisp_Mono2rgb24( Uint8 *pu8DstBmpData, Uint8 *pu8ResRawData, Uint32 u32Width, Uint32 u32Height, Uint8 u8PixelBits );
 ARDUCAMDISP_API Uint32 ArduCamDisp_Yuv4222rgb24( Uint8* pu8DstBmpData, Uint8* pu8ResYuvData, Uint32 u32Width, Uint32 u32Height, Uint8 u8YuvMode );
 ARDUCAMDISP_API Uint32 ArduCamDisp_Rgb5652rgb24( Uint8* pu8DstBmpData, Uint8* pu8ResRgbData, Uint32 u32Width, Uint32 u32Height, Uint8 u8RgbMode );
+
+ARDUCAMDISP_API Uint32 ArduCamDisp_RawD2rgb24( Uint8 *pu8DstBmpData, Uint8 *pu8ResRawData, Uint32 u32Width, Uint32 u32Height, Uint8 u8RawMode, Uint8 u8PixelBits, Uint8 u8DispMode );
+ARDUCAMDISP_API Uint32 ArduCamDisp_MonoD2rgb24( Uint8 *pu8DstBmpData, Uint8 *pu8ResRawData, Uint32 u32Width, Uint32 u32Height, Uint8 u8PixelBits, Uint8 u8DispMode );
+ARDUCAMDISP_API Uint32 ArduCamDisp_Yuv422D2rgb24( Uint8* pu8DstBmpData, Uint8* pu8ResYuvData, Uint32 u32Width, Uint32 u32Height, Uint8 u8YuvMode, Uint8 u8DispMode );
+ARDUCAMDISP_API Uint32 ArduCamDisp_Rgb565D2rgb24( Uint8* pu8DstBmpData, Uint8* pu8ResRgbData, Uint32 u32Width, Uint32 u32Height, Uint8 u8RgbMode, Uint8 u8DispMode );
+
+ARDUCAMDISP_API Uint32 ArduCamDisp_RawWhiteBalancePara( Uint8 *pu8ResRawData, Uint32 u32Width, Uint32 u32Height, Uint8 u8RawMode, Uint8 u8PixelBits, Int8* ps8GainOffset );
 
 ARDUCAMDISP_API void ArduCamDisp_FrameDisplayBMP( CDC *pcdDC, CRect* pcrRect, Uint8* pu8RgbData, Uint32 u32Width, Uint32 u32Height, 
 	Uint32 u32DispWidth, Uint32 u32DispHeight, Int32 s32locStartX, Int32 s32locStartY, 

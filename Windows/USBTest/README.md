@@ -4,21 +4,19 @@ Windows demo code for the following cameras:
 
 - MT9V034 (0.36MP Global Shutter Camera)
 - AR0134  (1.2MP Global Shutter Camera)
-- MT9N001 (9MP Rolling Shutter Camera)
-- MT9J001 (10MP Rolling Shutter Camera)
-- MT9F002 (14MP Rolling Shutter Camera)
-- OV7670  (0.3MP Rolling Shutter Camera)
+- MT9N001 (9MP Color Rolling Shutter Camera)
+- MT9J001 (10MP Mono Rolling Shutter Camera)
+- MT9J003 (10MP Color Rolling Shutter Camera)
+- MT9F002 (14MP Color Rolling Shutter Camera)
 - OV7675  (0.3MP Rolling Shutter Camera)
-- OV7725  (0.3MP Rolling Shutter Camera)
 - OV2640  (2MP Rolling Shutter Camera)
 - OV5640  (5MP Rolling Shutter Camera)
-- OV5642  (5MP Rolling Shutter Camera)
-- MT9M001 (1.3MP Rolling Shutter Camera)
+
 
 # Usuage
 
-1. Run the demo excutable file from : ``` \x64\Release\USBTest.exe ```
-
+1. For 64bit Windows run the demo excutable file from : ``` \x64\Release\USBTest.exe ```
+or for 32bit Windows run the demo excutable file from : ``` \Release\USBTest.exe ```
 ![Demo][Demo]
 
 [Demo]:http://www.arducam.com/wp-content/uploads/2017/09/USB_Camera_Demo.jpg "Demo"
@@ -45,10 +43,5 @@ Checkthe "Full Screen" to display the video in full window.
 # Troubleshooting
 You might come across missing MSVCF100.DLL file or similar.
 Please install the Microsoft Visual C++ 2010 SP1 Redistributable Package from
-
-``` \x64\Release\vcredist_x86.exe ```
-or
-``` \x64\Release\vcredist_x64.exe ```
-
-or from [Microsoft](https://www.microsoft.com/en-US/download/details.aspx?id=8328).
+[Microsoft](https://www.microsoft.com/en-US/download/details.aspx?id=8328).
 

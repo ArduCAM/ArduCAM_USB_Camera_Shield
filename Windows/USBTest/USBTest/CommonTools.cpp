@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "USBTest.h"
 #include "USBTestDlg.h"
+#include "math.h"
 
 Int32 CUSBTestDlg::atoi_ex( CString csUseNum ) 
 {
@@ -168,11 +169,53 @@ CString CUSBTestDlg::CreateDataFileName( ArduCamCfg* pstUseCfg )
 
 	switch ( pstUseCfg->emImageFmtMode )
 	{
-	case FORMAT_MODE_RAW :	csTmpString = m_csRecordPath + m_csRecordSubPath + csTmpString + "raw";			break;
-	case FORMAT_MODE_RGB :	csTmpString = m_csRecordPath + m_csRecordSubPath + csTmpString + "rgb565";		break;
-	case FORMAT_MODE_YUV :	csTmpString = m_csRecordPath + m_csRecordSubPath + csTmpString + "yuv422";		break;
-	case FORMAT_MODE_JPG :	csTmpString = m_csRecordPath + m_csRecordSubPath + csTmpString + "jpg";			break;
+	case FORMAT_MODE_RAW :		csTmpString = m_csRecordPath + m_csRecordSubPath + csTmpString + "raw";				break;
+	case FORMAT_MODE_RGB :		csTmpString = m_csRecordPath + m_csRecordSubPath + csTmpString + "rgb565";			break;
+	case FORMAT_MODE_YUV :		csTmpString = m_csRecordPath + m_csRecordSubPath + csTmpString + "yuv422";			break;
+	case FORMAT_MODE_JPG :		csTmpString = m_csRecordPath + m_csRecordSubPath + csTmpString + "jpg";				break;
+	case FORMAT_MODE_MON :		csTmpString = m_csRecordPath + m_csRecordSubPath + csTmpString + "mono";			break;
+	case FORMAT_MODE_RAW_D :	csTmpString = m_csRecordPath + m_csRecordSubPath + csTmpString + "raw_stereo";		break;
+	case FORMAT_MODE_MON_D :	csTmpString = m_csRecordPath + m_csRecordSubPath + csTmpString + "mono_stereo";		break;
 	}
 
 	return csTmpString;
 }
+
+
+void CUSBTestDlg::SetWhiteBalanceCfg( Int8 *pf64WBPara )
+{
+	Int32 s32TmpData1 = 0, s32TmpData2 = 0, s32TmpData3 = 0;
+
+	ArduCam_readSensorReg( m_cUsbCameraHd, m_stGainRSet.u32Addr, (Uint32*)&s32TmpData1 );
+	s32TmpData1 = min( m_stGainRSet.u32MaxValue, max( m_stGainRSet.u32MinValue, s32TmpData1 + pf64WBPara[0] ) );
+	ArduCam_writeSensorReg( m_cUsbCameraHd, m_stGainRSet.u32Addr, s32TmpData1 );
+
+	//ArduCam_readSensorReg( m_cUsbCameraHd, m_stGainGSet.u32Addr, (Uint32*)&s32TmpData2 );
+	//s32TmpData2 = min( m_stGainGSet.u32MaxValue, max( m_stGainGSet.u32MinValue, s32TmpData2 + pf64WBPara[1] ) );
+	//ArduCam_writeSensorReg( m_cUsbCameraHd, m_stGainGSet.u32Addr, s32TmpData2 );
+
+	//ArduCam_readSensorReg( m_cUsbCameraHd, m_stGainG2Set.u32Addr, (Uint32*)&s32TmpData3 );
+	//s32TmpData3 = min( m_stGainG2Set.u32MaxValue, max( m_stGainG2Set.u32MinValue, s32TmpData3 + pf64WBPara[1] ) );
+	//ArduCam_writeSensorReg( m_cUsbCameraHd, m_stGainG2Set.u32Addr, s32TmpData3 );
+
+	ArduCam_readSensorReg( m_cUsbCameraHd, m_stGainBSet.u32Addr, (Uint32*)&s32TmpData3 );
+	s32TmpData3 = min( m_stGainBSet.u32MaxValue, max( m_stGainBSet.u32MinValue, s32TmpData3 + pf64WBPara[2] ) );
+	ArduCam_writeSensorReg( m_cUsbCameraHd, m_stGainBSet.u32Addr, s32TmpData3 );
+
+	TRACE( "%d - %d :: %d ,	%d - %d :: %d\r\n", m_u32TestR, s32TmpData1,  pf64WBPara[0],   m_u32TestG2, s32TmpData3,  pf64WBPara[2] );
+
+	if (    ( abs( ( Int32 )m_u32TestR -  s32TmpData1 ) > 1 )
+//		|| ( abs( ( Int32 )m_u32TestG1 - s32TmpData2 ) > 1 )
+		|| ( abs( ( Int32 )m_u32TestG2 - s32TmpData3 ) > 1 ) )
+	{
+		m_u32TestR = m_u32TestR + 1 - 1;
+	}
+
+	m_u32TestR	= s32TmpData1;
+	//m_u32TestG1 = s32TmpData2;
+	m_u32TestG2 = s32TmpData3;
+
+	//TRACE( "%d,	%d,	%d\r\n", s32TmpData1, s32TmpData2, s32TmpData3 );
+}
+
+

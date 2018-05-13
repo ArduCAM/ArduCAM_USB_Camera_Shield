@@ -62,11 +62,17 @@
 #define IDC_CHECK_FULL_SCREEN           1053
 #define IDC_BUTTON_LOAD                 1054
 #define IDC_BUTTON_FRASH                1055
-#define IDC_CHECK3                      1056
 #define IDC_CHECK_IRCUT                 1056
+#define IDC_STATIC_UUID                 1057
 #define IDC_RADIO_SAVE_DATA             1058
 #define IDC_RADIO_SAVE_IMAGE            1059
 #define IDC_RADIO_SAVE_VIDEO            1060
+#define IDC_RADIO1                      1061
+#define IDC_RADIO_MODE_HORIZONTAL       1061
+#define IDC_RADIO2                      1062
+#define IDC_RADIO_MODE_VERTICAL         1062
+#define IDC_CHECK_IRCUT2                1063
+#define IDC_CHECK_WHITE_BALANCE         1063
 
 // Next default values for new objects
 // 
@@ -74,7 +80,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1057
+#define _APS_NEXT_CONTROL_VALUE         1062
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

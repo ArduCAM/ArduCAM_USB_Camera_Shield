@@ -153,6 +153,14 @@ typedef int               Int;
 #define CFG_CAMERA_I2C_MODE				0x1107
 #define CFG_CAMERA_I2C_ADDR				0x1108
 #define CFG_CAMERA_TRANS_LVL			0x1109
+#define CFG_CAMERA_G_GAIN				0x110A
+#define CFG_CAMERA_B_GAIN				0x110B
+#define CFG_CAMERA_R_GAIN				0x110C
+#define CFG_CAMERA_G2_GAIN				0x110D
+#define CFG_CAMERA_Y_GAIN				0x110E
+#define CFG_CAMERA_U_GAIN				0x110F
+#define CFG_CAMERA_V_GAIN				0x1110
+#define CFG_CAMERA_GL_GAIN				0x1111
 #define CFG_CAMERA_OK					0x11FF
 
 #define CFG_BOARD_ERROR					0x1200
@@ -165,6 +173,10 @@ typedef int               Int;
 #define CFG_REGISTER_DELAY				0x1302
 #define CFG_REGISTER_BITSET				0x1303
 #define CFG_REGISTER_BITCLR				0x1304
+#define CFG_REGISTER_WRITE_8_8			0x1305
+#define CFG_REGISTER_WRITE_8_16			0x1306
+#define CFG_REGISTER_WRITE_16_8			0x1307
+#define CFG_REGISTER_WRITE_16_16		0x1308
 #define CFG_REGISTER_OK					0x13FF
 /* --------------- Config TYPE --------------- */
 
@@ -175,6 +187,12 @@ typedef int               Int;
 #define RECORD_IMAGE				2
 #define RECORD_VIDEO				3
 /* --------------- Record --------------- */
+
+
+/* -- Double Image display mode -- */
+#define MODE_HORIZONTAL			0
+#define MODE_VERTICAL			1
+
 
 /* -- I2C mode -- */
 typedef enum  {
@@ -191,6 +209,9 @@ typedef enum  {
 	FORMAT_MODE_RGB = 1,
 	FORMAT_MODE_YUV = 2,
 	FORMAT_MODE_JPG = 3,
+	FORMAT_MODE_MON = 4,
+	FORMAT_MODE_RAW_D = 5,
+	FORMAT_MODE_MON_D = 6,
 }format_mode;
 
 
@@ -202,6 +223,13 @@ typedef struct
 	Int			 iHWnd;
 } USB2DriverInfo;
 
+
+typedef struct
+{
+	Uint8   u8UsbIndex;
+	Uint8	u8SerialNum[16];
+} ArduCamIndexinfo;
+  
 
 /* -- camera parameters -- */
 typedef struct  
@@ -250,6 +278,15 @@ typedef struct
 	SYSTEMTIME tiTmpTime;
 #endif
 }ArduIMUData;
+
+
+typedef struct  
+{
+	Uint32		u32Page;
+	Uint32		u32Addr;
+	Uint32		u32MinValue;
+	Uint32		u32MaxValue;
+}GainSet;
 
 
 extern UINT _FrameCaptureThread( LPVOID lParam );						// 图像采集线程

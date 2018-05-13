@@ -8,18 +8,27 @@ void CUSBTestDlg::OnBnClickedButtonScan()
 	// TODO: 在此添加控件通知处理程序代码
 	CString	csTmpString;
 
-	Uint32 u32UsbIndexArray[100];
-	Uint16 u16TmpVID = 0;
+	ArduCamIndexinfo stUsbIndexArray[100];
 
-	m_edtVid.GetWindowTextA( csTmpString );
-	u16TmpVID = atoi_ex( csTmpString );
-	
-	Uint32 u32UsbNum = ArduCam_scan( u32UsbIndexArray, u16TmpVID );
+	Uint32 u32UsbNum = ArduCam_scan( stUsbIndexArray );
 
 	m_cmbUsbIndex.ResetContent();
 	for ( Uint32 u32Index = 0; u32Index < u32UsbNum; u32Index++ )
 	{
-		csTmpString.Format( "%d", u32UsbIndexArray[u32Index] );
+		csTmpString.Format( "%d  %c%c%c%c-%c%c%c%c-%c%c%c%c", stUsbIndexArray[u32Index].u8UsbIndex,
+															stUsbIndexArray[u32Index].u8SerialNum[0],
+															stUsbIndexArray[u32Index].u8SerialNum[1],
+															stUsbIndexArray[u32Index].u8SerialNum[2],
+															stUsbIndexArray[u32Index].u8SerialNum[3],
+															stUsbIndexArray[u32Index].u8SerialNum[4],
+															stUsbIndexArray[u32Index].u8SerialNum[5],
+															stUsbIndexArray[u32Index].u8SerialNum[6],
+															stUsbIndexArray[u32Index].u8SerialNum[7],
+															stUsbIndexArray[u32Index].u8SerialNum[8],
+															stUsbIndexArray[u32Index].u8SerialNum[9],
+															stUsbIndexArray[u32Index].u8SerialNum[10],
+															stUsbIndexArray[u32Index].u8SerialNum[11] );
+
 		m_cmbUsbIndex.AddString( csTmpString );
 	}
 
@@ -33,9 +42,13 @@ void CUSBTestDlg::OnBnClickedButtonOpen()
 	CString	csTmpString;
 
 	Int32 s32Index = m_cmbUsbIndex.GetCurSel();
-	m_cmbUsbIndex.GetLBText( s32Index, csTmpString );
-	Uint32 u32TmpUsbIndex = atoi( csTmpString );
-	
+	Uint32 u32TmpUsbIndex = 0;
+	if ( s32Index >= 0 )
+	{
+		m_cmbUsbIndex.GetLBText( s32Index, csTmpString );
+		u32TmpUsbIndex = atoi( csTmpString );
+	}
+
 	ArduCamCfg stTmpUsbCameraCfg;
 
 	m_edtWidth.GetWindowText( csTmpString );
@@ -65,6 +78,9 @@ void CUSBTestDlg::OnBnClickedButtonOpen()
 		case 1:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_RGB;		break;
 		case 2:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_YUV;		break;
 		case 3:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_JPG;		break;
+		case 4:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_MON;		break;
+		case 5:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_RAW_D;	break;
+		case 6:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_MON_D;	break;
 		default:	stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_RAW;		break;
 	}
 
@@ -85,20 +101,22 @@ void CUSBTestDlg::OnBnClickedButtonOpen()
 
 	stTmpUsbCameraCfg.u32TransLvl = m_u32TransLvl;
 
-	Uint32 u32Value = ArduCam_open( m_cUsbCameraHd, &stTmpUsbCameraCfg, u32TmpUsbIndex );
+	Uint32 u32Value = 0;	
+	if ( s32Index >= 0 )	u32Value = ArduCam_open( m_cUsbCameraHd, &stTmpUsbCameraCfg, u32TmpUsbIndex );
+	else					u32Value = ArduCam_autoopen( m_cUsbCameraHd, &stTmpUsbCameraCfg );
 
 	DispErrorLog( u32Value );
 
 	if ( u32Value == USB_CAMERA_NO_ERROR )
 	{
-		if ( CFG_BOARD_ERROR == ArduCamCfg_SetBoardConfig( m_cUsbCameraCfgHd, m_cUsbCameraHd ) )
-			InsertText( "Board config error!", OUTPUT_RED );
+		//if ( CFG_BOARD_ERROR == ArduCamCfg_SetBoardConfig( m_cUsbCameraCfgHd, m_cUsbCameraHd ) )
+		//	InsertText( "Board config error!", OUTPUT_RED );
 		
 		if ( CFG_REGISTER_ERROR == ArduCamCfg_SetRegisterConfig( m_cUsbCameraCfgHd, m_cUsbCameraHd ) )
 			InsertText( "Register config error!", OUTPUT_RED );
 		
 		m_btPlay.EnableWindow( TRUE );
-		m_btStop.EnableWindow( TRUE );
+		m_btStop.EnableWindow( FALSE );
 		m_btShot.EnableWindow( TRUE );
 
 		m_btInit.EnableWindow( FALSE );
@@ -116,14 +134,33 @@ void CUSBTestDlg::OnBnClickedButtonOpen()
 		m_chkIRcut.EnableWindow( TRUE );
 		m_chkIRcut.SetCheck( FALSE );
 
+		if ( m_u8WhiteBalanceCfgEn == 0x7 )		m_chkWhiteBalance.EnableWindow( TRUE );
+
 		if ( stTmpUsbCameraCfg.emImageFmtMode != FORMAT_MODE_JPG )
 		{
 			m_chkForceDisp.EnableWindow( TRUE );
 			m_chkForceDisp.SetCheck( FALSE );
 		}
 
+		if (    ( stTmpUsbCameraCfg.emImageFmtMode == FORMAT_MODE_RAW_D ) 
+			 || ( stTmpUsbCameraCfg.emImageFmtMode == FORMAT_MODE_MON_D ) )
+		{
+			( ( CButton* )GetDlgItem( IDC_RADIO_MODE_HORIZONTAL ) )->EnableWindow( TRUE );
+			( ( CButton* )GetDlgItem( IDC_RADIO_MODE_VERTICAL   ) )->EnableWindow( TRUE );
+		}
+
 		m_u32FrameReadThreadEn = THREAD_ENABLE;												
 		m_ptdFrameReadThread   = AfxBeginThread( _FrameReadThread, this );
+
+		Uint8 u8TmpData[16];
+		ArduCam_readUserData( m_cUsbCameraHd, 0x400-16, 16, u8TmpData );
+
+		csTmpString.Format( "Serial: %c%c%c%c-%c%c%c%c-%c%c%c%c",	
+							u8TmpData[0], u8TmpData[1], u8TmpData[2], u8TmpData[3], 
+							u8TmpData[4], u8TmpData[5], u8TmpData[6], u8TmpData[7], 
+							u8TmpData[8], u8TmpData[9], u8TmpData[10], u8TmpData[11] );
+
+		m_sttSerial.SetWindowText( csTmpString );
 
 		InsertText( "USB camera init success!", OUTPUT_BLUE );
 	}
@@ -163,6 +200,9 @@ void CUSBTestDlg::OnBnClickedButtonInit()
 		case 1:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_RGB;		break;
 		case 2:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_YUV;		break;
 		case 3:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_JPG;		break;
+		case 4:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_MON;		break;
+		case 5:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_RAW_D;	break;
+		case 6:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_MON_D;	break;
 		default:	stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_RAW;		break;
 	}
 
@@ -189,14 +229,14 @@ void CUSBTestDlg::OnBnClickedButtonInit()
 
 	if ( u32Value == USB_CAMERA_NO_ERROR )
 	{
-		if ( CFG_BOARD_ERROR == ArduCamCfg_SetBoardConfig( m_cUsbCameraCfgHd, m_cUsbCameraHd ) )
-			InsertText( "Board config error!", OUTPUT_RED );
+		//if ( CFG_BOARD_ERROR == ArduCamCfg_SetBoardConfig( m_cUsbCameraCfgHd, m_cUsbCameraHd ) )
+		//	InsertText( "Board config error!", OUTPUT_RED );
 
 		if ( CFG_REGISTER_ERROR == ArduCamCfg_SetRegisterConfig( m_cUsbCameraCfgHd, m_cUsbCameraHd ) )
 			InsertText( "Register config error!", OUTPUT_RED );
 
 		m_btPlay.EnableWindow( TRUE );
-		m_btStop.EnableWindow( TRUE );
+		m_btStop.EnableWindow( FALSE );
 		m_btShot.EnableWindow( TRUE );
 		
 		m_btInit.EnableWindow( FALSE );
@@ -214,6 +254,8 @@ void CUSBTestDlg::OnBnClickedButtonInit()
 		m_chkIRcut.EnableWindow( TRUE );
 		m_chkIRcut.SetCheck( FALSE );
 
+		if ( m_u8WhiteBalanceCfgEn == 0x7 )		m_chkWhiteBalance.EnableWindow( TRUE );
+
 		if ( stTmpUsbCameraCfg.emImageFmtMode != FORMAT_MODE_JPG )
 		{
 			m_chkForceDisp.EnableWindow( TRUE );
@@ -222,6 +264,16 @@ void CUSBTestDlg::OnBnClickedButtonInit()
 
 		m_u32FrameReadThreadEn = THREAD_ENABLE;												
 		m_ptdFrameReadThread   = AfxBeginThread( _FrameReadThread, this );
+
+		Uint8 u8TmpData[16];
+		ArduCam_readUserData( m_cUsbCameraHd, 0x400-16, 16, u8TmpData );
+
+		csTmpString.Format( "Serial: %c%c%c%c-%c%c%c%c-%c%c%c%c",	
+							u8TmpData[0], u8TmpData[1], u8TmpData[2], u8TmpData[3], 
+							u8TmpData[4], u8TmpData[5], u8TmpData[6], u8TmpData[7], 
+							u8TmpData[8], u8TmpData[9], u8TmpData[10], u8TmpData[11] );
+
+		m_sttSerial.SetWindowText( csTmpString );
 
 		InsertText( "USB camera init success!", OUTPUT_BLUE );
 	}
@@ -266,14 +318,14 @@ void CUSBTestDlg::OnBnClickedButtonLoad()
 		u32TmpUserSet = u32TmpCfgData[0];
 	}
 
-	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_VID, u32TmpCfgData ) )
-	{
-		csTmpString.Format( "0x%X", u32TmpCfgData[0] );
-		m_edtVid.SetWindowTextA( csTmpString );
-		m_edtVid.EnableWindow(FALSE);
-	}
-	else
-		InsertText( "Not find camera VID configuration data!", OUTPUT_RED );
+	//if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_VID, u32TmpCfgData ) )
+	//{
+	//	csTmpString.Format( "0x%X", u32TmpCfgData[0] );
+	//	m_edtVid.SetWindowTextA( csTmpString );
+	//	m_edtVid.EnableWindow(FALSE);
+	//}
+	//else
+	//	InsertText( "Not find camera VID configuration data!", OUTPUT_RED );
 
 	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_TYPE, u32TmpCfgData ) )
 	{
@@ -334,6 +386,7 @@ void CUSBTestDlg::OnBnClickedButtonLoad()
 		switch ( u32TmpCfgData[0] )
 		{
 		case 0:
+		case 5:
 			switch ( u32TmpCfgData[1] )
 			{
 			case 0:		m_u32RawMode = RAW_RG;		m_btRawMode.SetWindowTextA( "RAWMod(RG)" );		break;
@@ -358,11 +411,12 @@ void CUSBTestDlg::OnBnClickedButtonLoad()
 			case 1:		m_u32YuvMode = YUV422_YV;	m_btRawMode.SetWindowTextA( "YUVMod(YV)" );		break;
 			case 2:		m_u32YuvMode = YUV422_UY;	m_btRawMode.SetWindowTextA( "YUVMod(UY)" );		break;
 			case 3:		m_u32YuvMode = YUV422_VY;	m_btRawMode.SetWindowTextA( "YUVMod(UV)" );		break;
-			default:	InsertText( "Unsupported RAW format load!", OUTPUT_RED );					break;
+			default:	InsertText( "Unsupported YUV format load!", OUTPUT_RED );					break;
 			}
 			break;
-		case 3:	
-			break;
+		case 3:			m_btRawMode.SetWindowTextA( "JPGMod" );							break;
+		case 4:
+		case 6:			m_btRawMode.SetWindowTextA( "MONOMod" );						break;
 		default:	InsertText( "Unsupported image format load!", OUTPUT_RED );			break;
 		}
 	}
@@ -378,9 +432,11 @@ void CUSBTestDlg::OnBnClickedButtonLoad()
 		
 		switch ( u32TmpCfgData[0] )
 		{
-		case 0:	 m_u32RawMode = RAW_RG;		m_btRawMode.SetWindowTextA( "RAWMod(RG)" );		break;
-		case 1:	 m_u32RgbMode = RGB565_RB;	m_btRawMode.SetWindowTextA( "RGBMod(RB)" );		break;
-		case 2:	 m_u32YuvMode = YUV422_YU;	m_btRawMode.SetWindowTextA( "YUVMod(YU)" );		break;
+		case 0:	case 5:	 m_u32RawMode = RAW_RG;		m_btRawMode.SetWindowTextA( "RAWMod(RG)" );		break;
+		case 1:			 m_u32RgbMode = RGB565_RB;	m_btRawMode.SetWindowTextA( "RGBMod(RB)" );		break;
+		case 2:			 m_u32YuvMode = YUV422_YU;	m_btRawMode.SetWindowTextA( "YUVMod(YU)" );		break;
+		case 3:										m_btRawMode.SetWindowTextA( "JPGMod" );			break;
+		case 4:	case 6:								m_btRawMode.SetWindowTextA( "MONOMod" );		break;
 		}
 		if ( u32TmpCfgData[0] != 3 )	InsertText( "Image format load incompletely!", OUTPUT_RED );	
 	}
@@ -413,6 +469,100 @@ void CUSBTestDlg::OnBnClickedButtonLoad()
 		m_u32TransLvl = u32TmpCfgData[0];
 	else
 		m_u32TransLvl = 0;
+
+	m_u8WhiteBalanceCfgEn = 0;
+	
+	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_G_GAIN, u32TmpCfgData ) )
+	{
+		m_stGainGSet.u32Page	 = u32TmpCfgData[0];
+		m_stGainGSet.u32Addr	 = u32TmpCfgData[1];
+		m_stGainGSet.u32MinValue = u32TmpCfgData[2];
+		m_stGainGSet.u32MaxValue = u32TmpCfgData[3];
+
+		m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x01;
+	}
+	//else
+		//InsertText( "G_Gain configuration error!", OUTPUT_RED );
+
+	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_B_GAIN, u32TmpCfgData ) )
+	{
+		m_stGainBSet.u32Page	 = u32TmpCfgData[0];
+		m_stGainBSet.u32Addr	 = u32TmpCfgData[1];
+		m_stGainBSet.u32MinValue = u32TmpCfgData[2];
+		m_stGainBSet.u32MaxValue = u32TmpCfgData[3];
+
+		m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x02;
+	}
+	//else
+		//InsertText( "B_Gain configuration error!", OUTPUT_RED );
+
+	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_R_GAIN, u32TmpCfgData ) )
+	{
+		m_stGainRSet.u32Page	 = u32TmpCfgData[0];
+		m_stGainRSet.u32Addr	 = u32TmpCfgData[1];
+		m_stGainRSet.u32MinValue = u32TmpCfgData[2];
+		m_stGainRSet.u32MaxValue = u32TmpCfgData[3];
+
+		m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x04;
+	}
+	//else
+		//InsertText( "R_Gain configuration error!", OUTPUT_RED );
+
+	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_G2_GAIN, u32TmpCfgData ) )
+	{
+		m_stGainG2Set.u32Page	 = u32TmpCfgData[0];
+		m_stGainG2Set.u32Addr	 = u32TmpCfgData[1];
+		m_stGainG2Set.u32MinValue = u32TmpCfgData[2];
+		m_stGainG2Set.u32MaxValue = u32TmpCfgData[3];
+	}
+	//else
+		//InsertText( "G2_Gain configuration error!", OUTPUT_RED );
+
+	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_Y_GAIN, u32TmpCfgData ) )
+	{
+		m_stGainYSet.u32Page	 = u32TmpCfgData[0];
+		m_stGainYSet.u32Addr	 = u32TmpCfgData[1];
+		m_stGainYSet.u32MinValue = u32TmpCfgData[2];
+		m_stGainYSet.u32MaxValue = u32TmpCfgData[3];
+
+		m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x01;
+	}
+	//else
+		//InsertText( "Y_Gain configuration error!", OUTPUT_RED );
+
+	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_U_GAIN, u32TmpCfgData ) )
+	{
+		m_stGainUSet.u32Page	 = u32TmpCfgData[0];
+		m_stGainUSet.u32Addr	 = u32TmpCfgData[1];
+		m_stGainUSet.u32MinValue = u32TmpCfgData[2];
+		m_stGainUSet.u32MaxValue = u32TmpCfgData[3];
+
+		m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x02;
+	}
+	//else
+		//InsertText( "U_Gain configuration error!", OUTPUT_RED );
+
+	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_V_GAIN, u32TmpCfgData ) )
+	{
+		m_stGainVSet.u32Page	 = u32TmpCfgData[0];
+		m_stGainVSet.u32Addr	 = u32TmpCfgData[1];
+		m_stGainVSet.u32MinValue = u32TmpCfgData[2];
+		m_stGainVSet.u32MaxValue = u32TmpCfgData[3];
+
+		m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x04;
+	}
+	//else
+		//InsertText( "V_Gain configuration error!", OUTPUT_RED );
+
+	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_GL_GAIN, u32TmpCfgData ) )			
+	{
+		m_stGainGLSet.u32Page	 = u32TmpCfgData[0];
+		m_stGainGLSet.u32Addr	 = u32TmpCfgData[1];
+		m_stGainGLSet.u32MinValue = u32TmpCfgData[2];
+		m_stGainGLSet.u32MaxValue = u32TmpCfgData[3];
+	}
+	//else
+		//InsertText( "GL_Gain configuration error!", OUTPUT_RED );
 
 	if ( u32TmpUserSet == 0 )
 	{
@@ -506,13 +656,17 @@ void CUSBTestDlg::OnBnClickedButtonShot()
 void CUSBTestDlg::OnBnClickedButtonClose()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	while ( m_u32CaptFlag == 1 )		Sleep(10);
+	
+	m_u32ReadFlag = 1;
+
 	m_u32FrameReadThreadEn  = THREAD_DISABLE;
 	m_u32FrameReadCnt		= 0;
 	m_u32FrameReadCntBak    = 0;
-	
-	ArduCam_close( m_cUsbCameraHd );
 
-	m_cUsbCameraHd = NULL;
+	while ( m_u32ReadFlag == 1 )		Sleep(10);
+
+	ArduCam_close( m_cUsbCameraHd );	m_cUsbCameraHd = NULL;
 
 	m_btPlay.EnableWindow( FALSE );
 	m_btStop.EnableWindow( FALSE );
@@ -540,6 +694,13 @@ void CUSBTestDlg::OnBnClickedButtonClose()
 
 	m_chkIRcut.EnableWindow( FALSE );
 	m_chkForceDisp.EnableWindow( FALSE );
+
+	m_chkWhiteBalance.EnableWindow( FALSE );
+	m_chkWhiteBalance.SetCheck( FALSE );
+	m_u8WhiteBalanceEn = 0;
+
+	( ( CButton* )GetDlgItem( IDC_RADIO_MODE_HORIZONTAL ) )->EnableWindow( FALSE );
+	( ( CButton* )GetDlgItem( IDC_RADIO_MODE_VERTICAL   ) )->EnableWindow( FALSE );
 }
  
 
@@ -602,7 +763,7 @@ void CUSBTestDlg::OnDestroy()
 void CUSBTestDlg::OnBnClickedButtonByteConv()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	if ( m_cmbImgFormat.GetCurSel() == 0 )
+	if ( ( m_cmbImgFormat.GetCurSel() == 0 ) || ( m_cmbImgFormat.GetCurSel() == 5 ) )
 	{
 		if ( m_u32RawMode == RAW_RG )
 		{
@@ -625,7 +786,7 @@ void CUSBTestDlg::OnBnClickedButtonByteConv()
 			m_btRawMode.SetWindowTextA( "RawMod(RG)" );
 		}
 	}
-	else if ( m_cmbImgFormat.GetCurSel() == 1 )
+	else if ( ( m_cmbImgFormat.GetCurSel() == 1 ) || ( m_cmbImgFormat.GetCurSel() == 6 ) )
 	{
 		if ( m_u32RgbMode == RGB565_RB )
 		{
@@ -638,7 +799,7 @@ void CUSBTestDlg::OnBnClickedButtonByteConv()
 			m_btRawMode.SetWindowTextA( "RgbMod(RB)" );
 		}
 	}
-	else if ( m_cmbImgFormat.GetCurSel() == 2 )
+	else if ( ( m_cmbImgFormat.GetCurSel() == 2 ) || ( m_cmbImgFormat.GetCurSel() == 7 ) )
 	{
 		if ( m_u32YuvMode == YUV422_YU )
 		{
@@ -710,11 +871,31 @@ void CUSBTestDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		m_s32locStartX = m_s32locStartX - ( m_s32LocXMoved * m_pixScale );
 		m_s32locStartY = m_s32locStartY + ( m_s32LocYMoved * m_pixScale );
 
-		if ( ( m_s32locStartX + m_u32DisplayWidth * m_pixScale ) > stTmpFramePara.u32Width )
-			m_s32locStartX = stTmpFramePara.u32Width - m_u32DisplayWidth * m_pixScale;
+		if (    (    ( stTmpFramePara.emImageFmtMode == FORMAT_MODE_RAW_D )
+				  || ( stTmpFramePara.emImageFmtMode == FORMAT_MODE_MON_D ) )
+			 && (     m_u8DImageDispMode == MODE_HORIZONTAL					) )
+		{
+			if ( ( m_s32locStartX + m_u32DisplayWidth * m_pixScale ) > stTmpFramePara.u32Width * 2 )
+				m_s32locStartX = stTmpFramePara.u32Width * 2 - m_u32DisplayWidth * m_pixScale;
+		}
+		else
+		{
+			if ( ( m_s32locStartX + m_u32DisplayWidth * m_pixScale ) > stTmpFramePara.u32Width )
+				m_s32locStartX = stTmpFramePara.u32Width - m_u32DisplayWidth * m_pixScale;
+		}
 
-		if ( ( m_s32locStartY + m_u32DisplayHeight * m_pixScale ) > stTmpFramePara.u32Height )
-			m_s32locStartY = stTmpFramePara.u32Height - m_u32DisplayHeight * m_pixScale;
+		if (    (    ( stTmpFramePara.emImageFmtMode == FORMAT_MODE_RAW_D )
+			|| ( stTmpFramePara.emImageFmtMode == FORMAT_MODE_MON_D ) )
+			&& (     m_u8DImageDispMode == MODE_VERTICAL			 		    ) )
+		{
+			if ( ( m_s32locStartY + m_u32DisplayHeight * m_pixScale ) > stTmpFramePara.u32Height * 2 )
+				m_s32locStartY = stTmpFramePara.u32Height * 2 - m_u32DisplayHeight * m_pixScale;
+		}
+		else
+		{
+			if ( ( m_s32locStartY + m_u32DisplayHeight * m_pixScale ) > stTmpFramePara.u32Height )
+				m_s32locStartY = stTmpFramePara.u32Height - m_u32DisplayHeight * m_pixScale;
+		}
 
 		m_s32locStartX = max( 0, m_s32locStartX );
 		m_s32locStartY = max( 0, m_s32locStartY );
@@ -722,7 +903,25 @@ void CUSBTestDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		FillBlackDisplay();
 		
 		if ( stTmpFramePara.emImageFmtMode == FORMAT_MODE_JPG )		FrameDisplayJPG( m_pu8OutRgb24, m_u32JpgSize );
-		else														FrameDisplayBMP( m_pu8OutRgb24, stTmpFramePara.u32Width, stTmpFramePara.u32Height );
+		else														
+		{
+			if (    ( stTmpFramePara.emImageFmtMode == FORMAT_MODE_RAW_D )
+				 || ( stTmpFramePara.emImageFmtMode == FORMAT_MODE_MON_D ) )
+			{
+				if ( m_u8DImageDispMode == MODE_HORIZONTAL )
+				{
+					FrameDisplayBMP( m_pu8OutRgb24, stTmpFramePara.u32Width * 2, stTmpFramePara.u32Height );
+				} 
+				else
+				{
+					FrameDisplayBMP( m_pu8OutRgb24, stTmpFramePara.u32Width, stTmpFramePara.u32Height * 2 );
+				}
+			}
+			else
+			{
+				FrameDisplayBMP( m_pu8OutRgb24, stTmpFramePara.u32Width, stTmpFramePara.u32Height );
+			}
+		}
 	}
 	else
 	{
@@ -778,11 +977,31 @@ BOOL CUSBTestDlg::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 			default :	m_pixScale = 1.0;		break;	
 		}
 
-		if ( ( m_s32locStartX + m_u32DisplayWidth * m_pixScale ) > stTmpFramePara.u32Width )
-			m_s32locStartX = stTmpFramePara.u32Width - m_u32DisplayWidth * m_pixScale;
+		if (    (    ( stTmpFramePara.emImageFmtMode == FORMAT_MODE_RAW_D )
+			      || ( stTmpFramePara.emImageFmtMode == FORMAT_MODE_MON_D ) )
+			 && (     m_u8DImageDispMode == MODE_HORIZONTAL					) )
+		{
+			if ( ( m_s32locStartX + m_u32DisplayWidth * m_pixScale ) > stTmpFramePara.u32Width * 2 )
+				m_s32locStartX = stTmpFramePara.u32Width * 2 - m_u32DisplayWidth * m_pixScale;
+		}
+		else
+		{
+			if ( ( m_s32locStartX + m_u32DisplayWidth * m_pixScale ) > stTmpFramePara.u32Width )
+				m_s32locStartX = stTmpFramePara.u32Width - m_u32DisplayWidth * m_pixScale;
+		}
 
-		if ( ( m_s32locStartY + m_u32DisplayHeight * m_pixScale ) > stTmpFramePara.u32Height )
-			m_s32locStartY = stTmpFramePara.u32Height - m_u32DisplayHeight * m_pixScale;
+		if (    (    ( stTmpFramePara.emImageFmtMode == FORMAT_MODE_RAW_D )
+			      || ( stTmpFramePara.emImageFmtMode == FORMAT_MODE_MON_D ) )
+			&& (     m_u8DImageDispMode == MODE_VERTICAL			 		    ) )
+		{
+			if ( ( m_s32locStartY + m_u32DisplayHeight * m_pixScale ) > stTmpFramePara.u32Height * 2 )
+				m_s32locStartY = stTmpFramePara.u32Height * 2 - m_u32DisplayHeight * m_pixScale;
+		}
+		else
+		{
+			if ( ( m_s32locStartY + m_u32DisplayHeight * m_pixScale ) > stTmpFramePara.u32Height )
+				m_s32locStartY = stTmpFramePara.u32Height - m_u32DisplayHeight * m_pixScale;
+		}
 
 		m_s32locStartX = max( 0, m_s32locStartX );
 		m_s32locStartY = max( 0, m_s32locStartY );
@@ -790,7 +1009,25 @@ BOOL CUSBTestDlg::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		FillBlackDisplay();
 
 		if ( stTmpFramePara.emImageFmtMode == FORMAT_MODE_JPG )		FrameDisplayJPG( m_pu8OutRgb24, m_u32JpgSize );
-		else														FrameDisplayBMP( m_pu8OutRgb24, stTmpFramePara.u32Width, stTmpFramePara.u32Height );
+		else
+		{
+			if (    ( stTmpFramePara.emImageFmtMode == FORMAT_MODE_RAW_D )
+				 || ( stTmpFramePara.emImageFmtMode == FORMAT_MODE_MON_D ) )
+			{
+				if ( m_u8DImageDispMode == MODE_HORIZONTAL )
+				{
+					FrameDisplayBMP( m_pu8OutRgb24, stTmpFramePara.u32Width * 2, stTmpFramePara.u32Height );
+				} 
+				else
+				{
+					FrameDisplayBMP( m_pu8OutRgb24, stTmpFramePara.u32Width, stTmpFramePara.u32Height * 2 );
+				}
+			}
+			else
+			{
+				FrameDisplayBMP( m_pu8OutRgb24, stTmpFramePara.u32Width, stTmpFramePara.u32Height );
+			}
+		}
 	}
 
 	return CDialog::OnMouseWheel(nFlags, zDelta, pt);
@@ -800,18 +1037,18 @@ BOOL CUSBTestDlg::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 void CUSBTestDlg::OnBnClickedRadioDisplay()
 {
 	// TODO: Add your control notification handler code here
-	if ( m_u8RecordEn == RECORD_VIDEO )			ArduCamDisp_EndRecordVideo( m_cUsbCameraRecordHd );
-
-	m_u8RecordEn = RECORD_NULL;
+	if ( m_u8RecordEn == RECORD_VIDEO )		m_u8RecordEnd = RECORD_NULL;
+		//ArduCamDisp_EndRecordVideo( m_cUsbCameraRecordHd );
+	else									m_u8RecordEn  = RECORD_NULL;
 }
 
 
 void CUSBTestDlg::OnBnClickedRadioSaveData()
 {
 	// TODO: Add your control notification handler code here
-	if ( m_u8RecordEn == RECORD_VIDEO )			ArduCamDisp_EndRecordVideo( m_cUsbCameraRecordHd );
-	
-	m_u8RecordEn = RECORD_DATA;
+	if ( m_u8RecordEn == RECORD_VIDEO )		m_u8RecordEnd = RECORD_DATA;
+	//ArduCamDisp_EndRecordVideo( m_cUsbCameraRecordHd );
+	else									m_u8RecordEn  = RECORD_DATA;
 
 	SYSTEMTIME tiTmpTime;
 	GetLocalTime( &tiTmpTime );
@@ -825,9 +1062,9 @@ void CUSBTestDlg::OnBnClickedRadioSaveData()
 void CUSBTestDlg::OnBnClickedRadioSaveImage()
 {
 	// TODO: Add your control notification handler code here
-	if ( m_u8RecordEn == RECORD_VIDEO )			ArduCamDisp_EndRecordVideo( m_cUsbCameraRecordHd );
-
-	m_u8RecordEn = RECORD_IMAGE;
+	if ( m_u8RecordEn == RECORD_VIDEO )		m_u8RecordEnd = RECORD_IMAGE;
+	//ArduCamDisp_EndRecordVideo( m_cUsbCameraRecordHd );
+	else									m_u8RecordEn  = RECORD_IMAGE;
 
 	SYSTEMTIME tiTmpTime;
 	GetLocalTime( &tiTmpTime );
@@ -843,7 +1080,8 @@ void CUSBTestDlg::OnBnClickedRadioSaveVideo()
 	// TODO: Add your control notification handler code here
 	if ( m_u8RecordEn == RECORD_VIDEO )			return;
 	
-	m_u8RecordEn = RECORD_VIDEO;
+	m_u8RecordEn  = RECORD_VIDEO;
+	m_u8RecordEnd = RECORD_VIDEO;
 
 	ArduCamDisp_StartRecordVideo( m_cUsbCameraRecordHd, m_csRecordPath );
 }
@@ -891,6 +1129,23 @@ void CUSBTestDlg::OnBnClickedCheckIrcut()
 }
   
 
+void CUSBTestDlg::OnBnClickedCheckWhiteBalance()
+{
+	// TODO: Add your control notification handler code here
+	if ( m_cUsbCameraHd != NULL )
+	{
+		if ( m_chkWhiteBalance.GetCheck() == TRUE )
+		{
+			m_u8WhiteBalanceEn = 1;
+		}
+		else
+		{
+			m_u8WhiteBalanceEn = 0;
+		}
+	}
+}
+  
+
 #ifdef	FORCE_DISPLAY
 void CUSBTestDlg::OnBnClickedCheck1()
 {
@@ -908,4 +1163,19 @@ void CUSBTestDlg::OnBnClickedCheck1()
 	}
 }
 #endif
+
+
+void CUSBTestDlg::OnBnClickedRadioModeHorizontal()
+{
+	// TODO: Add your control notification handler code here
+	m_u8DImageDispMode = MODE_HORIZONTAL;
+}
+
+
+void CUSBTestDlg::OnBnClickedRadioModeVertical()
+{
+	// TODO: Add your control notification handler code here
+	m_u8DImageDispMode = MODE_VERTICAL;
+}
+
   

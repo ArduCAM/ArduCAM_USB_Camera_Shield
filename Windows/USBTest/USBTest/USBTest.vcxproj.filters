@@ -27,9 +27,6 @@
     <ClCompile Include="USBTestDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="UICtrl.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="CommonTools.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -45,9 +42,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="USBTestDlg.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="common.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
