@@ -1,0 +1,31 @@
+{
+    "camera_param" : {
+        "emI2cMode" : 1,
+        "emImageFmtMode" : 4,
+        "u32Height" : 480,
+        "u32Width" : 640,
+        "u32I2cAddr" : "0x90",
+        "u8PixelBits" : 8,
+        "u8PixelBytes" : 1,
+        "u32TransLvl" : 64
+    },
+    "board_param_usb2" : [
+    	["0xD7","0x4600","0x0100","0x01",["0x05"]],
+     	["0xD7","0x4600","0x0200","0x01",["0x00"]],
+     	["0xD7","0x4600","0x0300","0x01",["0x00"]]
+    ],
+    "board_param_usb3" : [
+     	["0xF3","0x0000","0x0000","0x00",[]],
+        ["0xF9","0x0000","0x0000","0x00",[]]
+    ],    
+    "register_param_usb2" : [
+        ["0x03", "0x01E0"],
+        ["0x04", "0x0280"],
+        ["0x0D", "0x0320"]
+    ],    
+    "register_param_usb3" : [
+        ["0x03", "0x01E0"],
+        ["0x04", "0x0280"],
+        ["0x0D", "0x0320"]
+    ]          
+}
