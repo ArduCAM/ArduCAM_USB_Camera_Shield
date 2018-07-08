@@ -1,7 +1,7 @@
 # Overview
 
 This is OpenCV C/C++ demo code for the AR0134 camera.
-See section configuration file for other camera models.
+See section [Configuration File](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield/tree/master/Windows/OpenCV#configuration-file) for other camera models.
 
 # Prerequisites
 
@@ -30,9 +30,9 @@ Set Input-> Additional Dependencies with ArduCamlib.lib; opencv_world341d.lib;
 
 Compile the project and copy the opencv_world341.dll or opencv_world341d.dll from opencv\build\x64\vc15\bin to x64\Release or x64\Debug directory respectively.
 
-This demo load the configuration file and open the camera, lunch two threads one for capture and the other for display. 
+This demo load the configuration file and open the camera, launch two threads one for capture and the other for display. 
 In display thread it simply reads the frame and does RAW to RGB conversion using OpenCV functions. It is a simple and good start point to grab images and do some image processing.
 
 # Configuration File
 
-In this demo it uses JSON format to store the camera configuration, user and modify the given JSON file according to the [content](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield/tree/master/Windows/USBTest/x64/Release/Config) for other Arducam camera models.
+In this demo it uses JSON format to store the camera configuration, user can modify the given JSON file according to the [content](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield/tree/master/Windows/USBTest/x64/Release/Config) for other Arducam camera models.
