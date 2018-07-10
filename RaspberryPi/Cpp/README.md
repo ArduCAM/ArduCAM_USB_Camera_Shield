@@ -38,6 +38,7 @@ Install g++ compiler `sudo apt-get install g++-4.8`
 
 # Install the SDK
 Copy the libArduCamLib.so to /lib folder 
+`sudo cp libArduCamLib.so /lib`
 
 # Compile the source code
 Replace the xxxx with the cpp souce file name
