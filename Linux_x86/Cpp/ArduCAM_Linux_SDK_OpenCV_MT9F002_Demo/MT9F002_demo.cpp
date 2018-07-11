@@ -145,6 +145,8 @@ int main(int argc, char** argv )
 
     //3. Download the sensor register settings
     ArduCam_writeReg_8_8( useHandle, 0x46, 1, 0x05);
+    ArduCam_writeReg_8_8( useHandle, 0x46, 2, 0x00);
+    ArduCam_writeReg_8_8( useHandle, 0x46, 3, 0x00);     
     ArduCam_VRCMD(useHandle, 0xF6, 0, 0, 0, 3, VRCMD_Val, &size);  
     //Change camera exposure value
     ArduCam_writeSensorReg( useHandle,0x301A, 0x0018);

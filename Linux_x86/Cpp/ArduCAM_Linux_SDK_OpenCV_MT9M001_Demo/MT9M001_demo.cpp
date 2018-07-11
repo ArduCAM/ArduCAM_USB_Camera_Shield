@@ -151,6 +151,8 @@ int main(int argc, char** argv )
 
     //3. Download the sensor register settings
     ArduCam_writeReg_8_8( useHandle, 0x46, 1, 0x25);
+    ArduCam_writeReg_8_8( useHandle, 0x46, 2, 0x00);
+    ArduCam_writeReg_8_8( useHandle, 0x46, 3, 0x00);     
     ArduCam_VRCMD(useHandle, 0xF6, 0, 0, 0, 3, VRCMD_Val, &size); 
     //Change MT9M001 Gains
     //ArduCam_writeReg_8_16( useHandle, 0xBA, 0x35, 0x61);	//Global Gain
