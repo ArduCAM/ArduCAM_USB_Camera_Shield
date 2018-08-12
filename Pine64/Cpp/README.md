@@ -1,6 +1,6 @@
 # Overview
 
-This is ARM64 Arch C/C++ demo code for the following cameras:
+This is C/C++ demo code for the following cameras:
 
 - AR0134 (1.2MP Global Shutter Camera)
 
@@ -18,10 +18,6 @@ This is ARM64 Arch C/C++ demo code for the following cameras:
 
 - MT9F002 Color (14MP Rolling Shutter Camera)
 
-This demo is only demonstrate how to use the Arducam SDK functions, 
-
-Tested under Pine64 ubuntuMATE16.04 OS Opencv 2.4.13
-
 # Install library and OpenCV Environment
 
 Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
@@ -37,26 +33,22 @@ Install OpenCV library `sudo apt-get install libopencv-dev`
 Install g++ compiler `sudo apt-get install g++-4.8`
 
 # Install the SDK
-Copy the libArduCamLib.so to /lib folder 
+
+`make install-sdk`
 
 # Compile the source code
-Replace the xxxx with the cpp souce file name
 
-`g++ xxxx_demo.cpp -o Test `pkg-config --cflags --libs opencv` -lArduCamLib -lusb-1.0  -lpthread -L. -I. -std=gnu++11`
+`make`
 
 
-# Usuage
+# Usage
 
-- Realtime preview
-
-``` sudo ./Test ```
-
-- quit
-
-Press `q` in the terminal window
-
-- save image
-
-Press `s` in the terminal window
+ `sudo ./ArduCam_Demo <path/config-file-name>`	
+ example: `sudo ./ArduCam_Demo ../Config/AR0134_960p_Color.yml`
+ While the program is running, you can press the following buttons in the terminal:	
+ 
+    1.'s':Save the image to the images folder.	
+    2.'c':Stop saving images.	
+    3.'q':Stop running the program.	
 
 
