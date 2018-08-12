@@ -12,7 +12,7 @@ provider=%CYUSB3_Provider%
 CatalogFile=CYUSB3.cat
 DriverVer=08/21/2014,1.2.3.10
 
-[SourceDisksNames]
+[SourceDisksNames] 
 1=%CYUSB3_Install%,,,
 
 [SourceDisksFiles]

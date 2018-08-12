@@ -24,7 +24,7 @@ CYUSB3.Files.Ext = 10,System32\Drivers
 [ControlFlags]
 ExcludeFromSelect = *
 
-[Manufacturer]
+[Manufacturer] 
 %CYUSB3_Provider%=Device,NT,NTx86,NTamd64
 
 ;for all platforms
