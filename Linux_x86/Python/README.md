@@ -33,35 +33,10 @@ Install Python Dependence libraries
 
 # Usuage
 
-- Realtime preview
+`sudo python ArduCam_Py_Demo.py <path/config-file-name>	`
+example: `sudo python ArduCam_Py_Demo.py ../JSON_Config_Files/AR0134_960p_Color.json`	
+While the program is running, you can press the following buttons in the terminal:	
 
-``` sudo python MT9V034 ```
-
-``` sudo python AR0134 ```
-
-``` sudo python MT9M001 ```
-
-``` sudo python MT9N001 ```
-
-``` sudo python MT9J001 ```
-
-- Snapshot
-
-``` sudo python MT9F002 --type jpg --name sample_image ```
-
-## Parameters
---type : jpg, bmp, png
-
---name : file name without extension
-
-## Window Control
-The realtime preview mode supports zoom in/out with control the keyboard
-
-- Zoom in key ' <- '
-- Zoom out key ' -> '
-- Quit key ' q '
-
-# Troubleshooting
-The keyboard event number might not match your system, using the following command to determine which is your keyboard event
-
-``` cat /proc/bus/input/devices ```
+    1.'s' + Enter:Save the image to the images folder.	
+    2.'c' + Enter:Stop saving images.	
+    3.'q' + Enter:Stop running the program.	

@@ -33,26 +33,22 @@ Install OpenCV library `sudo apt-get install libopencv-dev`
 Install g++ compiler `sudo apt-get install g++-4.8`
 
 # Install the SDK
-Copy the libArduCamLib.so to /lib folder 
+
+`make install-sdk`
 
 # Compile the source code
-Replace the xxxx with the cpp souce file name
 
-`g++ xxxx_demo.cpp -o Test `pkg-config --cflags --libs opencv` -lArduCamLib -lusb-1.0  -lpthread -L. -I. -std=gnu++11`
+`make`
 
 
-# Usuage
+# Usage
 
-- Realtime preview
-
-``` sudo ./Test ```
-
-- quit
-
-Press `q` in the terminal window
-
-- save image
-
-Press `s` in the terminal window
+ `sudo ./ArduCam_Demo <path/config-file-name>`	
+ example: `sudo ./ArduCam_Demo ../Config/AR0134_960p_Color.yml`
+ While the program is running, you can press the following buttons in the terminal:	
+ 
+    1.'s':Save the image to the images folder.	
+    2.'c':Stop saving images.	
+    3.'q':Stop running the program.	
 
 
