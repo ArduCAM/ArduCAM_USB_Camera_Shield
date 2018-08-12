@@ -31,45 +31,12 @@ Install Python Dependence libraries
 
 `sudo pip install evdev`
 
-
 # Usuage
 
-- Realtime preview
+`sudo python ArduCam_Py_Demo.py <path/config-file-name>	`
+example: `sudo python ArduCam_Py_Demo.py ../JSON_Config_Files/AR0134_960p_Color.json`	
+While the program is running, you can press the following buttons in the terminal:	
 
-``` sudo python MT9V034 ```
-
-``` sudo python AR0134 ```
-
-``` sudo python MT9M001 ```
-
-``` sudo python MT9N001 ```
-
-``` sudo python MT9J001 ```
-
-- Snapshot
-
-``` sudo python MT9F002 --type jpg --name sample_image ```
-
-## Parameters
---type : jpg, bmp, png
-
---name : file name without extension
-
-## Window Control
-The realtime preview mode supports zoom in/out with control the keyboard
-
-- Zoom in key ' <- '
-- Zoom out key ' -> '
-- Quit key ' q '
-
-# Troubleshooting
-## Window control doesn't work
-
-The keyboard event number might not match your system, using the following command to determine which is your keyboard event
-
-``` cat /proc/bus/input/devices ```
-
-## Frame rate is too slow
-
-The realtime preview performance is not so good on Raspberry Pi board due to the processing power on RAW2RGB convertion and opencv imshow function. In this case the realtime preview is used only for viewfinder purpose, it is recommend to do image processing without realtime display.
-
+    1.'s' + Enter:Save the image to the images folder.	
+    2.'c' + Enter:Stop saving images.	
+    3.'q' + Enter:Stop running the program.	
