@@ -5,7 +5,7 @@ camera_parameter:
     TYPE: "OV2640"
     SIZE: [1600,1200]
     BIT_WIDTH: 8
-    FORMAT: 3
+    FORMAT: [3,0]
     I2C_MODE: 0
     I2C_ADDR: "0x60"
     TRANS_LVL: 64

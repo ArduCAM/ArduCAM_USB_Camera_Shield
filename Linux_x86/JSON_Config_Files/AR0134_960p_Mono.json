@@ -4,7 +4,7 @@
 		"TYPE":"AR0134",
 		"SIZE":[1280,964],
 		"BIT_WIDTH":8,
-		"FORMAT":4,
+		"FORMAT":[4,0],
 		"I2C_MODE":3,
 		"I2C_ADDR":"0x20",
 		"TRANS_LVL":64

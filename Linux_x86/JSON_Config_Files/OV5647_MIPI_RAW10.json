@@ -4,7 +4,7 @@
 		"TYPE":"OV5647",
 		"SIZE":[1296,972],
 		"BIT_WIDTH":10,
-		"FORMAT":0,
+		"FORMAT":[0,1],
 		"I2C_MODE":2,
 		"I2C_ADDR":"0x6c",
 		"TRANS_LVL":64

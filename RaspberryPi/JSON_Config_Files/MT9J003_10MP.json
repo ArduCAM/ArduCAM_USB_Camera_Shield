@@ -4,7 +4,7 @@
 		"TYPE":"MT9J003",
 		"SIZE":[3664,2748],
 		"BIT_WIDTH":8,
-		"FORMAT":0,
+		"FORMAT":[0,3],
 		"I2C_MODE":3,
 		"I2C_ADDR":"0x20",
 		"TRANS_LVL":64

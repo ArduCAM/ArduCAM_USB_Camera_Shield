@@ -20,7 +20,7 @@ ArduCamCfg cameraCfg;
 volatile bool _running = true;
 
 bool save_flag = false;
-
+int color_mode = 0;
 void showHelp(){
 	printf(" usage: sudo ./ArduCam_Demo <path/config-file-name>	\
 			\n\n example: sudo ./ArduCam_Demo ../Config/AR0134_960p_Color.yml	\
@@ -105,6 +105,66 @@ cv::Mat BytestoMat(Uint8* bytes, int width, int height)
 	return image;
 }
 
+cv::Mat ConvertImage(ArduCamOutData* frameData){
+	cv::Mat rawImage ;
+	switch(cameraCfg.emImageFmtMode){
+	case FORMAT_MODE_RGB:
+		rawImage = RGB565toMat(frameData->pu8ImageData,cameraCfg.u32Width,cameraCfg.u32Height);
+		break;
+	case FORMAT_MODE_RAW_D:
+		rawImage = separationImage(frameData->pu8ImageData,cameraCfg.u32Width,cameraCfg.u32Height);
+		switch(color_mode){
+		case 0:cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerRG2BGR);
+			break;
+		case 1:cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerGR2BGR);
+			break;
+		case 2:cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerGB2BGR);
+			break;
+		case 3:cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerBG2BGR);
+			break;
+		default:
+			cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerRG2BGR);
+			break;
+		}
+		break;
+	case FORMAT_MODE_MON_D:
+		rawImage = separationImage(frameData->pu8ImageData,cameraCfg.u32Width,cameraCfg.u32Height);
+		break;
+	case FORMAT_MODE_JPG:
+		rawImage = JPGToMat(frameData->pu8ImageData,frameData->stImagePara.u32Size);
+		break;
+	case FORMAT_MODE_RAW:
+		rawImage = BytestoMat(frameData->pu8ImageData, cameraCfg.u32Width, cameraCfg.u32Height);
+		switch(color_mode){
+		case 0:cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerRG2BGR);
+			break;
+		case 1:cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerGR2BGR);
+			break;
+		case 2:cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerGB2BGR);
+			break;
+		case 3:cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerBG2BGR);
+			break;
+		default:
+			cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerRG2BGR);
+			break;
+		}
+		break;
+	case FORMAT_MODE_YUV:
+		rawImage = YUV422toMat(frameData->pu8ImageData,cameraCfg.u32Width,cameraCfg.u32Height);
+		break;
+	case FORMAT_MODE_MON:
+		rawImage = BytestoMat(frameData->pu8ImageData, cameraCfg.u32Width, cameraCfg.u32Height);
+		break;
+	default:
+		rawImage = BytestoMat(frameData->pu8ImageData, cameraCfg.u32Width, cameraCfg.u32Height);
+		cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerRG2RGB);
+		break;
+	}
+
+	return rawImage;
+
+}
+
 void configBoard(ArduCamHandle &cameraHandle,cv::FileNode bp){
 	std::string hexStr;
 	for (int i = 0; i < bp.size(); i++) {
@@ -160,7 +220,8 @@ bool camera_initFromFile(std::string filename, ArduCamHandle &cameraHandle, Ardu
 		default: break;
 		}
 
-		cp["FORMAT"] >> value;
+		cp["FORMAT"][0] >> value;
+		cp["FORMAT"][1] >> color_mode;
 		switch (value) {
 		case 0: cameraCfg.emImageFmtMode = FORMAT_MODE_RAW; break;
 		case 1: cameraCfg.emImageFmtMode = FORMAT_MODE_RGB; break;
@@ -179,12 +240,13 @@ bool camera_initFromFile(std::string filename, ArduCamHandle &cameraHandle, Ardu
 		cp["BIT_WIDTH"] >> value; cameraCfg.u8PixelBits = value;
 		cp["BIT_WIDTH"] >> value; cameraCfg.u8PixelBytes = 1;
 
+		//if (ArduCam_open(cameraHandle, &cameraCfg,0) == USB_CAMERA_NO_ERROR) {
 		if (ArduCam_autoopen(cameraHandle, &cameraCfg) == USB_CAMERA_NO_ERROR) {
 			//ArduCam_enableForceRead(cameraHandle);	//Force display image
 			cv::FileNode board_param = cfg["board_parameter"];
 			cv::FileNode bp = cfg["board_parameter_dev2"];
 
-			ArduCam_writeReg_8_8(cameraHandle, 0x46, 3, 0x00);
+			//ArduCam_writeReg_8_8(cameraHandle, 0x46, 3, 0x00);
 			configBoard(cameraHandle,board_param);
 			
 			//confirm usb model  (u32UsbVersion will be assigned after calling the ArduCam_autoopen or ArduCam_open method)
@@ -270,35 +332,7 @@ void readImage_thread(ArduCamHandle handle) {
 			if ( rtn_val == USB_CAMERA_NO_ERROR) {              
 
 				int begin_disp = clock();
-				switch(cameraCfg.emImageFmtMode){
-				case FORMAT_MODE_RGB:
-					rawImage = RGB565toMat(frameData->pu8ImageData,cameraCfg.u32Width,cameraCfg.u32Height);
-					break;
-				case FORMAT_MODE_RAW_D:
-					rawImage = separationImage(frameData->pu8ImageData,cameraCfg.u32Width,cameraCfg.u32Height);
-					cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerGR2RGB);
-					break;
-				case FORMAT_MODE_MON_D:
-					rawImage = separationImage(frameData->pu8ImageData,cameraCfg.u32Width,cameraCfg.u32Height);
-					break;
-				case FORMAT_MODE_JPG:
-					rawImage = JPGToMat(frameData->pu8ImageData,frameData->stImagePara.u32Size);
-					break;
-				case FORMAT_MODE_RAW:
-					rawImage = BytestoMat(frameData->pu8ImageData, cameraCfg.u32Width, cameraCfg.u32Height);
-					cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerGR2RGB);
-					break;
-				case FORMAT_MODE_YUV:
-					rawImage = YUV422toMat(frameData->pu8ImageData,cameraCfg.u32Width,cameraCfg.u32Height);
-					break;
-				case FORMAT_MODE_MON:
-					rawImage = BytestoMat(frameData->pu8ImageData, cameraCfg.u32Width, cameraCfg.u32Height);
-					break;
-				default:
-					rawImage = BytestoMat(frameData->pu8ImageData, cameraCfg.u32Width, cameraCfg.u32Height);
-					cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerGR2RGB);
-					break;
-				}
+				rawImage = ConvertImage(frameData);
 				
 				if (!rawImage.data)
 				{

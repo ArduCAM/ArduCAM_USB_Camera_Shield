@@ -4,7 +4,7 @@
 		"TYPE":"MT9V034",
 		"SIZE":[640,480],
 		"BIT_WIDTH":8,
-		"FORMAT":0,
+		"FORMAT":[0,0],
 		"I2C_MODE":1,
 		"I2C_ADDR":"0x90",
 		"TRANS_LVL":64

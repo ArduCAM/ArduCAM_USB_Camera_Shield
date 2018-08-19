@@ -5,7 +5,7 @@ camera_parameter:
     TYPE: "OV5640"
     SIZE: [2592,1944]
     BIT_WIDTH: 8
-    FORMAT: 3
+    FORMAT: [3,0]
     I2C_MODE: 2
     I2C_ADDR: "0x78"
     TRANS_LVL: 64
@@ -18,13 +18,9 @@ board_parameter:
 
 board_parameter_dev2: []
 
-board_parameter_dev3_inf2: 
-   - ["0xf3","0x0000","0x0000","0x00",[]]
-   - ["0xf9","0x0000","0x0000","0x00",[]]
+board_parameter_dev3_inf2: []
 
-board_parameter_dev3_inf3: 
-   - ["0xf3","0x0000","0x0000","0x00",[]]
-   - ["0xf9","0x0000","0x0000","0x00",[]]
+board_parameter_dev3_inf3: []
 
 register_parameter: 
    - ["0x3103","0x0011"]

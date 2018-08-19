@@ -4,9 +4,9 @@
 		"TYPE":"OV5640",
 		"SIZE":[2592,1944],
 		"BIT_WIDTH":8,
-		"FORMAT":2,
+		"FORMAT":[2,1],
 		"I2C_MODE":2,
-		"I2C_ADDR":"0x78"
+		"I2C_ADDR":"0x78",
 	},
 	"board_parameter" : [
 	],

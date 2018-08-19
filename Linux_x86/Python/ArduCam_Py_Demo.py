@@ -11,11 +11,18 @@ import Image
 import ArducamSDK
 
 
-global cfg,handle,running,Width,Heigth,save_flag
+global cfg,handle,running,Width,Heigth,save_flag,color_mode
 running = True
 save_flag = False
 cfg = {}
 handle = {}
+global COLOR_BayerGB2BGR,COLOR_BayerRG2BGR,COLOR_BayerGR2BGR,COLOR_BayerBG2BGR
+
+COLOR_BayerBG2BGR = 46
+COLOR_BayerGB2BGR = 47
+COLOR_BayerRG2BGR = 48
+COLOR_BayerGR2BGR = 49
+
 
 def configBoard(fileNodes):
     global handle
@@ -62,7 +69,7 @@ def writeSensorRegs(fileNodes):
 pass
 
 def camera_initFromFile(fialeName):
-    global cfg,handle,Width,Height
+    global cfg,handle,Width,Height,color_mode
     #load config file
     config = json.load(open(fialeName,"r"))
 
@@ -71,7 +78,10 @@ def camera_initFromFile(fialeName):
     Height = int(camera_parameter["SIZE"][1])
 
     BitWidth = camera_parameter["BIT_WIDTH"]
-    FmtMode = camera_parameter["FORMAT"]
+    FmtMode = int(camera_parameter["FORMAT"][0])
+    color_mode = (int)(camera_parameter["FORMAT"][1])
+    print "color mode",color_mode
+
     I2CMode = camera_parameter["I2C_MODE"]
     SensorShipAddr = int(camera_parameter["I2C_ADDR"],16)
 
@@ -86,12 +96,13 @@ def camera_initFromFile(fialeName):
             "emI2cMode":I2CMode,
             "emImageFmtMode":FmtMode }
 
+    #ret,handle,rtn_cfg = ArducamSDK.Py_ArduCam_open(cfg,0)
     ret,handle,rtn_cfg = ArducamSDK.Py_ArduCam_autoopen(cfg)
     if ret == 0:
        
         #ArducamSDK.Py_ArduCam_writeReg_8_8(handle,0x46,3,0x00)
         usb_version = rtn_cfg['u32UsbVersion']
-        print "USB VERSION:",usb_version
+        #print "USB VERSION:",usb_version
         #config board param
         configBoard(config["board_parameter"])
 
@@ -132,10 +143,6 @@ def captureImage_thread():
     else:
         print "Capture began, rtn_val = ",rtn_val
     
-    #time.sleep(0.1)
-    ArducamSDK.Py_ArduCam_writeReg_8_8(handle,0x46,3,0xC0)
-    ArducamSDK.Py_ArduCam_writeReg_8_8(handle,0x46,3,0x40)
-    ArducamSDK.Py_ArduCam_writeReg_8_8(handle,0x46,3,0x00)
     while running:
         #print "capture"
         rtn_val = ArducamSDK.Py_ArduCam_captureImage(handle)
@@ -148,7 +155,8 @@ def captureImage_thread():
     ArducamSDK.Py_ArduCam_endCaptureImage(handle)
 
 def readImage_thread():
-    global handle,running,Width,Height,save_flag,cfg
+    global handle,running,Width,Height,save_flag,cfg,color_mode
+    global COLOR_BayerGB2BGR,COLOR_BayerRG2BGR,COLOR_BayerGR2BGR,COLOR_BayerBG2BGR
     count = 0
     totalFrame = 0
     time0 = time.time()
@@ -181,7 +189,16 @@ def readImage_thread():
                 image = np.frombuffer(data, np.uint8).reshape( Height,Width , 1 )
             if emImageFmtMode == ArducamSDK.FORMAT_MODE_RAW:
                 image = np.frombuffer(data, np.uint8).reshape( Height,Width , 1 )
-                image = cv2.cvtColor(image,cv2.COLOR_BayerGR2RGB)
+                if color_mode == 0:
+                    image = cv2.cvtColor(image,COLOR_BayerRG2BGR)
+                if color_mode == 1:
+                    image = cv2.cvtColor(image,COLOR_BayerGR2BGR)
+                if color_mode == 2:
+                    image = cv2.cvtColor(image,COLOR_BayerGB2BGR)
+                if color_mode == 3:
+                    image = cv2.cvtColor(image,COLOR_BayerBG2BGR)
+                if color_mode < 0 and color_mode > 3:
+                    image = cv2.cvtColor(image,COLOR_BayerGB2BGR)
         
             time1 = time.time()
             if time1 - time0 >= 1:
@@ -198,8 +215,10 @@ def readImage_thread():
             cv2.imshow("ArduCam Demo",image)
             cv2.waitKey(10)
             ArducamSDK.Py_ArduCam_del(handle)
-        #print "------------------------display time:",(time.time() - display_time)
-
+            #print "------------------------display time:",(time.time() - display_time)
+        else:
+            time.sleep(0.001);
+        
 def showHelp():
     print " usage: sudo python ArduCam_Py_Demo.py <path/config-file-name>	\
         \n\n example: sudo python ArduCam_Py_Demo.py ../Config/AR0134_960p_Color.yml	\
@@ -236,7 +255,7 @@ if __name__ == "__main__":
         rt = threading.Thread(target=readImage_thread)
         ct.start()
         rt.start()
-#
+        
         while running:
             input_kb = str(sys.stdin.readline()).strip("\n")
 
