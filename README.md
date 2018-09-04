@@ -18,12 +18,19 @@ More info can be found from [arducam website](http://www.arducam.com/arducam-usb
 -	MT9N001		9MP
 -	MT9J001		10MP (Monochrome)
 -	MT9J003   10MP (Color)
--	MT9F002		14MP
+-	MT9F001/MT9F002		14MP
 
-## Support OS 
+## Supported Platform 
+- PC
+- Raspberry Pi
+- ARM 64bit / Pine64
+Contact us for more platform support.
+
+## Supported OS 
 - Windows
 - Linux Ubuntu
 - Raspbian
 
-## Limitations
-The new USB2.0 camera shield now has onboard frame buffer, it won't have the limitation like before.
+## Supported Programming Languages
+- C/C++
+- Python
