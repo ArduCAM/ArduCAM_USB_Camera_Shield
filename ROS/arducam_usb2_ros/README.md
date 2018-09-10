@@ -18,12 +18,10 @@ cam0/arducam/camera/image_raw
 rosservice call cam0/arducam/read_reg *(register address)*
 
 Example, to obtain chip version:
-
 rosservice call cam0/arducam/read_reg 0
 
 - ### Write value to sensor register:
 rosservice call cam0/arducam/write_reg *(register address) (value)*
 
 Example, to adjust exposure on MT9N001:
-
 rosservice call cam0/arducam/write_reg 12306 100
