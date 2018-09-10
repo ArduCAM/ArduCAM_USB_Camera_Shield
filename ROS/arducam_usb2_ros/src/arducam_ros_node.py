@@ -14,6 +14,9 @@ import rospy
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
 
+from arducam_usb2_ros.srv import WriteReg, WriteRegResponse
+from arducam_usb2_ros.srv import ReadReg, ReadRegResponse
+
 
 global cfg,handle,ruWidth,Heigth,color_mode
 cfg = {}
@@ -104,9 +107,26 @@ def camera_initFromFile(fialeName):
 
     # ArducamSDK.
 
-    ret,handle,rtn_cfg = ArducamSDK.Py_ArduCam_open(cfg,0)
-##    ret,handle,rtn_cfg = ArducamSDK.Py_ArduCam_autoopen(cfg)
-    
+    if serial_selection == None:
+        ret,handle,rtn_cfg = ArducamSDK.Py_ArduCam_autoopen(cfg)
+    else:
+        index = None
+        num_cam, cam_list, cam_serial = ArducamSDK.Py_ArduCam_scan()
+        for i in range(num_cam):
+            datas = cam_serial[i]
+            camera_serial = "%c%c%c%c-%c%c%c%c-%c%c%c%c"%(datas[0],datas[1],datas[2],datas[3],
+                                                          datas[4],datas[5],datas[6],datas[7],
+                                                          datas[8],datas[9],datas[10],datas[11])
+            if camera_serial == str(serial_selection):
+                print("Arducam " + str(serial_selection) + " found")
+                index = i
+                break
+        if index == None:
+            print("Arducam " + str(serial_selection) + " not found")
+            exit()
+        time.sleep(3) 
+        ret,handle,rtn_cfg = ArducamSDK.Py_ArduCam_open(cfg,i)
+                
     if ret == 0:
         usb_version = rtn_cfg['usbType']
         print "USB VERSION:",usb_version
@@ -192,6 +212,27 @@ def captureImage():
     else:
         time.sleep(0.010)
 
+def write_register(request):
+    global handle
+    register = request.register
+    value = request.value
+    rtn_val = ArducamSDK.Py_ArduCam_writeSensorReg(handle,register,value)
+    if rtn_val == 0:
+        output = 'Value %d written to register %d' % (value, register)
+    else:
+        output = 'Invalid register'
+    return WriteRegResponse(output)
+
+def read_register(request):
+    global handle
+    register = request.register
+    rtn_val, output = ArducamSDK.Py_ArduCam_readSensorReg(handle,register)
+    if rtn_val == 0:
+        output = 'Register %d: %d' % (register, output)
+    else:
+        output = 'Invalid register'
+    return ReadRegResponse(output)
+
 def rosShutdown():
     global handle
     ArducamSDK.Py_ArduCam_endCaptureImage(handle)
@@ -214,6 +255,12 @@ if __name__ == "__main__":
     except:
         print("Empty config_file parameter.")
         exit()
+    try:
+        serial_selection = rospy.get_param("~camera_serial")
+        if len(serial_selection) == 0:
+            raise
+    except:
+        serial_selection = None
 
     if camera_initFromFile(config_file_name):
         ArducamSDK.Py_ArduCam_setMode(handle,ArducamSDK.CONTINUOUS_MODE)
@@ -223,6 +270,9 @@ if __name__ == "__main__":
             exit()
         else:
             print "Capture began, rtn_val = ",rtn_val
+
+        service_write = rospy.Service('arducam/write_reg', WriteReg, write_register)
+        service_read = rospy.Service('arducam/read_reg', ReadReg, read_register)
 
         rospy.on_shutdown(rosShutdown)
         while not rospy.is_shutdown():
