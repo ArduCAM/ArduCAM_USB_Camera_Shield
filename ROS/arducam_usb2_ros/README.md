@@ -1,5 +1,4 @@
 # ArduCAM USB2 Shield ROS node
-*Tested on Ubuntu 16.04/Linux Mint 18, ROS Kinetic with 2 Arducam MT9N001 USB2 shield cameras*
 
 ## Setup:
 1. Copy arducam_usb2_ros to your catkin workspace directory
