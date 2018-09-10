@@ -1,9 +1,13 @@
 <launch>
 
-    <arg name="camera_config" value="MT9N001_9MP.json" />
+    <group ns="cam0" clear_params="true">
+        <arg name="camera_config" value="MT9N001_9MP.json" /> <!-- Config file in JSON_Config_Files folder of your camera . -->
+        <arg name="serial_number" value="" /> <!-- Serial number of the camera in the form of "XXXX-XXXX-XXXX-XXXX", leave it blank "" if there is only one camera. -->
 
-    <node name="arducam_ros_node" pkg="arducam_usb2_ros" type="arducam_ros_node.py" output="screen">
-        <param name="config_file" value="$(find arducam_usb2_ros)/JSON_Config_Files/$(arg camera_config)" />
-    </node>
+        <node name="arducam_ros_node" pkg="arducam_usb2_ros" type="arducam_ros_node.py" output="screen">
+            <param name="config_file" value="$(find arducam_usb2_ros)/JSON_Config_Files/$(arg camera_config)" />
+            <param name="camera_serial" value="$(arg serial_number)" />
+        </node>
+    </group>
 
 </launch>
