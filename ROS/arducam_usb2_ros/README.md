@@ -10,7 +10,7 @@
 3. Change "serial_number" argument in arducam_node.launch file to your corresponding Arducam's serial number in the form of XXXX-XXXX-XXXX-XXXX, leave it blank if there is only one camera.
 2. roslaunch arducam_usb2_ros arducam_node.launch
 
-## With default arducam_node.launch file,
+## From default arducam_node.launch file
 - ### Topic publish:
 cam0/arducam/camera/image_raw
 
