@@ -12,16 +12,16 @@
 
 ## From default arducam_node.launch file
 - ### Topic publish:
-cam0/arducam/camera/image_raw
+/cam0/arducam/camera/image_raw
 
 - ### Read value from sensor register:
-rosservice call cam0/arducam/read_reg *(register address)*
+rosservice call /cam0/arducam/read_reg *(register address)*
 
 Example, to obtain chip version:
-rosservice call cam0/arducam/read_reg 0
+rosservice call /cam0/arducam/read_reg 0
 
 - ### Write value to sensor register:
-rosservice call cam0/arducam/write_reg *(register address) (value)*
+rosservice call /cam0/arducam/write_reg *(register address) (value)*
 
 Example, to adjust exposure on MT9N001:
-rosservice call cam0/arducam/write_reg 12306 100
+rosservice call /cam0/arducam/write_reg 12306 100
