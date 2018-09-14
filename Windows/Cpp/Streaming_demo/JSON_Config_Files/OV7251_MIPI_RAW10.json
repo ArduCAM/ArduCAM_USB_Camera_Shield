@@ -4,7 +4,7 @@
 		"TYPE":"OV7251",
 		"SIZE":[640,480],
 		"BIT_WIDTH":10,
-		"FORMAT":4,
+		"FORMAT":[4,0],
 		"I2C_MODE":2,
 		"I2C_ADDR":"0xc0",
 		"TRANS_LVL":64
@@ -162,6 +162,7 @@
 		["0x5000","0x0085"],
 		["0x5001","0x0080"],
 		["0x3503","0x0007"],
+		["DELAY","16"],
 		["0x0100","0x0001"]
 	],
 	"register_parameter_dev3_inf2" : [

@@ -4,7 +4,7 @@
 		"TYPE":"OV2640",
 		"SIZE":[320,240],
 		"BIT_WIDTH":8,
-		"FORMAT":3,
+		"FORMAT":[3,0],
 		"I2C_MODE":0,
 		"I2C_ADDR":"0x60",
 		"TRANS_LVL":64
@@ -24,6 +24,7 @@
 	"register_parameter" : [	
 		["0x00ff","0x0001"],
 		["0x0012","0x0080"],
+		["DELAY","100"],
 		["0x00ff","0x0000"],
 		["0x002c","0x00ff"],
 		["0x002e","0x00df"],

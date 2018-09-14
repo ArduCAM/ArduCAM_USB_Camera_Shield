@@ -6,22 +6,25 @@ import threading
 import numpy as np
 import signal
 import json
-
+from ImageConvert import *
 import ArducamSDK
 
 
-global cfg,handle,running,Width,Heigth,save_flag,color_mode
+global cfg,handle,running,Width,Heigth,save_flag,color_mode,save_raw
 running = True
 save_flag = False
+save_raw = False
 cfg = {}
 handle = {}
-global COLOR_BayerGB2BGR,COLOR_BayerRG2BGR,COLOR_BayerGR2BGR,COLOR_BayerBG2BGR
 
-COLOR_BayerBG2BGR = 46
-COLOR_BayerGB2BGR = 47
-COLOR_BayerRG2BGR = 48
-COLOR_BayerGR2BGR = 49
-
+def showHelp():
+    print " usage: sudo python ArduCam_Py_Demo.py <path/config-file-name>	\
+        \n\n example: sudo python ArduCam_Py_Demo.py ../JSON_Config_Files/AR0134_960p_Color.yml	\
+        \n\n While the program is running, you can press the following buttons in the terminal:	\
+        \n\n 's' + Enter:Save the image to the images folder.	\
+        \n\n 'c' + Enter:Stop saving images.	\
+        \n\n 'q' + Enter:Stop running the program.	\
+        \n\n"
 
 def configBoard(fileNodes):
     global handle
@@ -35,27 +38,8 @@ def configBoard(fileNodes):
         for j in range(0,len(fileNode[4])):
             buffs.append(int(fileNode[4][j],16))
         ArducamSDK.Py_ArduCam_setboardConfig(handle,int(command,16),int(value,16),int(index,16),int(buffsize,16),buffs)
-
+        
 pass
-
-def JPGToMat(data,datasize):
-    image = np.frombuffer(data,np.uint8,count = datasize)
-    return cv2.imdecode(image,cv2.IMREAD_ANYCOLOR)
-
-def YUVToMat(data):
-    global Width,Height
-    image = np.frombuffer(data, np.uint8).reshape( Height,Width , 2 )
-    return cv2.cvtColor(image,cv2.COLOR_YUV2BGR_YUYV)
-    
-def RGB565ToMat(data):
-    global Width,Height
-    arr = np.frombuffer(data,dtype=np.uint16).astype(np.uint32)
-    arr = ((arr & 0xFF00) >> 8) + ((arr & 0x00FF) << 8)
-    arr = 0xFF000000 + ((arr & 0xF800) << 8) + ((arr & 0x07E0) << 5) + ((arr & 0x001F) << 3)
-
-    arr.dtype = np.uint8
-    iamge = arr.reshape(Height,Width,4)
-    return cv2.flip(iamge,0)
 
 def writeSensorRegs(fileNodes):
     global handle
@@ -71,7 +55,7 @@ def writeSensorRegs(fileNodes):
 pass
 
 def camera_initFromFile(fialeName):
-    global cfg,handle,Width,Height,color_mode
+    global cfg,handle,Width,Height,color_mode,save_raw
     #load config file
     config = json.load(open(fialeName,"r"))
 
@@ -80,24 +64,28 @@ def camera_initFromFile(fialeName):
     Height = int(camera_parameter["SIZE"][1])
 
     BitWidth = camera_parameter["BIT_WIDTH"]
+    ByteLength = 1
+    if BitWidth > 8 and BitWidth <= 16:
+        ByteLength = 2
+        save_raw = True
     FmtMode = int(camera_parameter["FORMAT"][0])
     color_mode = (int)(camera_parameter["FORMAT"][1])
     print "color mode",color_mode
 
     I2CMode = camera_parameter["I2C_MODE"]
     I2cAddr = int(camera_parameter["I2C_ADDR"],16)
-
+    TransLvl = int(camera_parameter["TRANS_LVL"])
     cfg = {"u32CameraType":0x4D091031,
             "u32Width":Width,"u32Height":Height,
             "usbType":0,
-            "u8PixelBytes":1,
+            "u8PixelBytes":ByteLength,
             "u16Vid":0,
             "u32Size":0,
             "u8PixelBits":BitWidth,
             "u32I2cAddr":I2cAddr,
             "emI2cMode":I2CMode,
             "emImageFmtMode":FmtMode,
-            "u32TransLvl":32 }
+            "u32TransLvl":TransLvl }
 
     # ArducamSDK.
     #ret,handle,rtn_cfg = ArducamSDK.Py_ArduCam_open(cfg,0)
@@ -152,16 +140,16 @@ def captureImage_thread():
         rtn_val = ArducamSDK.Py_ArduCam_captureImage(handle)
         if rtn_val > 255:
             print "Error capture image, rtn_val = ",rtn_val
-            if rtn_val != ArducamSDK.USB_CAMERA_FRAME_INDEX_ERROR and rtn_val != ArducamSDK.USB_CAMERA_DATA_LEN_ERROR:
+            if rtn_val == ArducamSDK.USB_CAMERA_USB_TASK_ERROR:
                 break
         time.sleep(0.005)
         
     running = False
     ArducamSDK.Py_ArduCam_endCaptureImage(handle)
+    
 
 def readImage_thread():
-    global handle,running,Width,Height,save_flag,cfg,color_mode
-    global COLOR_BayerGB2BGR,COLOR_BayerRG2BGR,COLOR_BayerGR2BGR,COLOR_BayerBG2BGR
+    global handle,running,Width,Height,save_flag,cfg,color_mode,save_raw
     count = 0
     totalFrame = 0
     time0 = time.time()
@@ -182,29 +170,8 @@ def readImage_thread():
             if datasize == 0:
                 continue
 
-            image = None
-            emImageFmtMode = cfg['emImageFmtMode']
-            if emImageFmtMode == ArducamSDK.FORMAT_MODE_JPG:
-                image = JPGToMat(data,datasize)
-            if emImageFmtMode == ArducamSDK.FORMAT_MODE_YUV:
-                image = YUVToMat(data)
-            if emImageFmtMode == ArducamSDK.FORMAT_MODE_RGB:
-                image = RGB565ToMat(data)
-            if emImageFmtMode == ArducamSDK.FORMAT_MODE_MON:
-                image = np.frombuffer(data, np.uint8).reshape( Height,Width , 1 )
-            if emImageFmtMode == ArducamSDK.FORMAT_MODE_RAW:
-                image = np.frombuffer(data, np.uint8).reshape( Height,Width , 1 )
-                if color_mode == 0:
-                    image = cv2.cvtColor(image,COLOR_BayerRG2BGR)
-                if color_mode == 1:
-                    image = cv2.cvtColor(image,COLOR_BayerGR2BGR)
-                if color_mode == 2:
-                    image = cv2.cvtColor(image,COLOR_BayerGB2BGR)
-                if color_mode == 3:
-                    image = cv2.cvtColor(image,COLOR_BayerBG2BGR)
-                if color_mode < 0 and color_mode > 3:
-                    image = cv2.cvtColor(image,COLOR_BayerGB2BGR)
-        
+            image = convert_image(data,rtn_cfg,color_mode)
+            
             time1 = time.time()
             if time1 - time0 >= 1:
                 print "%s %d %s\n"%("fps:",count,"/s")
@@ -213,6 +180,9 @@ def readImage_thread():
             count += 1
             if save_flag:
                 cv2.imwrite("images/image%d.jpg"%totalFrame,image)
+                if save_raw:
+                    with open('images/image%d.raw'%totalFrame, 'wb') as f:
+                        f.write(data)
                 totalFrame += 1
                 
             image = cv2.resize(image,(640,480),interpolation = cv2.INTER_LINEAR)
@@ -224,15 +194,6 @@ def readImage_thread():
         else:
             time.sleep(0.001);
         
-def showHelp():
-    print " usage: sudo python ArduCam_Py_Demo.py <path/config-file-name>	\
-        \n\n example: sudo python ArduCam_Py_Demo.py ../JSON_Config_Files/AR0134_960p_Color.yml	\
-        \n\n While the program is running, you can press the following buttons in the terminal:	\
-        \n\n 's' + Enter:Save the image to the images folder.	\
-        \n\n 'c' + Enter:Stop saving images.	\
-        \n\n 'q' + Enter:Stop running the program.	\
-        \n\n"
-
 def sigint_handler(signum, frame):
     global running,handle
     running = False

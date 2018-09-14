@@ -5,8 +5,8 @@ FLAGS		= -L. -I. -std=gnu++11 -g
 LDIR		= ./Arducam_SDK
 
 ArduCam_Demo:ArduCam_Demo.cpp  $(LDIR)/ArduCamLib.h
-	$(CC) $^ -o $@ $(LIBS) $(FLAGS) 
-
+	$(CC) $^ -o $@ $(LIBS) $(FLAGS)  
+	
 .PHONY:clean
 
 clean:
