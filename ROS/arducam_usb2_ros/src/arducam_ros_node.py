@@ -245,10 +245,10 @@ def capture(request):
         datasize = rtn_cfg['u32Size']
         if rtn_val != 0:
             print "read data fail!"
-            return
+            return CaptureResponse("Failed to Capture")
             
         if datasize == 0:
-            return
+            return CaptureResponse("Failed to Capture")
 
         image = None
         emImageFmtMode = cfg['emImageFmtMode']
