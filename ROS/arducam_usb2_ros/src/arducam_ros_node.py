@@ -16,6 +16,7 @@ from sensor_msgs.msg import Image
 
 from arducam_usb2_ros.srv import WriteReg, WriteRegResponse
 from arducam_usb2_ros.srv import ReadReg, ReadRegResponse
+from arducam_usb2_ros.srv import Capture, CaptureResponse
 
 
 global cfg,handle,ruWidth,Heigth,color_mode
@@ -199,6 +200,10 @@ def captureImage():
                 image = cv2.cvtColor(image,COLOR_BayerBG2BGR)
             if color_mode < 0 and color_mode > 3:
                 image = cv2.cvtColor(image,COLOR_BayerGB2BGR)
+        if h_flip:
+            image = cv2.flip(image, 1)
+        if v_flip:
+            image = cv2.flip(image, 0)
 
         try:    
             img_msg = bridge.cv2_to_imgmsg(image, "bgr8")
@@ -233,6 +238,56 @@ def read_register(request):
         output = 'Invalid register'
     return ReadRegResponse(output)
 
+def capture(request):
+    global handle
+    if ArducamSDK.Py_ArduCam_availableImage(handle) > 0:		
+        rtn_val,data,rtn_cfg = ArducamSDK.Py_ArduCam_readImage(handle)
+        datasize = rtn_cfg['u32Size']
+        if rtn_val != 0:
+            print "read data fail!"
+            return
+            
+        if datasize == 0:
+            return
+
+        image = None
+        emImageFmtMode = cfg['emImageFmtMode']
+        if emImageFmtMode == ArducamSDK.FORMAT_MODE_JPG:
+            image = JPGToMat(data,datasize)
+        if emImageFmtMode == ArducamSDK.FORMAT_MODE_YUV:
+            image = YUVToMat(data)
+        if emImageFmtMode == ArducamSDK.FORMAT_MODE_RGB:
+            image = RGB565ToMat(data)
+        if emImageFmtMode == ArducamSDK.FORMAT_MODE_MON:
+            image = np.frombuffer(data, np.uint8).reshape( Height,Width , 1 )
+        if emImageFmtMode == ArducamSDK.FORMAT_MODE_RAW:
+            image = np.frombuffer(data, np.uint8).reshape( Height,Width , 1 )
+            if color_mode == 0:
+                image = cv2.cvtColor(image,COLOR_BayerRG2BGR)
+            if color_mode == 1:
+                image = cv2.cvtColor(image,COLOR_BayerGR2BGR)
+            if color_mode == 2:
+                image = cv2.cvtColor(image,COLOR_BayerGB2BGR)
+            if color_mode == 3:
+                image = cv2.cvtColor(image,COLOR_BayerBG2BGR)
+            if color_mode < 0 and color_mode > 3:
+                image = cv2.cvtColor(image,COLOR_BayerGB2BGR)
+        if h_flip:
+            image = cv2.flip(image, 1)
+        if v_flip:
+            image = cv2.flip(image, 0)
+
+        try:    
+            img_msg = bridge.cv2_to_imgmsg(image, "bgr8")
+            img_msg.header.stamp = rospy.Time.now()
+            img_msg.header.frame_id = "arducam_optical_frame"
+            pub_capture.publish(img_msg)
+            return CaptureResponse("Captured")
+        except CvBridgeError as e:
+            return CaptureResponse("Failed to Capture")
+    else:
+        return CaptureResponse("Failed to Capture")
+
 def rosShutdown():
     global handle
     ArducamSDK.Py_ArduCam_endCaptureImage(handle)
@@ -246,6 +301,7 @@ if __name__ == "__main__":
 
     rospy.init_node("arducam_ros_node")
     pub = rospy.Publisher("arducam/camera/image_raw", Image, queue_size=1)
+    pub_capture = rospy.Publisher("arducam/camera/captured", Image, queue_size=1)
     bridge = CvBridge()
     try:
         config_file_name = rospy.get_param("~config_file")
@@ -261,6 +317,14 @@ if __name__ == "__main__":
             raise
     except:
         serial_selection = None
+    try:
+        h_flip = rospy.get_param("~horizontal_flip")
+    except:
+        h_flip = False
+    try:
+        v_flip = rospy.get_param("~vertical_flip")
+    except:
+        v_flip = False
 
     if camera_initFromFile(config_file_name):
         ArducamSDK.Py_ArduCam_setMode(handle,ArducamSDK.CONTINUOUS_MODE)
@@ -273,6 +337,7 @@ if __name__ == "__main__":
 
         service_write = rospy.Service('arducam/write_reg', WriteReg, write_register)
         service_read = rospy.Service('arducam/read_reg', ReadReg, read_register)
+        service_capture = rospy.Service('arducam/capture', Capture, capture)
 
         rospy.on_shutdown(rosShutdown)
         while not rospy.is_shutdown():
