@@ -13,6 +13,7 @@
 ## From default arducam_node.launch file
 - ### Topic publish:
 /cam0/arducam/camera/image_raw
+
 /cam0/arducam/camera/captured
 
 - ### Read value from sensor register:
@@ -29,5 +30,6 @@ rosservice call /cam0/arducam/write_reg 12306 100
 
 - ### Capture image:
 rosservice call /cam0/arducam/capture
+
 (Image published to /cam0/arducam/camera/captured)
 
