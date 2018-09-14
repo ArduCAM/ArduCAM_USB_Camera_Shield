@@ -1,5 +1,7 @@
 # ArduCAM USB2 Shield ROS node
 
+(Tested on Ubuntu 16.04/Linux Mint 18, ROS Kinetic)
+
 ## Setup:
 1. Copy arducam_usb2_ros to your catkin workspace directory
 2. Run catkin_make
@@ -7,8 +9,9 @@
 
 ## Usage:
 1. Change "camera_config" argument in arducam_node.launch file to your corresponding Arducam camera.
-3. Change "serial_number" argument in arducam_node.launch file to your corresponding Arducam's serial number in the form of XXXX-XXXX-XXXX, leave it blank if there is only one camera.
-2. roslaunch arducam_usb2_ros arducam_node.launch
+2. Change "serial_number" argument in arducam_node.launch file to your corresponding Arducam's serial number in the form of XXXX-XXXX-XXXX, leave it blank if there is only one camera.
+3. Change "horizontal_flip" or "vertical_flip" arguments in arducam_node.launch file to change image horizontal or vertical orientation.
+4. roslaunch arducam_usb2_ros arducam_node.launch
 
 ## From default arducam_node.launch file
 - ### Topic publish:
