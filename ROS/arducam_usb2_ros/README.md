@@ -8,7 +8,7 @@
 3. Run setup.sh in arducam_usb2_ros folder
 
 ## Usage:
-1. Change "camera_config" argument in the launch file to your corresponding Arducam camera.
+1. Change "camera_config" argument in the launch file to your corresponding Arducam camera JSON config file.
 2. Change "serial_number" argument in the launch file to your corresponding Arducam's serial number in the form of XXXX-XXXX-XXXX, leave it blank if there is only one camera.
 3. Change "horizontal_flip" or "vertical_flip" arguments in the launch file to change image horizontal or vertical orientation.
 4. Change "frame_id" argument in the launch file to change topic's frame_id of your like.
