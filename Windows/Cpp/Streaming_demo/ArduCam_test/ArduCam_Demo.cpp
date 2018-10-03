@@ -29,7 +29,7 @@ using namespace cv;
 
 ArduCamCfg cameraCfg;
 volatile bool _running = true;
-
+bool save_raw = false;
 bool save_flag = false;
 int color_mode = 0;
 void showHelp(){
@@ -124,6 +124,20 @@ cv::Mat RGB565toMat(Uint8* bytes, int width, int height) {
 	return image;
 }
 
+
+cv::Mat dBytesToMat(Uint8* bytes,int bit_width,int width,int height){
+    unsigned char* temp_data = (unsigned char*)malloc(width * height);
+    int index = 0;
+    for(int i = 0 ; i < width * height * 2 ;i+=2){
+        unsigned char temp = ((bytes[i + 1] << 8 | bytes[i]) >> (bit_width - 8)) & 0xFF;
+        temp_data[index++] = temp;
+    }
+    cv::Mat image = cv::Mat(height, width, CV_8UC1);
+	memcpy(image.data, temp_data, cameraCfg.u32Height * cameraCfg.u32Width);
+    free(temp_data);
+    return image;
+}
+
 cv::Mat BytestoMat(Uint8* bytes, int width, int height)
 {
 	cv::Mat image = cv::Mat(height, width, CV_8UC1, bytes);
@@ -132,12 +146,17 @@ cv::Mat BytestoMat(Uint8* bytes, int width, int height)
 
 cv::Mat ConvertImage(ArduCamOutData* frameData){
 	cv::Mat rawImage ;
+	Uint8* data = frameData->pu8ImageData;
+	int height,width;
+	width = cameraCfg.u32Width;
+	height = cameraCfg.u32Height;
+
 	switch(cameraCfg.emImageFmtMode){
 	case FORMAT_MODE_RGB:
-		rawImage = RGB565toMat(frameData->pu8ImageData,cameraCfg.u32Width,cameraCfg.u32Height);
+		rawImage = RGB565toMat(data,width,height);
 		break;
 	case FORMAT_MODE_RAW_D:
-		rawImage = separationImage(frameData->pu8ImageData,cameraCfg.u32Width,cameraCfg.u32Height);
+		rawImage = separationImage(data,width,height);
 		switch(color_mode){
 		case RAW_RG:cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerRG2BGR);
 			break;
@@ -153,13 +172,17 @@ cv::Mat ConvertImage(ArduCamOutData* frameData){
 		}
 		break;
 	case FORMAT_MODE_MON_D:
-		rawImage = separationImage(frameData->pu8ImageData,cameraCfg.u32Width,cameraCfg.u32Height);
+		rawImage = separationImage(data,width,height);
 		break;
 	case FORMAT_MODE_JPG:
-		rawImage = JPGToMat(frameData->pu8ImageData,frameData->stImagePara.u32Size);
+		rawImage = JPGToMat(data,frameData->stImagePara.u32Size);
 		break;
 	case FORMAT_MODE_RAW:
-		rawImage = BytestoMat(frameData->pu8ImageData, cameraCfg.u32Width, cameraCfg.u32Height);
+    	if(cameraCfg.u8PixelBytes == 2){
+	        rawImage = dBytesToMat(data,frameData->stImagePara.u8PixelBits,width,height);
+	    }else{
+		    rawImage = BytestoMat(data, width, height);
+		}
 		switch(color_mode){
 		case RAW_RG:cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerRG2BGR);
 			break;
@@ -175,13 +198,21 @@ cv::Mat ConvertImage(ArduCamOutData* frameData){
 		}
 		break;
 	case FORMAT_MODE_YUV:
-		rawImage = YUV422toMat(frameData->pu8ImageData,cameraCfg.u32Width,cameraCfg.u32Height);
+		rawImage = YUV422toMat(data,width,height);
 		break;
 	case FORMAT_MODE_MON:
-		rawImage = BytestoMat(frameData->pu8ImageData, cameraCfg.u32Width, cameraCfg.u32Height);
+		if(cameraCfg.u8PixelBytes == 2){
+	        rawImage = dBytesToMat(data,frameData->stImagePara.u8PixelBits,width,height);
+	    }else{
+		    rawImage = BytestoMat(data, width, height);
+		}
 		break;
 	default:
-		rawImage = BytestoMat(frameData->pu8ImageData, cameraCfg.u32Width, cameraCfg.u32Height);
+		if(cameraCfg.u8PixelBytes == 2){
+	        rawImage = dBytesToMat(data,frameData->stImagePara.u8PixelBits,width,height);
+	    }else{
+		    rawImage = BytestoMat(data, width, height);
+		}
 		cv::cvtColor(rawImage, rawImage, cv::COLOR_BayerRG2RGB);
 		break;
 	}
@@ -274,7 +305,14 @@ bool camera_initFromFile(std::string filename, ArduCamHandle &cameraHandle, Ardu
 		
 		cp["I2C_ADDR"] >> hexStr; cameraCfg.u32I2cAddr = std::stoul(hexStr, nullptr, 16);
 		cp["BIT_WIDTH"] >> value; cameraCfg.u8PixelBits = value;
-		cp["BIT_WIDTH"] >> value; cameraCfg.u8PixelBytes = 1;
+		cp["TRANS_LVL"] >> value; cameraCfg.u32TransLvl = value;
+		
+		if(cameraCfg.u8PixelBits <= 8){
+		    cameraCfg.u8PixelBytes = 1;
+		}else if(cameraCfg.u8PixelBits > 8 && cameraCfg.u8PixelBits <= 16){
+		    cameraCfg.u8PixelBytes = 2;
+		    save_raw = true;
+		}
 
 		//int ret_val = ArduCam_open(cameraHandle, &cameraCfg,0);
 		int ret_val = ArduCam_autoopen(cameraHandle, &cameraCfg);
@@ -340,7 +378,9 @@ void captureImage_thread(ArduCamHandle handle) {
 		rtn_val = ArduCam_captureImage(handle);
 		if ( rtn_val == USB_CAMERA_USB_TASK_ERROR) {
 			std::cout << "Error capture image, rtn_val = " << rtn_val << std::endl;
-			return;
+			break;
+		}else if(rtn_val > 0xFF){
+		    std::cout << "Error capture image, rtn_val = " << rtn_val << std::endl;
 		}
 	}
 
@@ -379,7 +419,6 @@ void readImage_thread(ArduCamHandle handle) {
 
 				int begin_disp = clock();
 				rawImage = ConvertImage(frameData);
-				
 				if (!rawImage.data)
 				{
 					std::cout << "No image data \n";
@@ -396,10 +435,17 @@ void readImage_thread(ArduCamHandle handle) {
 					frame_count = 0;
 				}
 				if(save_flag){
-					printf("save image%ld.jpg.\n",total_frame);
 					char imageName[50];
-					sprintf(imageName,"images/image%ld.jpg",total_frame);
+					printf("save image%ld.jpg.\n",total_frame);
+				    sprintf(imageName,"images/image%ld.jpg",total_frame);
 					cv::imwrite(imageName,rawImage);
+					if(save_raw){
+    				    printf("save image%ld.raw.\n",total_frame);
+    				    sprintf(imageName,"images/image%ld.raw",total_frame);
+    				    FILE *file = fopen(imageName,"wb");
+    				    fwrite(frameData->pu8ImageData,1,frameData->stImagePara.u32Size,file);
+    				    fclose(file);
+    				}
 					total_frame++;
 				}
 				cv::resize(rawImage, rawImage, cv::Size(640, 480), (0, 0), (0, 0), cv::INTER_LINEAR);
@@ -459,13 +505,10 @@ int main(int argc,char **argv)
 			u8TmpData[8], u8TmpData[9], u8TmpData[10], u8TmpData[11]);
         printf("index:%4d\tSerial:%s\n",pUsbIdxArray[i].u8UsbIndex,serial);
     }
-		
 #ifdef linux
 	sleep(2);
 #endif
-#ifdef _WIN32
-	Sleep(2);
-#endif
+
 	//read config file and open the camera.
 	if (camera_initFromFile(config_file_name, cameraHandle, cameraCfg)) {
 	    ArduCam_setMode(cameraHandle,CONTINUOUS_MODE);

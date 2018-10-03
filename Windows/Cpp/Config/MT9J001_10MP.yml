@@ -83,7 +83,7 @@ register_parameter:
    - ["0x020a","0x002a"]
    - ["0x020c","0x0024"]
    - ["0x3012","0x0100"]
-   - ["0x0204","0x0065"]
+
 
 register_parameter_dev3_inf2: 
    - ["0x0304","0x0006"]
