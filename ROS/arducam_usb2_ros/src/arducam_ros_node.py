@@ -208,7 +208,7 @@ def captureImage():
         try:    
             img_msg = bridge.cv2_to_imgmsg(image, "bgr8")
             img_msg.header.stamp = rospy.Time.now()
-            img_msg.header.frame_id = "arducam_optical_frame"
+            img_msg.header.frame_id = id_frame
             pub.publish(img_msg)
             cv2.waitKey(10)
         except CvBridgeError as e:
@@ -325,6 +325,11 @@ if __name__ == "__main__":
         v_flip = rospy.get_param("~vertical_flip")
     except:
         v_flip = False
+    try:
+        id_frame = rospy.get_param("~frame_id")
+    except:
+        print "Please input frame_id."
+        exit()
 
     if camera_initFromFile(config_file_name):
         ArducamSDK.Py_ArduCam_setMode(handle,ArducamSDK.CONTINUOUS_MODE)

@@ -1,0 +1,52 @@
+<launch>
+
+    <group ns="cam0" clear_params="true">
+        <arg name="camera_config" value="MT9N001_9MP.json" /> <!-- Config file in JSON_Config_Files folder of your camera. -->
+        <arg name="serial_number" value="AU2S-1835-0013" /> <!-- Serial number of the camera in the form of "XXXX-XXXX-XXXX", leave it blank "" if there is only one camera. -->
+        <arg name="horizontal_flip" value="true" /> <!-- Flip image horizontally. -->
+        <arg name="vertical_flip" value="false" /> <!-- Flip image vertically. -->
+        <arg name="frame_id" value="cam0" /> <!--Topic frame_id. -->
+
+        <node name="arducam_ros_node" pkg="arducam_usb2_ros" type="arducam_ros_node.py" output="screen">
+            <param name="config_file" value="$(find arducam_usb2_ros)/JSON_Config_Files/$(arg camera_config)" />
+            <param name="camera_serial" value="$(arg serial_number)" />
+            <param name="horizontal_flip" value="$(arg horizontal_flip)" />
+            <param name="vertical_flip" value="$(arg vertical_flip)" />
+            <param name="frame_id" value="$(arg frame_id)" />
+        </node>
+    </group>
+
+    <group ns="cam1" clear_params="true">
+        <arg name="camera_config" value="MT9N001_9MP.json" /> <!-- Config file in JSON_Config_Files folder of your camera. -->
+        <arg name="serial_number" value="AU2S-1838-0003" /> <!-- Serial number of the camera in the form of "XXXX-XXXX-XXXX", leave it blank "" if there is only one camera. -->
+        <arg name="horizontal_flip" value="true" /> <!-- Flip image horizontally. -->
+        <arg name="vertical_flip" value="false" /> <!-- Flip image vertically. -->
+        <arg name="frame_id" value="cam1" /> <!--Topic frame_id. -->
+
+        <node name="arducam_ros_node" pkg="arducam_usb2_ros" type="arducam_ros_node.py" output="screen">
+            <param name="config_file" value="$(find arducam_usb2_ros)/JSON_Config_Files/$(arg camera_config)" />
+            <param name="camera_serial" value="$(arg serial_number)" />
+            <param name="horizontal_flip" value="$(arg horizontal_flip)" />
+            <param name="vertical_flip" value="$(arg vertical_flip)" />
+            <param name="frame_id" value="$(arg frame_id)" />
+        </node>
+    </group>
+
+    <group ns="cam2" clear_params="true">
+        <arg name="camera_config" value="MT9N001_9MP.json" /> <!-- Config file in JSON_Config_Files folder of your camera. -->
+        <arg name="serial_number" value="AU2S-1835-0012" /> <!-- Serial number of the camera in the form of "XXXX-XXXX-XXXX", leave it blank "" if there is only one camera. -->
+        <arg name="horizontal_flip" value="true" /> <!-- Flip image horizontally. -->
+        <arg name="vertical_flip" value="false" /> <!-- Flip image vertically. -->
+        <arg name="frame_id" value="cam2" /> <!--Topic frame_id. -->
+
+        <node name="arducam_ros_node" pkg="arducam_usb2_ros" type="arducam_ros_node.py" output="screen">
+            <param name="config_file" value="$(find arducam_usb2_ros)/JSON_Config_Files/$(arg camera_config)" />
+            <param name="camera_serial" value="$(arg serial_number)" />
+            <param name="horizontal_flip" value="$(arg horizontal_flip)" />
+            <param name="vertical_flip" value="$(arg vertical_flip)" />
+            <param name="frame_id" value="$(arg frame_id)" />
+        </node>
+    </group>
+
+
+</launch>
