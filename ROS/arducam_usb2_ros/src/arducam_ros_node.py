@@ -280,7 +280,7 @@ def capture(request):
         try:    
             img_msg = bridge.cv2_to_imgmsg(image, "bgr8")
             img_msg.header.stamp = rospy.Time.now()
-            img_msg.header.frame_id = "arducam_optical_frame"
+            img_msg.header.frame_id = id_frame
             pub_capture.publish(img_msg)
             return CaptureResponse("Captured")
         except CvBridgeError as e:
