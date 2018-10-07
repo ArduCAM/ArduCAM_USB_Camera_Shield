@@ -27,7 +27,7 @@ extern "C"{
     #define USB_3                               3      //USB 3.0
     #define USB_3_2                             4      //USB3.0 mode and USB2.0 interface
 
-    #define SINGLE_MODE                         0x01
+    #define EXTERNAL_TRIGGER_MODE               0x01
     #define CONTINUOUS_MODE                     0x02
     
     #define	USB_CAMERA_NO_ERROR						0x0000
@@ -138,7 +138,7 @@ extern "C"{
     unsigned int ArduCam_writeUserData( ArduCamHandle useHandle, Uint16 u16Addr, Uint8 u8Len, Uint8* pu8Data );
     unsigned int ArduCam_softTrigger(ArduCamHandle useHandle);
     unsigned int ArduCam_isFrameReady(ArduCamHandle useHandle);
-    unsigned int ArduCam_getSingleFrame(ArduCamHandle useHandle, ArduCamOutData* &pstFrameData);
+    unsigned int ArduCam_getSingleFrame(ArduCamHandle useHandle, ArduCamOutData* &pstFrameData,int time_out = 1500);
     unsigned int ArduCam_setMode(ArduCamHandle useHandle, int mode);
 }
 

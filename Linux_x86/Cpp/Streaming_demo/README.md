@@ -41,7 +41,7 @@ Install g++ compiler `sudo apt-get install g++-4.8`
 # Usage
 
  `sudo ./ArduCam_Demo <path/config-file-name>`	
- example: `sudo ./ArduCam_Demo ../Config/AR0134_960p_Color.yml`
+ example: `sudo ./ArduCam_Demo ../../../cpp_config/AR0134_960p_Color.yml`
  While the program is running, you can press the following buttons in the terminal:	
  
     1.'s':Save the image to the images folder.	
