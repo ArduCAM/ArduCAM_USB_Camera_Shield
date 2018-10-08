@@ -1,13 +1,10 @@
 #!/usr/bin/env python
-import sys
 import os
 import time
 import cv2
-import threading
 import numpy as np
-import signal
 import json
-
+from ImageConvert import *
 import ArducamSDK
 
 import rospy
@@ -19,15 +16,9 @@ from arducam_usb2_ros.srv import ReadReg, ReadRegResponse
 from arducam_usb2_ros.srv import Capture, CaptureResponse
 
 
-global cfg,handle,ruWidth,Heigth,color_mode
+global cfg,handle,Width,Heigth,color_mode
 cfg = {}
 handle = {}
-global COLOR_BayerGB2BGR,COLOR_BayerRG2BGR,COLOR_BayerGR2BGR,COLOR_BayerBG2BGR
-
-COLOR_BayerBG2BGR = 46
-COLOR_BayerGB2BGR = 47
-COLOR_BayerRG2BGR = 48
-COLOR_BayerGR2BGR = 49
 
 
 def configBoard(fileNodes):
@@ -44,25 +35,6 @@ def configBoard(fileNodes):
         ArducamSDK.Py_ArduCam_setboardConfig(handle,int(command,16),int(value,16),int(index,16),int(buffsize,16),buffs)
 
 pass
-
-def JPGToMat(data,datasize):
-    image = np.frombuffer(data,np.uint8,count = datasize)
-    return cv2.imdecode(image,cv2.IMREAD_ANYCOLOR)
-
-def YUVToMat(data):
-    global Width,Height
-    image = np.frombuffer(data, np.uint8).reshape( Height,Width , 2 )
-    return cv2.cvtColor(image,cv2.COLOR_YUV2BGR_YUYV)
-    
-def RGB565ToMat(data):
-    global Width,Height
-    arr = np.frombuffer(data,dtype=np.uint16).astype(np.uint32)
-    arr = ((arr & 0xFF00) >> 8) + ((arr & 0x00FF) << 8)
-    arr = 0xFF000000 + ((arr & 0xF800) << 8) + ((arr & 0x07E0) << 5) + ((arr & 0x001F) << 3)
-
-    arr.dtype = np.uint8
-    iamge = arr.reshape(Height,Width,4)
-    return cv2.flip(iamge,0)
 
 def writeSensorRegs(fileNodes):
     global handle
@@ -87,24 +59,27 @@ def camera_initFromFile(fialeName):
     Height = int(camera_parameter["SIZE"][1])
 
     BitWidth = camera_parameter["BIT_WIDTH"]
+    ByteLength = 1
+    if BitWidth > 8 and BitWidth <= 16:
+        ByteLength = 2
     FmtMode = int(camera_parameter["FORMAT"][0])
     color_mode = (int)(camera_parameter["FORMAT"][1])
     print "color mode",color_mode
 
     I2CMode = camera_parameter["I2C_MODE"]
     I2cAddr = int(camera_parameter["I2C_ADDR"],16)
-
+    TransLvl = int(camera_parameter["TRANS_LVL"])
     cfg = {"u32CameraType":0x4D091031,
             "u32Width":Width,"u32Height":Height,
             "usbType":0,
-            "u8PixelBytes":1,
+            "u8PixelBytes":ByteLength,
             "u16Vid":0,
             "u32Size":0,
             "u8PixelBits":BitWidth,
             "u32I2cAddr":I2cAddr,
             "emI2cMode":I2CMode,
             "emImageFmtMode":FmtMode,
-            "u32TransLvl":32 }
+            "u32TransLvl":TransLvl }
 
     # ArducamSDK.
 
@@ -161,13 +136,14 @@ def camera_initFromFile(fialeName):
 pass
        
 def captureImage():
-    global handle
+    global handle,Width,Height,cfg,color_mode
+    global COLOR_BayerGB2BGR,COLOR_BayerRG2BGR,COLOR_BayerGR2BGR,COLOR_BayerBG2BGR
 
     rtn_val = ArducamSDK.Py_ArduCam_captureImage(handle)
     if rtn_val > 255:
         print "Error capture image, rtn_val = ",rtn_val
-        if rtn_val != ArducamSDK.USB_CAMERA_FRAME_INDEX_ERROR and rtn_val != ArducamSDK.USB_CAMERA_DATA_LEN_ERROR:
-            return
+        if rtn_val == ArducamSDK.USB_CAMERA_USB_TASK_ERROR:
+            exit()
     if ArducamSDK.Py_ArduCam_availableImage(handle) > 0:		
         rtn_val,data,rtn_cfg = ArducamSDK.Py_ArduCam_readImage(handle)
         datasize = rtn_cfg['u32Size']
@@ -178,28 +154,7 @@ def captureImage():
         if datasize == 0:
             return
 
-        image = None
-        emImageFmtMode = cfg['emImageFmtMode']
-        if emImageFmtMode == ArducamSDK.FORMAT_MODE_JPG:
-            image = JPGToMat(data,datasize)
-        if emImageFmtMode == ArducamSDK.FORMAT_MODE_YUV:
-            image = YUVToMat(data)
-        if emImageFmtMode == ArducamSDK.FORMAT_MODE_RGB:
-            image = RGB565ToMat(data)
-        if emImageFmtMode == ArducamSDK.FORMAT_MODE_MON:
-            image = np.frombuffer(data, np.uint8).reshape( Height,Width , 1 )
-        if emImageFmtMode == ArducamSDK.FORMAT_MODE_RAW:
-            image = np.frombuffer(data, np.uint8).reshape( Height,Width , 1 )
-            if color_mode == 0:
-                image = cv2.cvtColor(image,COLOR_BayerRG2BGR)
-            if color_mode == 1:
-                image = cv2.cvtColor(image,COLOR_BayerGR2BGR)
-            if color_mode == 2:
-                image = cv2.cvtColor(image,COLOR_BayerGB2BGR)
-            if color_mode == 3:
-                image = cv2.cvtColor(image,COLOR_BayerBG2BGR)
-            if color_mode < 0 and color_mode > 3:
-                image = cv2.cvtColor(image,COLOR_BayerGB2BGR)
+        image = convert_image(data,rtn_cfg,color_mode)
         if h_flip:
             image = cv2.flip(image, 1)
         if v_flip:
@@ -215,7 +170,7 @@ def captureImage():
             pass
         ArducamSDK.Py_ArduCam_del(handle)
     else:
-        time.sleep(0.010)
+        time.sleep(0.001)
 
 def write_register(request):
     global handle
@@ -239,7 +194,9 @@ def read_register(request):
     return ReadRegResponse(output)
 
 def capture(request):
-    global handle
+    global handle,Width,Height,cfg,color_mode
+    global COLOR_BayerGB2BGR,COLOR_BayerRG2BGR,COLOR_BayerGR2BGR,COLOR_BayerBG2BGR
+    
     if ArducamSDK.Py_ArduCam_availableImage(handle) > 0:		
         rtn_val,data,rtn_cfg = ArducamSDK.Py_ArduCam_readImage(handle)
         datasize = rtn_cfg['u32Size']
@@ -250,28 +207,7 @@ def capture(request):
         if datasize == 0:
             return CaptureResponse("Failed to Capture")
 
-        image = None
-        emImageFmtMode = cfg['emImageFmtMode']
-        if emImageFmtMode == ArducamSDK.FORMAT_MODE_JPG:
-            image = JPGToMat(data,datasize)
-        if emImageFmtMode == ArducamSDK.FORMAT_MODE_YUV:
-            image = YUVToMat(data)
-        if emImageFmtMode == ArducamSDK.FORMAT_MODE_RGB:
-            image = RGB565ToMat(data)
-        if emImageFmtMode == ArducamSDK.FORMAT_MODE_MON:
-            image = np.frombuffer(data, np.uint8).reshape( Height,Width , 1 )
-        if emImageFmtMode == ArducamSDK.FORMAT_MODE_RAW:
-            image = np.frombuffer(data, np.uint8).reshape( Height,Width , 1 )
-            if color_mode == 0:
-                image = cv2.cvtColor(image,COLOR_BayerRG2BGR)
-            if color_mode == 1:
-                image = cv2.cvtColor(image,COLOR_BayerGR2BGR)
-            if color_mode == 2:
-                image = cv2.cvtColor(image,COLOR_BayerGB2BGR)
-            if color_mode == 3:
-                image = cv2.cvtColor(image,COLOR_BayerBG2BGR)
-            if color_mode < 0 and color_mode > 3:
-                image = cv2.cvtColor(image,COLOR_BayerGB2BGR)
+        image = convert_image(data,rtn_cfg,color_mode)
         if h_flip:
             image = cv2.flip(image, 1)
         if v_flip:
