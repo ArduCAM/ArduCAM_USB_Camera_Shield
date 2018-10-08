@@ -261,6 +261,7 @@ void writeSensorRegs(ArduCamHandle &cameraHandle,cv::FileNode rp){
 		rp[i][1] >> hexStr;
 		Uint32 val = std::stoul(hexStr, nullptr, 16);
 		ArduCam_writeSensorReg(cameraHandle, addr, val);
+		//usleep(1000);
 	}
 }
 
@@ -383,7 +384,7 @@ void captureImage_thread(ArduCamHandle handle) {
 		    std::cout << "Error capture image, rtn_val = " << rtn_val << std::endl;
 		}
 	}
-
+    _running = false;
 	ArduCam_endCaptureImage(handle);
 	std::cout << "Capture thread stopped." << std::endl;
 }
