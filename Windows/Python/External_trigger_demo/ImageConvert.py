@@ -37,6 +37,7 @@ def convert_image(data,cfg,color_mode):
     Width = cfg["u32Width"]
     Height = cfg["u32Height"]
     bitWidth = cfg["u8PixelBits"]
+    datasize = cfg['u32Size']
     global COLOR_BayerGB2BGR,COLOR_BayerRG2BGR,COLOR_BayerGR2BGR,COLOR_BayerBG2BGR
     image = None
     emImageFmtMode = cfg['emImageFmtMode']
