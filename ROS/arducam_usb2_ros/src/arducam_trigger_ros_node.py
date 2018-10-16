@@ -157,40 +157,9 @@ def read_register(request):
     return ReadRegResponse(output)
 
 def trigger(request):
-    global handle,Width,Height,cfg,color_mode
-    global COLOR_BayerGB2BGR,COLOR_BayerRG2BGR,COLOR_BayerGR2BGR,COLOR_BayerBG2BGR
-
+    global handle
     ArducamSDK.Py_ArduCam_softTrigger(handle)
-    prev = rospy.Time.now()
-    value = 0
-    while value != 1:
-        value = ArducamSDK.Py_ArduCam_isFrameReady(handle)
-        if rospy.Time.now() - prev >= rospy.Duration(1):
-            break
-        rospy.sleep(0.001)
-    if value == 1:
-        rtn_val,data,rtn_cfg = ArducamSDK.Py_ArduCam_getSingleFrame(handle)
-        if rtn_val != 0:
-            return TriggerResponse("Failed to Capture")
-        datasize = rtn_cfg['u32Size']
-        if datasize == 0:
-            return TriggerResponse("Failed to Capture")
-        image = convert_image(data,rtn_cfg,color_mode)
-        if h_flip:
-            image = cv2.flip(image, 1)
-        if v_flip:
-            image = cv2.flip(image, 0)
-
-        try:    
-            img_msg = bridge.cv2_to_imgmsg(image, "bgr8")
-            img_msg.header.stamp = rospy.Time.now()
-            img_msg.header.frame_id = id_frame
-            pub_trigger.publish(img_msg)
-            return TriggerResponse("Captured")
-        except CvBridgeError as e:
-            return TriggerResponse("Failed to Capture")
-    else:
-        return TriggerResponse("Failed to Capture")
+    return TriggerResponse("Triggered")
 
 def rosShutdown():
     global handle
@@ -244,4 +213,29 @@ if __name__ == "__main__":
         service_capture = rospy.Service('arducam/trigger', Trigger, trigger)
 
         rospy.on_shutdown(rosShutdown)
-        rospy.spin()
+        while not rospy.is_shutdown():
+            value = ArducamSDK.Py_ArduCam_isFrameReady(handle)
+            if value == 1:
+                rtn_val,data,rtn_cfg = ArducamSDK.Py_ArduCam_getSingleFrame(handle)
+                if rtn_val != 0:
+                    rospy.sleep(0.001)
+                    continue
+                datasize = rtn_cfg['u32Size']
+                if datasize == 0:
+                    rospy.sleep(0.001)
+                    continue
+                image = convert_image(data,rtn_cfg,color_mode)
+                if h_flip:
+                    image = cv2.flip(image, 1)
+                if v_flip:
+                    image = cv2.flip(image, 0)
+
+                try:    
+                    img_msg = bridge.cv2_to_imgmsg(image, "bgr8")
+                    img_msg.header.stamp = rospy.Time.now()
+                    img_msg.header.frame_id = id_frame
+                    pub_trigger.publish(img_msg)
+                except CvBridgeError as e:
+                    rospy.sleep(0.001)
+            else:
+                rospy.sleep(0.001)
