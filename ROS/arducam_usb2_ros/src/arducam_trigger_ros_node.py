@@ -13,7 +13,7 @@ from sensor_msgs.msg import Image
 
 from arducam_usb2_ros.srv import WriteReg, WriteRegResponse
 from arducam_usb2_ros.srv import ReadReg, ReadRegResponse
-from arducam_usb2_ros.srv import Capture, CaptureResponse
+from arducam_usb2_ros.srv import Trigger, TriggerResponse
 
 
 global cfg,handle,Width,Heigth,color_mode
@@ -134,43 +134,6 @@ def camera_initFromFile(fialeName):
         return False
 
 pass
-       
-def captureImage():
-    global handle,Width,Height,cfg,color_mode
-    global COLOR_BayerGB2BGR,COLOR_BayerRG2BGR,COLOR_BayerGR2BGR,COLOR_BayerBG2BGR
-
-    rtn_val = ArducamSDK.Py_ArduCam_captureImage(handle)
-    if rtn_val > 255:
-        print "Error capture image, rtn_val = ",rtn_val
-        if rtn_val == ArducamSDK.USB_CAMERA_USB_TASK_ERROR:
-            exit()
-    if ArducamSDK.Py_ArduCam_availableImage(handle) > 0:		
-        rtn_val,data,rtn_cfg = ArducamSDK.Py_ArduCam_readImage(handle)
-        datasize = rtn_cfg['u32Size']
-        if rtn_val != 0:
-            print "read data fail!"
-            return
-            
-        if datasize == 0:
-            return
-
-        image = convert_image(data,rtn_cfg,color_mode)
-        if h_flip:
-            image = cv2.flip(image, 1)
-        if v_flip:
-            image = cv2.flip(image, 0)
-
-        try:    
-            img_msg = bridge.cv2_to_imgmsg(image, "bgr8")
-            img_msg.header.stamp = rospy.Time.now()
-            img_msg.header.frame_id = id_frame
-            pub.publish(img_msg)
-            cv2.waitKey(10)
-        except CvBridgeError as e:
-            pass
-        ArducamSDK.Py_ArduCam_del(handle)
-    else:
-        time.sleep(0.001)
 
 def write_register(request):
     global handle
@@ -193,20 +156,25 @@ def read_register(request):
         output = 'Invalid register'
     return ReadRegResponse(output)
 
-def capture(request):
+def trigger(request):
     global handle,Width,Height,cfg,color_mode
     global COLOR_BayerGB2BGR,COLOR_BayerRG2BGR,COLOR_BayerGR2BGR,COLOR_BayerBG2BGR
-    
-    if ArducamSDK.Py_ArduCam_availableImage(handle) > 0:		
-        rtn_val,data,rtn_cfg = ArducamSDK.Py_ArduCam_readImage(handle)
-        datasize = rtn_cfg['u32Size']
-        if rtn_val != 0:
-            print "read data fail!"
-            return CaptureResponse("Failed to Capture")
-            
-        if datasize == 0:
-            return CaptureResponse("Failed to Capture")
 
+    ArducamSDK.Py_ArduCam_softTrigger(handle)
+    prev = rospy.Time.now()
+    value = 0
+    while value != 1:
+        value = ArducamSDK.Py_ArduCam_isFrameReady(handle)
+        if rospy.Time.now() - prev >= rospy.Duration(1):
+            break
+        rospy.sleep(0.001)
+    if value == 1:
+        rtn_val,data,rtn_cfg = ArducamSDK.Py_ArduCam_getSingleFrame(handle)
+        if rtn_val != 0:
+            return TriggerResponse("Failed to Capture")
+        datasize = rtn_cfg['u32Size']
+        if datasize == 0:
+            return TriggerResponse("Failed to Capture")
         image = convert_image(data,rtn_cfg,color_mode)
         if h_flip:
             image = cv2.flip(image, 1)
@@ -217,16 +185,15 @@ def capture(request):
             img_msg = bridge.cv2_to_imgmsg(image, "bgr8")
             img_msg.header.stamp = rospy.Time.now()
             img_msg.header.frame_id = id_frame
-            pub_capture.publish(img_msg)
-            return CaptureResponse("Captured")
+            pub_trigger.publish(img_msg)
+            return TriggerResponse("Captured")
         except CvBridgeError as e:
-            return CaptureResponse("Failed to Capture")
+            return TriggerResponse("Failed to Capture")
     else:
-        return CaptureResponse("Failed to Capture")
+        return TriggerResponse("Failed to Capture")
 
 def rosShutdown():
     global handle
-    ArducamSDK.Py_ArduCam_endCaptureImage(handle)
     rtn_val = ArducamSDK.Py_ArduCam_close(handle)
     if rtn_val == 0:
         print "device close success!"
@@ -235,9 +202,8 @@ def rosShutdown():
 
 if __name__ == "__main__":
 
-    rospy.init_node("arducam_ros_node")
-    pub = rospy.Publisher("arducam/camera/image_raw", Image, queue_size=1)
-    pub_capture = rospy.Publisher("arducam/captured/camera/image_raw", Image, queue_size=1)
+    rospy.init_node("arducam_trigger_ros_node")
+    pub_trigger = rospy.Publisher("arducam/triggered/camera/image_raw", Image, queue_size=1)
     bridge = CvBridge()
     try:
         config_file_name = rospy.get_param("~config_file")
@@ -268,18 +234,14 @@ if __name__ == "__main__":
         exit()
 
     if camera_initFromFile(config_file_name):
-        ArducamSDK.Py_ArduCam_setMode(handle,ArducamSDK.CONTINUOUS_MODE)
-        rtn_val = ArducamSDK.Py_ArduCam_beginCaptureImage(handle)
-        if rtn_val != 0:
-            print "Error beginning capture, rtn_val = ",rtn_val
+        ret_val = ArducamSDK.Py_ArduCam_setMode(handle,ArducamSDK.EXTERNAL_TRIGGER_MODE)
+        if(ret_val == ArducamSDK.USB_BOARD_FW_VERSION_NOT_SUPPORT_ERROR):
+            print("USB_BOARD_FW_VERSION_NOT_SUPPORT_ERROR")
             exit()
-        else:
-            print "Capture began, rtn_val = ",rtn_val
 
         service_write = rospy.Service('arducam/write_reg', WriteReg, write_register)
         service_read = rospy.Service('arducam/read_reg', ReadReg, read_register)
-        service_capture = rospy.Service('arducam/capture', Capture, capture)
+        service_capture = rospy.Service('arducam/trigger', Trigger, trigger)
 
         rospy.on_shutdown(rosShutdown)
-        while not rospy.is_shutdown():
-            captureImage()
+        rospy.spin()

@@ -59,6 +59,7 @@ find_package(catkin REQUIRED COMPONENTS
    WriteReg.srv
    ReadReg.srv
    Capture.srv
+   Trigger.srv
 #   Service1.srv
 #   Service2.srv    
  )
