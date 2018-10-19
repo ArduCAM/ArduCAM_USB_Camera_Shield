@@ -157,9 +157,18 @@ def read_register(request):
     return ReadRegResponse(output)
 
 def trigger(request):
-    global handle
+    global handle,soft_trigger,captured
+    soft_trigger = True
     ArducamSDK.Py_ArduCam_softTrigger(handle)
-    return TriggerResponse("Triggered")
+    while True:
+        if captured == 0:
+            continue
+        elif captured == 1:
+            captured = 0
+            return TriggerResponse("Failed to Capture")
+        elif captured == 2:
+            captured = 0
+            return TriggerResponse("Captured")
 
 def rosShutdown():
     global handle
@@ -210,8 +219,10 @@ if __name__ == "__main__":
 
         service_write = rospy.Service('arducam/write_reg', WriteReg, write_register)
         service_read = rospy.Service('arducam/read_reg', ReadReg, read_register)
-        service_capture = rospy.Service('arducam/trigger', Trigger, trigger)
+        service_trigger = rospy.Service('arducam/trigger', Trigger, trigger)
 
+        captured = 0
+        soft_trigger = False
         rospy.on_shutdown(rosShutdown)
         while not rospy.is_shutdown():
             value = ArducamSDK.Py_ArduCam_isFrameReady(handle)
@@ -219,10 +230,16 @@ if __name__ == "__main__":
                 rtn_val,data,rtn_cfg = ArducamSDK.Py_ArduCam_getSingleFrame(handle)
                 if rtn_val != 0:
                     rospy.sleep(0.001)
+                    if soft_trigger:
+                        captured = 1
+                        soft_trigger = False
                     continue
                 datasize = rtn_cfg['u32Size']
                 if datasize == 0:
                     rospy.sleep(0.001)
+                    if soft_trigger:
+                        captured = 1
+                        soft_trigger = False
                     continue
                 image = convert_image(data,rtn_cfg,color_mode)
                 if h_flip:
@@ -235,7 +252,13 @@ if __name__ == "__main__":
                     img_msg.header.stamp = rospy.Time.now()
                     img_msg.header.frame_id = id_frame
                     pub_trigger.publish(img_msg)
+                    if soft_trigger:
+                        captured = 2
+                        soft_trigger = False
                 except CvBridgeError as e:
                     rospy.sleep(0.001)
+                    if soft_trigger:
+                        captured = 1
+                        soft_trigger = False
             else:
                 rospy.sleep(0.001)
