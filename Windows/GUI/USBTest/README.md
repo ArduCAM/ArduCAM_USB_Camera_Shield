@@ -2,7 +2,8 @@
 
 Windows demo code for the following cameras:
 
-- MT9V034 (0.36MP Global Shutter Camera)
+- MT9V034 (0.36MP Color Global Shutter Camera)
+- MT9V022 (0.3MP Mono Global Shutter Camera)
 - AR0134  (1.2MP Global Shutter Camera)
 - MT9N001 (9MP Color Rolling Shutter Camera)
 - MT9J001 (10MP Mono Rolling Shutter Camera)
