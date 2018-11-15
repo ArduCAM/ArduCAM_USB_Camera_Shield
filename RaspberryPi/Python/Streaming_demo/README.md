@@ -20,12 +20,12 @@ Python demo code for the following cameras:
 - Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
 - Copy the libusb-xxx.tar.bz to the Pi then run the following command to unzip it.[xxx：version number]
 ```Bash
- tar -jxvf  libusb-xxx.tar.bz2  
+tar -jxvf  libusb-xxx.tar.bz2  
 ```
 - Before compilation, Run the following commands to config it  
 ```Bash
-   cd libusb-xxx 
-  ./configure --disable-udev
+cd libusb-xxx 
+./configure --disable-udev
 ```
 - Install the libusb library 
 ```Bash
