@@ -18,9 +18,9 @@ Python demo code for the following cameras:
 # Install library and OpenCV Environment
 ## Downlaod and inatall the latest libusb 
 - Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
-- Copy the libusb-xxx.tar.bz to the Pi then run the following command to unzip it.
+- Copy the libusb-xxx.tar.bz to the Pi then run the following command to unzip it.[xxx：version number]
 ```Bash
- tar -jxvf  libusb-xxx.tar.bz2
+ tar -jxvf  libusb-xxx.tar.bz2  
 ```
 - Before compilation, Run the following commands to config it  
 ```Bash
@@ -54,6 +54,15 @@ sudo python ArduCam_Py_Demo.py <path/config-file-name>
 example:
 ```Bash
    sudo python ArduCam_Py_Demo.py ../../../python_config/AR0134_960p_Color.json	
+```
+## For the External_trigger_demo 
+```Bash 
+cd ArduCAM_USB_Camera_Shield/RaspberryPi/Python/External_trigger_demo.py/
+```
+sudo python ArduCam_Ext_Trigger_Demo.py <path/config-file-name>
+example:
+```Bash
+   sudo python ArduCam_Ext_Trigger_Demo.py ../../../python_config/AR0134_960p_Color.json	
 ```
 While the program is running, you can press the following buttons in the terminal:	
     1.'s' + Enter:Save the image to the images folder.	
