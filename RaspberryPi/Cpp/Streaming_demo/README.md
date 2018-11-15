@@ -30,20 +30,12 @@ cd libusb-xxx
 ```Bash
 sudo make install
 ```
-## Install Python 2.7 / python-opencv and g++ compiler
- Notice: On raspberry Pi platform we advise use Python 2.7 
- ```bash
- sudo apt-get install python2.7-dev
- ``` 
- - For Python3
-```Bash
-sudo apt-get install python3.x-dev
-```
+## Install Opencv and g++ compiler
 - Install opencv
 ```Bash
 sudo apt-get install libopencv-dev
 ```
-- Install g++ compiler
+- Install g++ compiler[the version number of g++ should more than 4.8]
 ```Bash 
 sudo apt-get install g++-4.8
 ```
