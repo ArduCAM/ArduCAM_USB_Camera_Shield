@@ -45,7 +45,15 @@ Install Python Dependence libraries
 # Usuage
 
 `sudo python ArduCam_Ext_Trigger_Demo.py <path/config-file-name>	`
-example: `sudo python ArduCam_Ext_Trigger_Demo.py ../../../python_config/AR0134_960p_Color.json`	
+example: `sudo python ArduCam_Ext_Trigger_Demo.py ../../../python_config/AR0134_960p_Color.json`
 
-press Ctrl+C exit
+## For the External_trigger_demo 
+```Bash 
+cd ArduCAM_USB_Camera_Shield/RaspberryPi/Python/External_trigger_demo.py/
+```
+sudo python ArduCam_Ext_Trigger_Demo.py <path/config-file-name>
+example:
+```Bash
+sudo python ArduCam_Ext_Trigger_Demo.py ../../../python_config/AR0134_960p_Color.json	
+```
 
