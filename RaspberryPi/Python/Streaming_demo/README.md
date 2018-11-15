@@ -53,7 +53,7 @@ cd ArduCAM_USB_Camera_Shield/RaspberryPi/Python/Streaming_demo/
 sudo python ArduCam_Py_Demo.py <path/config-file-name>
 example:
 ```Bash
-   sudo python ArduCam_Py_Demo.py ../../../python_config/AR0134_960p_Color.json	
+sudo python ArduCam_Py_Demo.py ../../../python_config/AR0134_960p_Color.json	
 ```
 ## For the External_trigger_demo 
 ```Bash 
@@ -62,9 +62,9 @@ cd ArduCAM_USB_Camera_Shield/RaspberryPi/Python/External_trigger_demo.py/
 sudo python ArduCam_Ext_Trigger_Demo.py <path/config-file-name>
 example:
 ```Bash
-   sudo python ArduCam_Ext_Trigger_Demo.py ../../../python_config/AR0134_960p_Color.json	
+sudo python ArduCam_Ext_Trigger_Demo.py ../../../python_config/AR0134_960p_Color.json	
 ```
 While the program is running, you can press the following buttons in the terminal:	
-    1.'s' + Enter:Save the image to the images folder.	
-    2.'c' + Enter:Stop saving images.	
-    3.'q' + Enter:Stop running the program.	
+  - 's' + Enter:Save the image to the images folder.	
+  - 'c' + Enter:Stop saving images.	
+  - 'q' + Enter:Stop running the program.	
