@@ -16,7 +16,7 @@ Python demo code for the following cameras:
 - OV7675 （0.36MP Rolling Shutter Camera)
 
 # Install library and OpenCV Environment
-## Downlaod and inatall the latest libusb 
+## Downlaod and install the latest libusb 
 - Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
 - Copy the libusb-xxx.tar.bz to the Pi then run the following command to unzip it.[xxx：version number]
 ```Bash
