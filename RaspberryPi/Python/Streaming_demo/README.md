@@ -41,7 +41,9 @@ Install Python Dependence libraries
 
 `sudo python ArduCam_Py_Demo.py <path/config-file-name>	`
 example:
+```Bash
     `sudo python ArduCam_Py_Demo.py ../../../python_config/AR0134_960p_Color.json`	
+```
 While the program is running, you can press the following buttons in the terminal:	
 
     1.'s' + Enter:Save the image to the images folder.	
