@@ -1,11 +1,6 @@
 # Overview
-This ArduCam_Ext_Trigger_Demo demostrates how to capture a single frame from the camera with external trigger input to USB2 camera shield.
-The purpose of this demo is used for multi-camera synchronized capture, it works for both rolling shutter camera and global shutter camera. 
-If you want to trigger multiple global shutter camera, you have set the global shutter camera into trigger mode and connect the external trigger to both camera board and USB2 camera shield.
 
-Note that this example only works for lastest USB2 camera shield hardware.
-
-Python demo code for the following cameras(but not limited to):
+Python demo code for the following cameras:
 
 - MT9V022 (0.36MP Global Shutter Camera)
 - MT9V034 (0.36MP Global Shutter Camera)
@@ -21,31 +16,45 @@ Python demo code for the following cameras(but not limited to):
 - OV7675 （0.36MP Rolling Shutter Camera)
 
 # Install library and OpenCV Environment
-
-Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
-
-Unzip `tar -jxvf  libusb-1.0.21.tar.bz2`
-
-Then configure `./configure` or `./configure --disable-udev`
-
-Install the libusb library `sudo make install` 
-
-Install Python 2.7 `sudo apt-get install python2.7-dev` or Install Python 3.x `sudo apt-get install python3.x-dev`
-
-Install Python Dependence libraries 
-
-`sudo apt-get install python-pip`
-
-`sudo apt-get install python-opencv`
-
-`sudo apt-get install python-imaging`
-
-`sudo pip install evdev`
+## Downlaod and install the latest libusb 
+- Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
+- Copy the libusb-xxx.tar.bz to the Pi then run the following command to unzip it.[xxx：version number]
+```Bash
+tar -jxvf  libusb-xxx.tar.bz2  
+```
+- Before compilation, Run the following commands to config it  
+```Bash
+cd libusb-xxx 
+./configure --disable-udev
+```
+- Install the libusb library 
+```Bash
+sudo make install
+```
+## Install Python 2.7 and python-opencv
+ Notice: On raspberry Pi platform we advise use Python 2.7 
+ ```bash
+ sudo apt-get install python2.7-dev
+ ``` 
+ - For Python3
+```Bash
+sudo apt-get install python3.x-dev
+```
+- Install opencv
+```Bash
+sudo apt-get install python-opencv
+```
 
 # Usuage
+## For the External_trigger_demo 
+```Bash 
+cd ArduCAM_USB_Camera_Shield/RaspberryPi/Python/External_trigger_demo.py/
+```
+sudo python ArduCam_Ext_Trigger_Demo.py <path/config-file-name>
+example:
+```Bash
+sudo python ArduCam_Ext_Trigger_Demo.py ../../../python_config/AR0134_960p_Color.json	
+```
+Press Ctrl+C to exit the demo.
 
-`sudo python ArduCam_Ext_Trigger_Demo.py <path/config-file-name>	`
-example: `sudo python ArduCam_Ext_Trigger_Demo.py ../../../python_config/AR0134_960p_Color.json`	
-
-press Ctrl+C exit
 

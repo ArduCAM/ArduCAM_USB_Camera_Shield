@@ -14,34 +14,54 @@ This is C/C++ demo code for the following cameras:
 - OV5640 （5MP Rolling Shutter Camera)
 - OV5642 （5MP Rolling Shutter Camera)
 - OV7675 （0.36MP Rolling Shutter Camera)
-
 # Install library and OpenCV Environment
-
-Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
-
-Unzip `tar -jxvf  libusb-1.0.21.tar.bz2`
-
-Then configure `./configure` or `./configure --disable-udev`
-
-Install the libusb library `sudo make install` 
-
-Install OpenCV library `sudo apt-get install libopencv-dev`
-
-Install g++ compiler `sudo apt-get install g++-4.8`
+## Downlaod and install the latest libusb 
+- Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
+- Copy the libusb-xxx.tar.bz to the Pi then run the following command to unzip it.[xxx：version number]
+```Bash
+tar -jxvf  libusb-xxx.tar.bz2  
+```
+- Before compilation, Run the following commands to config it  
+```Bash
+cd libusb-xxx 
+./configure --disable-udev
+```
+- Install the libusb library 
+```Bash
+sudo make install
+```
+## Install Opencv and g++ compiler
+- Install opencv
+```Bash
+sudo apt-get install libopencv-dev
+```
+- Install g++ compiler[the version number of g++ should more than 4.8]
+```Bash 
+sudo apt-get install g++-4.8
+```
 
 # Install the SDK
-
-`make install-sdk`
-
+- Run the following command to install SDK
+```Bash
+make install-sdk
+```
 # Compile the source code
-
-`make`
-
-
+- Run the following command to compile the source code 
+```Bash
+make
+```
 # Usage
-
  `sudo ./ArduCam_Demo <path/config-file-name>`	
- example: `sudo ./ArduCam_Demo ../Config/AR0134_960p_Color.yml`
+ 
+ example:
+ 
+ ```bash
+ cd ArduCAM_USB_Camera_Shield/RaspberryPi/Cpp/Streaming_demo
+ ```
+ ```bash
+ sudo ./ArduCam_Demo ../../../cpp_config/AR0134_960p_Color.yml
+ ```
+ 
  While the program is running, you can press the following buttons in the terminal:	
  
     1.'s':Save the image to the images folder.	

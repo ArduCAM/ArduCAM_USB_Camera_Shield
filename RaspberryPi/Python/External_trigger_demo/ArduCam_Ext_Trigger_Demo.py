@@ -176,8 +176,8 @@ def getAndDisplaySingleFrame(handle,index):
 
             
 def showHelp():
-    print(" usage: sudo python3 ArduCam_Ext_Trigger_Demo.py <path/config-file-name>	\
-        \n\n example: sudo python3 ArduCam_Ext_Trigger_Demo.py ../python_config/AR0134_960p_Color.json	\
+    print(" usage: sudo python ArduCam_Ext_Trigger_Demo.py <path/config-file-name>	\
+        \n\n example: sudo python ArduCam_Ext_Trigger_Demo.py .../../../python_config/AR0134_960p_Color.json	\
         \n\n")
 
 def sigint_handler(signum, frame):

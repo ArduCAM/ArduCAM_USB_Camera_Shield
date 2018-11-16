@@ -39,7 +39,7 @@ int color_mode = 0;
 
 void showHelp(){
 	printf(" usage: sudo ./ArduCam_Ext_Trigger_Demo <path/config-file-name>	\
-			\n\n example: sudo ./ArduCam_Ext_Trigger_Demo ../cpp_config/AR0134_960p_Color.yml	\
+			\n\n example: sudo ./ArduCam_Ext_Trigger_Demo ./../../cpp_config/AR0134_960p_Color.yml	\
 			\n\n");
 }
 

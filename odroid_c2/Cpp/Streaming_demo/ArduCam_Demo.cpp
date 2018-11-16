@@ -34,7 +34,7 @@ bool save_flag = false;
 int color_mode = 0;
 void showHelp(){
 	printf(" usage: sudo ./ArduCam_Demo <path/config-file-name>	\
-			\n\n example: sudo ./ArduCam_Demo ../Config/AR0134_960p_Color.yml	\
+			\n\n example: sudo ./ArduCam_Demo ../../../cpp_config/AR0134_960p_Color.yml	\
 			\n\n While the program is running, you can press the following buttons in the terminal:	\
 			\n\n 's':Save the image to the images folder.	\
 			\n\n 'c':Stop saving images.	\
