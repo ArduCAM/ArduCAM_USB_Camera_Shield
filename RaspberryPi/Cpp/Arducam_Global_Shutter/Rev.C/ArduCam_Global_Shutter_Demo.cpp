@@ -2,7 +2,7 @@
 //
 
 #ifdef linux
-#include "Arducam_SDK/ArduCamLib.h"
+#include "ArduCamLib.h"
 #include <unistd.h>
 #include <termios.h>
 #endif
