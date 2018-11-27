@@ -45,24 +45,27 @@ sudo apt-get install g++-4.8
 ```Bash
 make install-sdk
 ```
-# Compile the source code
-- Run the following command to compile the source code 
-```Bash
-make
-```
+
 # Usage
 - For the Rev.C
 ```bash
  cd ArduCAM_USB_Camera_Shield/RaspberryPi/Cpp/Arducam_Global_Shutter/Rev.C
 ```
-```bash
+- Run the following command to compile the source code 
+ ```Bash
+ make
+ ```
+ ```bash
  sudo ./Arducam_Global_Shutter_Demo <path/config-file-name>
-``` 	
+ ``` 	
  
  example:
  ```bash
  cd ArduCAM_USB_Camera_Shield/RaspberryPi/Cpp/Arducam_Global_Shutter/Rev.C
  ```
+```Bash
+ make
+```
  ```bash
  sudo ./Arducam_Global_Shutter_Demo ../AR0134_960p_Color.yml
  ```
@@ -70,6 +73,9 @@ make
   ```bash
  cd ArduCAM_USB_Camera_Shield/RaspberryPi/Cpp/Arducam_Global_Shutter/Rev.D
  ```
+ ```Bash
+ make
+```
  ```bash
  sudo ./Arducam_Global_Shutter_Demo <path/config-file-name>
 ``` 
@@ -78,6 +84,9 @@ make
  ```bash
  cd ArduCAM_USB_Camera_Shield/RaspberryPi/Cpp/Arducam_Global_Shutter/Rev.D
  ```
+ ```Bash
+ make
+```
  ```bash
  sudo ./Arducam_Global_Shutter_Demo ../AR0134_960p_Color.yml
  ```
