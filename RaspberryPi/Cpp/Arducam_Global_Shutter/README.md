@@ -77,7 +77,7 @@ make install-sdk
  make
 ```
  ```bash
- sudo ./Arducam_Global_Shutter_Demo <path/config-file-name>
+ sudo ./ArduCam_Global_Shutter_Demo <path/config-file-name>
 ``` 
  
  example:
@@ -88,7 +88,7 @@ make install-sdk
  make
 ```
  ```bash
- sudo ./Arducam_Global_Shutter_Demo ../AR0134_960p_Color.yml
+ sudo ./ArduCam_Global_Shutter_Demo ../AR0134_960p_Color.yml
  ```
  press Ctrl+C exit
  
