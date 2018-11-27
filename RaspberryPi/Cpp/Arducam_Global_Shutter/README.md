@@ -53,7 +53,7 @@ make
 # Usage
 - For the Rev.C
 ```bash
- cd ArduCAM_USB_Camera_Shield\RaspberryPi\Cpp\Arducam_Global_Shutter\Rev.C
+ cd ArduCAM_USB_Camera_Shield/RaspberryPi/Cpp/Arducam_Global_Shutter/Rev.C
 ```
 ```bash
  sudo ./Arducam_Global_Shutter_Demo <path/config-file-name>
@@ -61,14 +61,14 @@ make
  
  example:
  ```bash
- cd ArduCAM_USB_Camera_Shield\RaspberryPi\Cpp\Arducam_Global_Shutter\Rev.C
+ cd ArduCAM_USB_Camera_Shield/RaspberryPi/Cpp/Arducam_Global_Shutter/Rev.C
  ```
  ```bash
  sudo ./Arducam_Global_Shutter_Demo ../AR0134_960p_Color.yml
  ```
  - For the Rev.D
   ```bash
-  cd ArduCAM_USB_Camera_Shield\RaspberryPi\Cpp\Arducam_Global_Shutter\Rev.D
+ cd ArduCAM_USB_Camera_Shield/RaspberryPi/Cpp/Arducam_Global_Shutter/Rev.D
  ```
  ```bash
  sudo ./Arducam_Global_Shutter_Demo <path/config-file-name>
@@ -76,7 +76,7 @@ make
  
  example:
  ```bash
- cd ArduCAM_USB_Camera_Shield\RaspberryPi\Cpp\Arducam_Global_Shutter\Rev.D
+ cd ArduCAM_USB_Camera_Shield/RaspberryPi/Cpp/Arducam_Global_Shutter/Rev.D
  ```
  ```bash
  sudo ./Arducam_Global_Shutter_Demo ../AR0134_960p_Color.yml
