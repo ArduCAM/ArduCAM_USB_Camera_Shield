@@ -5,7 +5,10 @@ If you want to trigger multiple global shutter camera, you have set the global s
 
 Note that this example only works for lastest USB2 camera shield hardware.
 
-This is C/C++ demo code for the AR0134 (1.2MP Global Shutter Camera)
+This is C/C++ demo code for the following cameras (but not limited to):
+- AR0134 (1.2MP Global Shutter Camera)
+- MT9V022 (0.36MP Global Shutter Camera)
+- MT9V034 (0.36MP Global Shutter Camera)
  
 # Install library and OpenCV Environment
 ## Downlaod and install the latest libusb 
@@ -48,14 +51,27 @@ make install-sdk
 make
 ```
 # Usage
+- For the Rev.C
+ `cd ArduCAM_USB_Camera_Shield\RaspberryPi\Cpp\Arducam_Global_Shutter\Rev.C`
  `sudo ./Arducam_Global_Shutter_Demo <path/config-file-name>`	
  
  example:
  ```bash
- cd ArduCAM_USB_Camera_Shield/RaspberryPi/Cpp/Arducam_Global_Shutter
+ cd ArduCAM_USB_Camera_Shield\RaspberryPi\Cpp\Arducam_Global_Shutter\Rev.C
  ```
  ```bash
- sudo ./Arducam_Global_Shutter_Demo ../../../cpp_config/AR0134_960p_Color.yml
+ sudo ./Arducam_Global_Shutter_Demo ../AR0134_960p_Color.yml
+ ```
+ - For the Rev.D
+ `cd ArduCAM_USB_Camera_Shield\RaspberryPi\Cpp\Arducam_Global_Shutter\Rev.D`
+ `sudo ./Arducam_Global_Shutter_Demo <path/config-file-name>`	
+ 
+ example:
+ ```bash
+ cd ArduCAM_USB_Camera_Shield\RaspberryPi\Cpp\Arducam_Global_Shutter\Rev.D
+ ```
+ ```bash
+ sudo ./Arducam_Global_Shutter_Demo ../AR0134_960p_Color.yml
  ```
  press Ctrl+C exit
  
