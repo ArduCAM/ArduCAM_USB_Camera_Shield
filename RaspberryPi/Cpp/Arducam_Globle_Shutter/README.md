@@ -65,12 +65,14 @@ So, please connect the trigger signal from the camera board. For example,
 we use MT9V034 (UC-396), we can input the trigger signal as the following 
 picture shows. Notice the valid trigger signal is 3.3 high level, please 
 ensure your micro controller's level is 3.3v.
+
 ![Alt text]( https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield/blob/master/Data/Arducam_UC-396.png)
 
 For the UC-391 Rev.D baseboard which has external trigger signal interface, 
 so you can input the trigger to the baseboard directly. Such as the following 
 picture shows. Notice the valid trigger signal is 3.3 high level, please 
 ensure your micro controller's level is 3.3v.
+
 ![Alt text]( https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield/blob/master/Data/Arducam_UC-391_Rev_D.png)
 
 ## The test project
