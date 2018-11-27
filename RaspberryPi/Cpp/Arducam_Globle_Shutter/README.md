@@ -58,4 +58,13 @@ make
  sudo ./ArduCam_Globle_Shutter_Demo ../../../cpp_config/AR0134_960p_Color.yml
  ```
  press Ctrl+C exit
+ 
+ ## The test project
+ ![Alt text]( https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield/blob/master/Data/Arducam_Globle_Shutter_Shoow1.png)
+ ![Alt text]( https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield/blob/master/Data/Arducam_Globle_Shutter_Shoow2.png)
+ ![Alt text]( https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield/blob/master/Data/Arducam_Globle_Shutter_Shoow3.png)
+ 
+ 
+
+ 
 
