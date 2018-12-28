@@ -11,7 +11,7 @@ This is C/C++ demo code for the following cameras (but not limited to):
 - MT9V034 (0.36MP Global Shutter Camera)
  
 # Install library and OpenCV Environment
-## Downlaod and install the latest libusb 
+## Download and install the latest libusb 
 - Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
 - Copy the libusb-xxx.tar.bz to the Pi then run the following command to unzip it.[xxx：version number]
 ```Bash
