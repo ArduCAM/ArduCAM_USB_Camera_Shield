@@ -27,6 +27,8 @@
 using namespace std;
 using namespace cv;
 
+ArduCamHandle cameraHandles[32];
+std::vector<std::thread> threads;
 ArduCamCfg cameraCfg;
 volatile bool _running = true;
 bool save_raw = false;
@@ -272,7 +274,7 @@ void writeSensorRegs(ArduCamHandle &cameraHandle,cv::FileNode rp){
  * @param cameraCfg :camera config struct
  * @return TURE or FALSE
  * */
-bool camera_initFromFile(std::string filename, ArduCamHandle &cameraHandle, ArduCamCfg &cameraCfg) {
+bool camera_initFromFile(std::string filename, ArduCamHandle &cameraHandle, ArduCamCfg &cameraCfg, const int cam_index) {
 	cv::FileStorage cfg;
 	if (cfg.open(filename, cv::FileStorage::READ)) {
 		cv::FileNode cp = cfg["camera_parameter"];
@@ -315,8 +317,8 @@ bool camera_initFromFile(std::string filename, ArduCamHandle &cameraHandle, Ardu
 		    save_raw = true;
 		}
 
-		//int ret_val = ArduCam_open(cameraHandle, &cameraCfg,0);
-		int ret_val = ArduCam_autoopen(cameraHandle, &cameraCfg);
+		int ret_val = ArduCam_open(cameraHandle, &cameraCfg, cam_index);
+		//int ret_val = ArduCam_autoopen(cameraHandle, &cameraCfg);
 		if ( ret_val == USB_CAMERA_NO_ERROR) {
 			//ArduCam_enableForceRead(cameraHandle);	//Force display image
 			cv::FileNode board_param = cfg["board_parameter"];
@@ -389,15 +391,18 @@ void captureImage_thread(ArduCamHandle handle) {
 	std::cout << "Capture thread stopped." << std::endl;
 }
 
-void readImage_thread(ArduCamHandle handle) {
+void readImage_thread(ArduCamHandle handle, const int cam_index) {
 	ArduCamOutData* frameData;
-	cv::namedWindow("ArduCam", cv::WINDOW_AUTOSIZE);
+	char win_name[50];
+	sprintf(win_name,"ArduCam%d", cam_index);
+	cv::namedWindow(win_name, cv::WINDOW_AUTOSIZE);
 	long beginTime = time(NULL);
 	int frame_count = 0;
 	long total_frame = 0;
 	int flag = 0;
 	cv::Mat rawImage ;
-	const char* save_path = "images";
+	char save_path[50];
+	sprintf(save_path,"cam%d_images/", cam_index);
 #ifdef linux
 	if(access(save_path, F_OK) != 0){  
 		if(mkdir(save_path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == -1)  
@@ -432,25 +437,25 @@ void readImage_thread(ArduCamHandle handle) {
 				if ((time(NULL) - beginTime) >= 1)
 				{
 					beginTime = time(NULL);
-					printf("-------------------%d fps\n", frame_count);
+					printf("cam%d-------------------%d fps\n", cam_index, frame_count);
 					frame_count = 0;
 				}
 				if(save_flag){
 					char imageName[50];
 					printf("save image%ld.jpg.\n",total_frame);
-				    sprintf(imageName,"images/image%ld.jpg",total_frame);
+					sprintf(imageName,"cam%d_images/image%ld.jpg", cam_index, total_frame);
 					cv::imwrite(imageName,rawImage);
 					if(save_raw){
-    				    printf("save image%ld.raw.\n",total_frame);
-    				    sprintf(imageName,"images/image%ld.raw",total_frame);
-    				    FILE *file = fopen(imageName,"wb");
-    				    fwrite(frameData->pu8ImageData,1,frameData->stImagePara.u32Size,file);
-    				    fclose(file);
+					printf("save image%ld.raw.\n",total_frame);
+					sprintf(imageName,"cam%d_images/image%ld.raw", cam_index, total_frame);
+					FILE *file = fopen(imageName,"wb");
+					fwrite(frameData->pu8ImageData,1,frameData->stImagePara.u32Size,file);
+					fclose(file);
     				}
 					total_frame++;
 				}
 				cv::resize(rawImage, rawImage, cv::Size(640, 480), (0, 0), (0, 0), cv::INTER_LINEAR);
-				cv::imshow("ArduCam", rawImage);
+				cv::imshow(win_name, rawImage);
 				//printf("----------%f\n", (clock() - begin_disp) * 1.0 / CLOCKS_PER_SEC);
 
 				int key = -1;
@@ -491,43 +496,48 @@ int main(int argc,char **argv)
 		showHelp();
 		return 0;
 	}
-	
+
 	ArduCamIndexinfo pUsbIdxArray[16];
 	int camera_num =  0;
 	camera_num = ArduCam_scan(pUsbIdxArray);
-    printf("device num:%d\n",camera_num);
+	printf("device num:%d\n",camera_num);
 	char serial[16];
 	unsigned char *u8TmpData;
-    for(int i = 0; i < camera_num ;i++){
+	for(int i = 0; i < camera_num ;i++){
 		u8TmpData = pUsbIdxArray[i].u8SerialNum;
 		sprintf(serial,"%c%c%c%c-%c%c%c%c-%c%c%c%c",
 			u8TmpData[0], u8TmpData[1], u8TmpData[2], u8TmpData[3],
 			u8TmpData[4], u8TmpData[5], u8TmpData[6], u8TmpData[7],
 			u8TmpData[8], u8TmpData[9], u8TmpData[10], u8TmpData[11]);
-        printf("index:%4d\tSerial:%s\n",pUsbIdxArray[i].u8UsbIndex,serial);
-    }
+		printf("index:%4d\tSerial:%s\n",pUsbIdxArray[i].u8UsbIndex,serial);
+	}
 #ifdef linux
 	sleep(2);
 #endif
+	for(int i = 0 ; i < camera_num ;i++){
+		//read config file and open the camera.
+		if (!camera_initFromFile(config_file_name, cameraHandles[i], cameraCfg, i)) 
+			 cameraHandles[i] = NULL;
+		else{
+			Uint32 ret_val =  ArduCam_setMode(cameraHandles[i], CONTINUOUS_MODE);
+			threads.push_back(std::thread(captureImage_thread, cameraHandles[i]));
+			threads.push_back(std::thread(readImage_thread, cameraHandles[i], i));
+			std::cout << "camera " << i << " capture thread create successfully." << std::endl;
+			std::cout << "camera " << i << " read thread create successfully." << std::endl;
+		}
+	}
 
-	//read config file and open the camera.
-	if (camera_initFromFile(config_file_name, cameraHandle, cameraCfg)) {
-	    ArduCam_setMode(cameraHandle,CONTINUOUS_MODE);
-		std::thread captureThread(captureImage_thread, cameraHandle);
-		std::thread readThread(readImage_thread, cameraHandle);
-		std::cout << "capture thread create successfully." << std::endl;
-		std::cout << "read thread create successfully." << std::endl;
-		int key = -1;
+	int key_val = -1;
 #ifdef linux
-		while((key = getchar()) != -1){
+	while((key_val = getchar()) != -1){
 #endif
 #ifdef _WIN32
-        while((key = _getch()) != -1){
+        while((key_val = _getch()) != -1){
 #endif
-			if(key == 'q' || key == 'Q'){
+			if(key_val == 'q' || key_val == 'Q'){
 				break;
 			}
-			switch(key){
+			switch(key_val){
 			case 's':
 			case 'S':
 				save_flag = true;
@@ -537,15 +547,17 @@ int main(int argc,char **argv)
 				save_flag = false;
 				break;
 			}
-		}
-		
-		_running = false;
-		readThread.join();
-		captureThread.join();
-		cv::destroyAllWindows();
-		ArduCam_close(cameraHandle);
 	}
 
+	_running = false;
+	for (auto & i : threads)
+		i.join();
+	cv::destroyAllWindows();
+	for(int i = 0 ;i < camera_num ;i++){
+		if(cameraHandles[i] != NULL){
+			ArduCam_close(cameraHandles[i]);
+		}
+	}
 
 	std::cout << std::endl << "Press ENTER to exit..." << std::endl;
 	std::string key;
