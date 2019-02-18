@@ -44,6 +44,15 @@
     <ClInclude Include="USBTestDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ArduCamlib.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ArduCamDispLib.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\USBTest.ico">

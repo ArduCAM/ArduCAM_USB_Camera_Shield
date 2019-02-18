@@ -19,8 +19,6 @@ Python demo code for the following cameras:
 
 Download the [Python2.7](https://www.python.org/ftp/python/2.7.15/python-2.7.15.amd64.msi) or Download the [Python3.x](https://www.python.org/downloads/windows/) 
 
-Click [here](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield/blob/master/Data/How%20to%20install%20Python%20on%20Windows.pdf) to get the detail steps about how to install Python on Windows platform
-
 Install Python Dependence libraries 
 
 `pip install opencv-python` or `pip3 install opencv-python`

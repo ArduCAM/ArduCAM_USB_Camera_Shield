@@ -8,7 +8,8 @@ camera_parameter:
     FORMAT: [0,2]
     I2C_MODE: 3
     I2C_ADDR: "0x20"
-
+    TRANS_LVL: 64
+    
 board_parameter: []
 
 board_parameter_dev2: 

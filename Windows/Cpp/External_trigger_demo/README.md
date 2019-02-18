@@ -1,10 +1,6 @@
 # Overview
-This ArduCam_Ext_Trigger_Demo demostrates how to capture a single frame from the camera with external trigger input to USB2 camera shield.
-The purpose of this demo is used for multi-camera synchronized capture, it works for both rolling shutter camera and global shutter camera. 
-If you want to trigger multiple global shutter camera, you have set the global shutter camera into trigger mode and connect the external trigger to both camera board and USB2 camera shield.
 
-Note that this example only works for lastest USB2 camera shield hardware.
-
+This is OpenCV C/C++ demo code for the AR0134 camera.
 See section [Configuration File](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield/tree/master/Windows/OpenCV#configuration-file) for other camera models.
 
 # Prerequisites
