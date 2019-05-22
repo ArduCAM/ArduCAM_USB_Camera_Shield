@@ -66,8 +66,8 @@ typedef  Uint32* ArduCamHandle;
 #define	USB_USERDATA_LEN_ERROR					0xFF62
 /* --------------- Error Code --------------- */
 
-#define MAX_IMAGE_WIDTH							4608
-#define	MAX_IMAGE_HEIGHT						3288
+#define MAX_IMAGE_WIDTH							5000
+#define	MAX_IMAGE_HEIGHT						4000
 #define	MAX_IMAGE_SIZE							( MAX_IMAGE_WIDTH * MAX_IMAGE_HEIGHT )
 
 #define USB_1									1      //USB 1.0 (EZUSB) is supported

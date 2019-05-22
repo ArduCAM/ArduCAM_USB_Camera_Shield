@@ -13,7 +13,7 @@
 
 #include "afxwin.h"
 #include "afxcmn.h"
-
+#include "TTComboBox.h"
 /* -------------------- DlgFrame -------------------- */
 #define FRAME_W_GAP					20
 #define FRAME_H_GAP					20
@@ -115,7 +115,8 @@ public:
 	Int8  Num2Asc( Int8 s8Data );
 	
 	void  DlgFrameSet( void );
-
+	CToolTipCtrl  m_tooltip;
+	CMenu m_Menu;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Ö§³Ö
 
@@ -295,7 +296,7 @@ public:
 	CComboBox m_cmbImgFormat;
 	afx_msg void OnCbnSelchangeComboType();
 	CButton m_btCfgLoad;
-	CComboBox m_cmbCfgFileName;
+	CTTComboBox m_cmbCfgFileName;
 	afx_msg void OnBnClickedButtonLoad();
 	CButton m_btCfgFrash;
 	afx_msg void OnBnClickedButtonRefresh();
@@ -317,4 +318,11 @@ public:
 	afx_msg void OnBnClickedRadioModeVertical();
 	CButton m_chkWhiteBalance;
 	afx_msg void OnBnClickedCheckWhiteBalance();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnMenuAbout();
+	void readCpldVersion(CString &str);
+	void readUsbVersion(CString &str);
+	virtual void OnOK();
+	afx_msg void OnEnChangeEdit4();
 };

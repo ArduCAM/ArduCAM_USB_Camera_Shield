@@ -53,6 +53,7 @@
 #include <atlstr.h>  
 #include <stdio.h> 
 #include <stdlib.h> 
+#include <afxcontrolbars.h>
 
 
 #ifdef _UNICODE

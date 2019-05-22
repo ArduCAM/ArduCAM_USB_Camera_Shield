@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "USBTest.h"
 #include "USBTestDlg.h"
-
+#include "AboutDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -117,7 +117,7 @@ BEGIN_MESSAGE_MAP(CUSBTestDlg, CDialog)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEWHEEL()
-
+	ON_WM_MOUSEMOVE ()
 
 #ifdef FORCE_DISPLAY
 	ON_BN_CLICKED(IDC_CHECK1, &CUSBTestDlg::OnBnClickedCheck1)
@@ -135,6 +135,8 @@ BEGIN_MESSAGE_MAP(CUSBTestDlg, CDialog)
 	ON_BN_CLICKED(IDC_RADIO_MODE_VERTICAL, &CUSBTestDlg::OnBnClickedRadioModeVertical)
 	//ON_BN_CLICKED(IDC_CHECK_WHITE_BALANCE, &CUSBTestDlg::OnBnClickedCheckWhiteBalance)
 	ON_BN_CLICKED(IDC_CHECK_WHITE_BALANCE, &CUSBTestDlg::OnBnClickedCheckWhiteBalance)
+	ON_COMMAND(ID_MENU_ABOUT, &CUSBTestDlg::OnMenuAbout)
+	ON_EN_CHANGE(IDC_EDIT4, &CUSBTestDlg::OnEnChangeEdit4)
 END_MESSAGE_MAP()
 
 
@@ -149,7 +151,14 @@ BOOL CUSBTestDlg::OnInitDialog()
 #ifndef FORCE_DISPLAY
 	m_chkForceDisp.ShowWindow(FALSE);
 #endif
-	
+	m_Menu.LoadMenu(IDR_MENU1);
+	SetMenu(&m_Menu);
+	m_tooltip.Create(&m_edtType);
+
+	//将CToolTipCtrl与相应的控件对应起来
+	m_tooltip.AddTool(&m_edtType, TTS_ALWAYSTIP);
+	m_tooltip.SetDelayTime(300);
+	m_chkFullScreen.SetCheck(TRUE);
 	m_u32FrameCaptureThreadEn = THREAD_DISABLE;
 	m_u32FrameReadThreadEn    = THREAD_DISABLE;
 
@@ -227,7 +236,7 @@ BOOL CUSBTestDlg::OnInitDialog()
 
 	FillBlackDisplay();
 
-	m_u8FullScreenEn	  = 0;
+	m_u8FullScreenEn	  = 1;
 	m_u8WhiteBalanceEn	  = 0;
 	//m_u8WhiteBalanceCfgEn = 0;
 
@@ -305,7 +314,6 @@ void CUSBTestDlg::DlgFrameSet( void )
 
 void CUSBTestDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: ÔÚ´ËÌí¼ÓÏûÏ¢´¦Àí³ÌÐò´úÂëºÍ/»òµ÷ÓÃÄ¬ÈÏÖµ
 	switch (nIDEvent)
 	{
 		/* --------------------------------------------------------------------------------------------------- */
@@ -731,7 +739,6 @@ void CUSBTestDlg::ReadFrame( void )
 
 void CUSBTestDlg::OnBnClickedButtonScan()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	CString	csTmpString;
 
 	ArduCamIndexinfo stUsbIndexArray[100];
@@ -764,7 +771,6 @@ void CUSBTestDlg::OnBnClickedButtonScan()
 
 void CUSBTestDlg::OnBnClickedButtonOpen()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	CString	csTmpString;
 
 	Int32 s32Index = m_cmbUsbIndex.GetCurSel();
@@ -890,14 +896,14 @@ void CUSBTestDlg::OnBnClickedButtonOpen()
 		m_sttSerial.SetWindowText( csTmpString );
 
 		InsertText( "USB camera init success!", OUTPUT_BLUE );
+		SetTimer(DISP_INF_TIMER, 1000, NULL);
 	}
-	SetTimer( DISP_INF_TIMER, 1000, NULL );
+	
 }
   
 
 void CUSBTestDlg::OnBnClickedButtonInit()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	ArduCamCfg stTmpUsbCameraCfg;
 	CString	csTmpString;
 
@@ -1338,7 +1344,7 @@ void CUSBTestDlg::OnBnClickedButtonRefresh()
 
 void CUSBTestDlg::OnBnClickedButtonPlay()
 {
-	// TODO: 在此添加控件通知处理程序代码
+
 	if ( m_u8PlayState != STATE_PLAY )
 	{		
 		m_u8PlayState = STATE_PLAY;
@@ -1355,7 +1361,6 @@ void CUSBTestDlg::OnBnClickedButtonPlay()
 
 void CUSBTestDlg::OnBnClickedButtonStop()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	if ( m_u8PlayState != STATE_STOP )
 	{
 		m_u8PlayState = STATE_STOP;
@@ -1376,14 +1381,13 @@ void CUSBTestDlg::OnBnClickedButtonStop()
 
 void CUSBTestDlg::OnBnClickedButtonShot()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	m_u32ShotTimeFlag = 1;
 } 
   
 
 void CUSBTestDlg::OnBnClickedButtonClose()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	while ( m_u32CaptFlag == 1 )		Sleep(10);
 	
 	m_u32ReadFlag = 1;
@@ -1436,7 +1440,7 @@ void CUSBTestDlg::OnBnClickedButtonClose()
 
 void CUSBTestDlg::OnBnClickedButtonRegRead()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	CString csTmpString;
 	Uint32 u32TmpAddr;
 	Uint32 u32TmpValue;
@@ -1455,7 +1459,7 @@ void CUSBTestDlg::OnBnClickedButtonRegRead()
 
 void CUSBTestDlg::OnBnClickedButtonRegWrite()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	CString csTmpString;
 	Uint32 u32TmpAddr;
 	Uint32 u32TmpValue;
@@ -1477,7 +1481,6 @@ void CUSBTestDlg::OnDestroy()
 {
 	CDialog::OnDestroy();
 
-	// TODO: 在此处添加消息处理程序代码
 	if ( m_u8PlayState != STATE_STOP )
 	{
 		m_u8PlayState = STATE_STOP;
@@ -1492,7 +1495,7 @@ void CUSBTestDlg::OnDestroy()
 
 void CUSBTestDlg::OnBnClickedButtonByteConv()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	if ( ( m_cmbImgFormat.GetCurSel() == 0 ) || ( m_cmbImgFormat.GetCurSel() == 5 ) )
 	{
 		if ( m_u32RawMode == RAW_RG )
@@ -1557,7 +1560,6 @@ void CUSBTestDlg::OnBnClickedButtonByteConv()
 
 void CUSBTestDlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值	
 	/* ----- 如鼠标位置在显示区域内，读取当前鼠标位置，并保存，用于鼠标弹起时拖动处理	----- */
 	/* ----- 如鼠标位置不在显示区域内，将当前鼠标位置置为（0,0），不做拖动处理			----- */
 	if (    ( point.x >= m_sttDisplay_rect.left   )
@@ -1584,7 +1586,6 @@ void CUSBTestDlg::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CUSBTestDlg::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	if (    ( point.x >= m_sttDisplay_rect.left   )
 		 && ( point.x <= m_sttDisplay_rect.right  ) 
 		 && ( point.y >= m_sttDisplay_rect.top    )
@@ -1666,7 +1667,6 @@ void CUSBTestDlg::OnLButtonUp(UINT nFlags, CPoint point)
 
 BOOL CUSBTestDlg::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	/* ----- 将屏幕位置转换为控件内的位置 ----- */
 	ScreenToClient( &pt );
 
@@ -1842,18 +1842,31 @@ void CUSBTestDlg::OnBnClickedCheckIrcut()
 	if ( m_cUsbCameraHd != NULL )
 	{
 		Uint32 u32TmpData;
-
-		if ( m_chkIRcut.GetCheck() == TRUE )
+		Uint8 data = { 0 };
+		Uint8 pu8DevUsbType;
+		Uint8 pu8InfUsbType;
+		ArduCam_getUsbType(m_cUsbCameraHd, &pu8DevUsbType, &pu8InfUsbType);
+		if (m_chkIRcut.GetCheck() == TRUE)
 		{
-			ArduCam_readReg_8_8( m_cUsbCameraHd, USB_CPLD_I2C_ADDRESS, 0x01, &u32TmpData );
-			u32TmpData = u32TmpData | 0x10;
-			ArduCam_writeReg_8_8( m_cUsbCameraHd, USB_CPLD_I2C_ADDRESS, 0x01, u32TmpData );
+			if (pu8DevUsbType == USB_3) {
+				ArduCam_setboardConfig(m_cUsbCameraHd, 0xF4, 0x01, 0, 0, (Uint8*)&data);
+			}
+			else {
+				ArduCam_readReg_8_8(m_cUsbCameraHd, USB_CPLD_I2C_ADDRESS, 0x01, &u32TmpData);
+				u32TmpData = u32TmpData | 0x10;
+				ArduCam_writeReg_8_8(m_cUsbCameraHd, USB_CPLD_I2C_ADDRESS, 0x01, u32TmpData);
+			}
 		}
 		else
 		{
-			ArduCam_readReg_8_8( m_cUsbCameraHd, USB_CPLD_I2C_ADDRESS, 0x01, &u32TmpData );
-			u32TmpData = u32TmpData & 0xEF;
-			ArduCam_writeReg_8_8( m_cUsbCameraHd, USB_CPLD_I2C_ADDRESS, 0x01, u32TmpData );
+			if (pu8DevUsbType == USB_3) {
+				ArduCam_setboardConfig(m_cUsbCameraHd, 0xF4, 0x09, 0, 0, (Uint8*)&data);
+			}
+			else {
+				ArduCam_readReg_8_8(m_cUsbCameraHd, USB_CPLD_I2C_ADDRESS, 0x01, &u32TmpData);
+				u32TmpData = u32TmpData & 0xEF;
+				ArduCam_writeReg_8_8(m_cUsbCameraHd, USB_CPLD_I2C_ADDRESS, 0x01, u32TmpData);
+			}
 		}
 	}
 }
@@ -1879,7 +1892,7 @@ void CUSBTestDlg::OnBnClickedCheckWhiteBalance()
 #ifdef	FORCE_DISPLAY
 void CUSBTestDlg::OnBnClickedCheck1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	if ( m_cUsbCameraHd != NULL )
 	{
 		if ( m_chkForceDisp.GetCheck() == TRUE )
@@ -1909,3 +1922,96 @@ void CUSBTestDlg::OnBnClickedRadioModeVertical()
 }
 
   
+
+
+BOOL CUSBTestDlg::PreTranslateMessage(MSG* pMsg)
+{
+	/*if (m_tooltip.m_hWnd != NULL)
+		m_tooltip.RelayEvent(pMsg);*/
+	if (pMsg->message == WM_MOUSEMOVE)
+		m_tooltip.RelayEvent(pMsg);
+
+	if ((pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_RETURN))
+	{
+		if (GetFocus() == GetDlgItem(IDC_EDIT4))
+		{
+			if (m_btRegRead.IsWindowEnabled())
+				OnBnClickedButtonRegRead();
+		}
+		if (GetFocus() == GetDlgItem(IDC_EDIT5))
+		{
+			if (m_btRegWrite.IsWindowEnabled())
+				OnBnClickedButtonRegWrite();
+		}
+	}
+
+
+	return CDialog::PreTranslateMessage(pMsg);
+}
+
+void CUSBTestDlg::OnMouseMove(UINT nFlags, CPoint point) {
+	CString text;
+	m_edtType.GetWindowTextA(text);
+	m_tooltip.UpdateTipText(text, &m_edtType);
+	CDialog::OnMouseMove(nFlags, point);
+}
+void CUSBTestDlg::readUsbVersion(CString &str) {
+	Uint8 pu8DevUsbType;
+	Uint8 pu8InfUsbType;
+	ArduCam_getUsbType(m_cUsbCameraHd, &pu8DevUsbType, &pu8InfUsbType);
+	str.Format(_T("Device: %d\tInterface: %d"), pu8DevUsbType, pu8InfUsbType);
+}
+void CUSBTestDlg::readCpldVersion(CString &str) {
+	Uint32 version;
+	Uint8 pu8DevUsbType;
+	Uint8 pu8InfUsbType;
+	ArduCam_getUsbType(m_cUsbCameraHd, &pu8DevUsbType, &pu8InfUsbType);
+	if (pu8DevUsbType == USB_3) {
+		str.Format(_T("----/--/--"));
+		return;
+	}
+	ArduCam_readReg_8_8(m_cUsbCameraHd,USB_CPLD_I2C_ADDRESS, 00, &version);
+	if (version < 0x23) {
+		str.Format(_T("----/--/--"));
+		return; 
+	}
+
+	Uint32 year, mouth, day, ret_val = 0;
+	ArduCam_readReg_8_8(m_cUsbCameraHd,USB_CPLD_I2C_ADDRESS, 5, &year);
+	ArduCam_readReg_8_8(m_cUsbCameraHd,USB_CPLD_I2C_ADDRESS, 6, &mouth);
+	ArduCam_readReg_8_8(m_cUsbCameraHd,USB_CPLD_I2C_ADDRESS, 7, &day);
+	str.Format(_T("V%d.%d\t20%d/%02d/%02d"), (version & 0xF0) >> 4,version & 0x0F, year, mouth, day);
+}
+void CUSBTestDlg::OnMenuAbout()
+{
+	AboutDlg aboutDlg;
+	if (m_u32FrameReadThreadEn == THREAD_ENABLE && m_cUsbCameraHd) {
+		CString str;
+		readCpldVersion(str);
+		aboutDlg.setCpldVersion(str);
+		readUsbVersion(str);
+		aboutDlg.setUsbVersion(str);
+	}
+	else {
+		aboutDlg.setCpldVersion("----/--/--");
+		aboutDlg.setUsbVersion("Device: --\tInterface: --");
+	}
+	aboutDlg.DoModal();
+}
+
+
+void CUSBTestDlg::OnOK()
+{
+	// CDialog::OnOK();
+}
+
+
+void CUSBTestDlg::OnEnChangeEdit4()
+{
+	// TODO:  如果该控件是 RICHEDIT 控件，它将不
+	// 发送此通知，除非重写 CDialog::OnInitDialog()
+	// 函数并调用 CRichEditCtrl().SetEventMask()，
+	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+
+	// TODO:  在此添加控件通知处理程序代码
+}
