@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "USBTest.h"
 #include "USBTestDlg.h"
-
+#include "AboutDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -117,7 +117,7 @@ BEGIN_MESSAGE_MAP(CUSBTestDlg, CDialog)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEWHEEL()
-
+	ON_WM_MOUSEMOVE ()
 
 #ifdef FORCE_DISPLAY
 	ON_BN_CLICKED(IDC_CHECK1, &CUSBTestDlg::OnBnClickedCheck1)
@@ -133,7 +133,10 @@ BEGIN_MESSAGE_MAP(CUSBTestDlg, CDialog)
 	ON_BN_CLICKED(IDC_CHECK_IRCUT, &CUSBTestDlg::OnBnClickedCheckIrcut)
 	ON_BN_CLICKED(IDC_RADIO_MODE_HORIZONTAL, &CUSBTestDlg::OnBnClickedRadioModeHorizontal)
 	ON_BN_CLICKED(IDC_RADIO_MODE_VERTICAL, &CUSBTestDlg::OnBnClickedRadioModeVertical)
+	//ON_BN_CLICKED(IDC_CHECK_WHITE_BALANCE, &CUSBTestDlg::OnBnClickedCheckWhiteBalance)
 	ON_BN_CLICKED(IDC_CHECK_WHITE_BALANCE, &CUSBTestDlg::OnBnClickedCheckWhiteBalance)
+	ON_COMMAND(ID_MENU_ABOUT, &CUSBTestDlg::OnMenuAbout)
+	ON_EN_CHANGE(IDC_EDIT4, &CUSBTestDlg::OnEnChangeEdit4)
 END_MESSAGE_MAP()
 
 
@@ -148,7 +151,14 @@ BOOL CUSBTestDlg::OnInitDialog()
 #ifndef FORCE_DISPLAY
 	m_chkForceDisp.ShowWindow(FALSE);
 #endif
-	
+	m_Menu.LoadMenu(IDR_MENU1);
+	SetMenu(&m_Menu);
+	m_tooltip.Create(&m_edtType);
+
+	//将CToolTipCtrl与相应的控件对应起来
+	m_tooltip.AddTool(&m_edtType, TTS_ALWAYSTIP);
+	m_tooltip.SetDelayTime(300);
+	m_chkFullScreen.SetCheck(TRUE);
 	m_u32FrameCaptureThreadEn = THREAD_DISABLE;
 	m_u32FrameReadThreadEn    = THREAD_DISABLE;
 
@@ -207,7 +217,7 @@ BOOL CUSBTestDlg::OnInitDialog()
 	}
 	m_cmbCfgFileName.SetCurSel( 0 );
 
-	SetTimer( DISP_INF_TIMER, 1000, NULL );
+	//SetTimer( DISP_INF_TIMER, 1000, NULL );
 	SetTimer( SCAN_TIMER,     2000, NULL );
 
 	m_u32CaptFlag = 0;
@@ -226,9 +236,9 @@ BOOL CUSBTestDlg::OnInitDialog()
 
 	FillBlackDisplay();
 
-	m_u8FullScreenEn	  = 0;
+	m_u8FullScreenEn	  = 1;
 	m_u8WhiteBalanceEn	  = 0;
-	m_u8WhiteBalanceCfgEn = 0;
+	//m_u8WhiteBalanceCfgEn = 0;
 
 	return TRUE;  
 }
@@ -304,7 +314,6 @@ void CUSBTestDlg::DlgFrameSet( void )
 
 void CUSBTestDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: ÔÚ´ËÌí¼ÓÏûÏ¢´¦Àí³ÌÐò´úÂëºÍ/»òµ÷ÓÃÄ¬ÈÏÖµ
 	switch (nIDEvent)
 	{
 		/* --------------------------------------------------------------------------------------------------- */
@@ -392,6 +401,22 @@ void CUSBTestDlg::DispErrorLog( Uint32 u32ErrorCode )
 
 }
   
+int CUSBTestDlg::filetime_WIN32(int64 *filetime_int64)
+{
+
+#ifdef _WIN32
+	FILETIME fileTime;
+	ULARGE_INTEGER currentFileTime;
+	GetSystemTimeAsFileTime(&fileTime);
+	currentFileTime.HighPart = fileTime.dwHighDateTime;
+	currentFileTime.LowPart = fileTime.dwLowDateTime;
+	*filetime_int64 = (int64)currentFileTime.QuadPart;
+	return 0;
+#else
+	*filetime_int64 = -1;
+	return -1;
+#endif
+}
 
 void CUSBTestDlg::DispInfo( void )
 {
@@ -405,6 +430,17 @@ void CUSBTestDlg::DispInfo( void )
 
 	m_u32FrameCaptureCntBak = m_u32FrameCaptureCnt;
 	m_u32FrameReadCntBak    = m_u32FrameReadCnt;
+
+	ArduCam_getboardConfig( m_cUsbCameraHd, 0xB0, 0, 0, sizeof(UTC_PARA_OUT), (Uint8*) &stpstUtcParaOut );
+	TRACE("A = %8f, B = %8f\n", stpstUtcParaOut.f64A, stpstUtcParaOut.f64B);
+	stUtcParaIn.s64C0 = stpstUtcParaOut.s64C0;
+
+	//stUtcParaIn.s64U0 = clock();
+	filetime_WIN32(&stUtcParaIn.s64U0);
+	TRACE("U0 = %I64u\n", stUtcParaIn.s64U0);
+	ArduCam_setboardConfig( m_cUsbCameraHd, 0xB1, 0, 0, sizeof(UTC_PARA_IN), (Uint8*) &stUtcParaIn );
+	TRACE("C0 = %d, U0 = %I64u\n",  stUtcParaIn.s64C0, stUtcParaIn.s64U0);
+
 }
     
    
@@ -478,12 +514,11 @@ void CUSBTestDlg::CaptureFrame( void )
 	}
 
 	ArduCam_endCaptureImage( m_cUsbCameraHd );
-
 	m_u32CaptFlag = 0;
 
 	return;
 }
-  
+
 
 void CUSBTestDlg::ReadFrame( void )
 {
@@ -499,20 +534,29 @@ void CUSBTestDlg::ReadFrame( void )
 			
 			if ( u32TmpState == USB_CAMERA_NO_ERROR )
 			{
+				//TRACE( "TIME: %04d-%02d-%02d %02d:%02d:%02d %03d\r\n",    pstTmpFrameData->stTime.wYear,
+				//														  pstTmpFrameData->stTime.wMonth,
+				//														  pstTmpFrameData->stTime.wDay,
+				//														  pstTmpFrameData->stTime.wHour,
+				//														  pstTmpFrameData->stTime.wMinute,
+				//														  pstTmpFrameData->stTime.wSecond,
+				//														  pstTmpFrameData->stTime.wMilliseconds );
+				TRACE( "UTC Time: %I64u \r\n", pstTmpFrameData->u64Time );
+
 				m_u32FrameReadCnt++;
 
 				CString csTmpString;
 
-				if ( m_u8WhiteBalanceEn == 1 )
-				{
-					Int8 s8GainOffset[3];
+				//if ( m_u8WhiteBalanceEn == 1 )
+				//{
+				//	Int8 s8GainOffset[3];
 
-					if ( pstTmpFrameData->stImagePara.emImageFmtMode == FORMAT_MODE_RAW )
-					{
-						ArduCamDisp_RawWhiteBalancePara( pstTmpFrameData->pu8ImageData, pstTmpFrameData->stImagePara.u32Width, pstTmpFrameData->stImagePara.u32Height, m_u32RawMode, pstTmpFrameData->stImagePara.u8PixelBits, s8GainOffset );
-						SetWhiteBalanceCfg( s8GainOffset );
-					}
-				}
+				//	if ( pstTmpFrameData->stImagePara.emImageFmtMode == FORMAT_MODE_RAW )
+				//	{
+				//		ArduCamDisp_RawWhiteBalancePara( pstTmpFrameData->pu8ImageData, pstTmpFrameData->stImagePara.u32Width, pstTmpFrameData->stImagePara.u32Height, m_u32RawMode, pstTmpFrameData->stImagePara.u8PixelBits, s8GainOffset );
+				//		SetWhiteBalanceCfg( s8GainOffset );
+				//	}
+				//}
 
 				if ( m_u8RecordEn == RECORD_NULL )
 				{
@@ -520,6 +564,11 @@ void CUSBTestDlg::ReadFrame( void )
 					{
 					case FORMAT_MODE_RAW:
 						ArduCamDisp_Raw2rgb24( m_pu8OutRgb24, pstTmpFrameData->pu8ImageData, pstTmpFrameData->stImagePara.u32Width, pstTmpFrameData->stImagePara.u32Height, m_u32RawMode, pstTmpFrameData->stImagePara.u8PixelBits );
+						
+						if (m_u8WhiteBalanceEn == 1) {
+							ArduCamDisp_RgbWhiteBalance(m_pu8OutRgb24, m_pu8OutRgb24, pstTmpFrameData->stImagePara.u32Width, pstTmpFrameData->stImagePara.u32Height);
+						}
+
 						FrameDisplayBMP( m_pu8OutRgb24, pstTmpFrameData->stImagePara.u32Width, pstTmpFrameData->stImagePara.u32Height );
 						break;
 					case FORMAT_MODE_MON:
@@ -690,7 +739,6 @@ void CUSBTestDlg::ReadFrame( void )
 
 void CUSBTestDlg::OnBnClickedButtonScan()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	CString	csTmpString;
 
 	ArduCamIndexinfo stUsbIndexArray[100];
@@ -723,7 +771,6 @@ void CUSBTestDlg::OnBnClickedButtonScan()
 
 void CUSBTestDlg::OnBnClickedButtonOpen()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	CString	csTmpString;
 
 	Int32 s32Index = m_cmbUsbIndex.GetCurSel();
@@ -819,7 +866,8 @@ void CUSBTestDlg::OnBnClickedButtonOpen()
 		m_chkIRcut.EnableWindow( TRUE );
 		m_chkIRcut.SetCheck( FALSE );
 
-		if ( m_u8WhiteBalanceCfgEn == 0x7 )		m_chkWhiteBalance.EnableWindow( TRUE );
+		//if ( m_u8WhiteBalanceCfgEn == 0x7 )		m_chkWhiteBalance.EnableWindow( TRUE );
+		if(stTmpUsbCameraCfg.emImageFmtMode == FORMAT_MODE_RAW )	m_chkWhiteBalance.EnableWindow(TRUE);
 
 		if ( stTmpUsbCameraCfg.emImageFmtMode != FORMAT_MODE_JPG )
 		{
@@ -848,13 +896,14 @@ void CUSBTestDlg::OnBnClickedButtonOpen()
 		m_sttSerial.SetWindowText( csTmpString );
 
 		InsertText( "USB camera init success!", OUTPUT_BLUE );
+		SetTimer(DISP_INF_TIMER, 1000, NULL);
 	}
+	
 }
   
 
 void CUSBTestDlg::OnBnClickedButtonInit()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	ArduCamCfg stTmpUsbCameraCfg;
 	CString	csTmpString;
 
@@ -939,7 +988,7 @@ void CUSBTestDlg::OnBnClickedButtonInit()
 		m_chkIRcut.EnableWindow( TRUE );
 		m_chkIRcut.SetCheck( FALSE );
 
-		if ( m_u8WhiteBalanceCfgEn == 0x7 )		m_chkWhiteBalance.EnableWindow( TRUE );
+		//if ( m_u8WhiteBalanceCfgEn == 0x7 )		m_chkWhiteBalance.EnableWindow( TRUE );
 
 		if ( stTmpUsbCameraCfg.emImageFmtMode != FORMAT_MODE_JPG )
 		{
@@ -1155,97 +1204,97 @@ void CUSBTestDlg::OnBnClickedButtonLoad()
 	else
 		m_u32TransLvl = 0;
 
-	m_u8WhiteBalanceCfgEn = 0;
+	//m_u8WhiteBalanceCfgEn = 0;
 	
-	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_G_GAIN, u32TmpCfgData ) )
-	{
-		m_stGainGSet.u32Page	 = u32TmpCfgData[0];
-		m_stGainGSet.u32Addr	 = u32TmpCfgData[1];
-		m_stGainGSet.u32MinValue = u32TmpCfgData[2];
-		m_stGainGSet.u32MaxValue = u32TmpCfgData[3];
+	//if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_G_GAIN, u32TmpCfgData ) )
+	//{
+	//	m_stGainGSet.u32Page	 = u32TmpCfgData[0];
+	//	m_stGainGSet.u32Addr	 = u32TmpCfgData[1];
+	//	m_stGainGSet.u32MinValue = u32TmpCfgData[2];
+	//	m_stGainGSet.u32MaxValue = u32TmpCfgData[3];
 
-		m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x01;
-	}
+	//	m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x01;
+	//}
 	//else
 		//InsertText( "G_Gain configuration error!", OUTPUT_RED );
 
-	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_B_GAIN, u32TmpCfgData ) )
-	{
-		m_stGainBSet.u32Page	 = u32TmpCfgData[0];
-		m_stGainBSet.u32Addr	 = u32TmpCfgData[1];
-		m_stGainBSet.u32MinValue = u32TmpCfgData[2];
-		m_stGainBSet.u32MaxValue = u32TmpCfgData[3];
+	//if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_B_GAIN, u32TmpCfgData ) )
+	//{
+	//	m_stGainBSet.u32Page	 = u32TmpCfgData[0];
+	//	m_stGainBSet.u32Addr	 = u32TmpCfgData[1];
+	//	m_stGainBSet.u32MinValue = u32TmpCfgData[2];
+	//	m_stGainBSet.u32MaxValue = u32TmpCfgData[3];
 
-		m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x02;
-	}
+	//	m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x02;
+	//}
 	//else
 		//InsertText( "B_Gain configuration error!", OUTPUT_RED );
 
-	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_R_GAIN, u32TmpCfgData ) )
-	{
-		m_stGainRSet.u32Page	 = u32TmpCfgData[0];
-		m_stGainRSet.u32Addr	 = u32TmpCfgData[1];
-		m_stGainRSet.u32MinValue = u32TmpCfgData[2];
-		m_stGainRSet.u32MaxValue = u32TmpCfgData[3];
+	//if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_R_GAIN, u32TmpCfgData ) )
+	//{
+	//	m_stGainRSet.u32Page	 = u32TmpCfgData[0];
+	//	m_stGainRSet.u32Addr	 = u32TmpCfgData[1];
+	//	m_stGainRSet.u32MinValue = u32TmpCfgData[2];
+	//	m_stGainRSet.u32MaxValue = u32TmpCfgData[3];
 
-		m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x04;
-	}
+	//	m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x04;
+	//}
 	//else
 		//InsertText( "R_Gain configuration error!", OUTPUT_RED );
 
-	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_G2_GAIN, u32TmpCfgData ) )
-	{
-		m_stGainG2Set.u32Page	 = u32TmpCfgData[0];
-		m_stGainG2Set.u32Addr	 = u32TmpCfgData[1];
-		m_stGainG2Set.u32MinValue = u32TmpCfgData[2];
-		m_stGainG2Set.u32MaxValue = u32TmpCfgData[3];
-	}
+	//if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_G2_GAIN, u32TmpCfgData ) )
+	//{
+	//	m_stGainG2Set.u32Page	 = u32TmpCfgData[0];
+	//	m_stGainG2Set.u32Addr	 = u32TmpCfgData[1];
+	//	m_stGainG2Set.u32MinValue = u32TmpCfgData[2];
+	//	m_stGainG2Set.u32MaxValue = u32TmpCfgData[3];
+	//}
 	//else
 		//InsertText( "G2_Gain configuration error!", OUTPUT_RED );
 
-	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_Y_GAIN, u32TmpCfgData ) )
-	{
-		m_stGainYSet.u32Page	 = u32TmpCfgData[0];
-		m_stGainYSet.u32Addr	 = u32TmpCfgData[1];
-		m_stGainYSet.u32MinValue = u32TmpCfgData[2];
-		m_stGainYSet.u32MaxValue = u32TmpCfgData[3];
+	//if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_Y_GAIN, u32TmpCfgData ) )
+	//{
+	//	m_stGainYSet.u32Page	 = u32TmpCfgData[0];
+	//	m_stGainYSet.u32Addr	 = u32TmpCfgData[1];
+	//	m_stGainYSet.u32MinValue = u32TmpCfgData[2];
+	//	m_stGainYSet.u32MaxValue = u32TmpCfgData[3];
 
-		m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x01;
-	}
+	//	m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x01;
+	//}
 	//else
 		//InsertText( "Y_Gain configuration error!", OUTPUT_RED );
 
-	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_U_GAIN, u32TmpCfgData ) )
-	{
-		m_stGainUSet.u32Page	 = u32TmpCfgData[0];
-		m_stGainUSet.u32Addr	 = u32TmpCfgData[1];
-		m_stGainUSet.u32MinValue = u32TmpCfgData[2];
-		m_stGainUSet.u32MaxValue = u32TmpCfgData[3];
+	//if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_U_GAIN, u32TmpCfgData ) )
+	//{
+	//	m_stGainUSet.u32Page	 = u32TmpCfgData[0];
+	//	m_stGainUSet.u32Addr	 = u32TmpCfgData[1];
+	//	m_stGainUSet.u32MinValue = u32TmpCfgData[2];
+	//	m_stGainUSet.u32MaxValue = u32TmpCfgData[3];
 
-		m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x02;
-	}
+	//	m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x02;
+	//}
 	//else
 		//InsertText( "U_Gain configuration error!", OUTPUT_RED );
 
-	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_V_GAIN, u32TmpCfgData ) )
-	{
-		m_stGainVSet.u32Page	 = u32TmpCfgData[0];
-		m_stGainVSet.u32Addr	 = u32TmpCfgData[1];
-		m_stGainVSet.u32MinValue = u32TmpCfgData[2];
-		m_stGainVSet.u32MaxValue = u32TmpCfgData[3];
+	//if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_V_GAIN, u32TmpCfgData ) )
+	//{
+	//	m_stGainVSet.u32Page	 = u32TmpCfgData[0];
+	//	m_stGainVSet.u32Addr	 = u32TmpCfgData[1];
+	//	m_stGainVSet.u32MinValue = u32TmpCfgData[2];
+	//	m_stGainVSet.u32MaxValue = u32TmpCfgData[3];
 
-		m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x04;
-	}
+	//	m_u8WhiteBalanceCfgEn = m_u8WhiteBalanceCfgEn | 0x04;
+	//}
 	//else
 		//InsertText( "V_Gain configuration error!", OUTPUT_RED );
 
-	if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_GL_GAIN, u32TmpCfgData ) )			
-	{
-		m_stGainGLSet.u32Page	 = u32TmpCfgData[0];
-		m_stGainGLSet.u32Addr	 = u32TmpCfgData[1];
-		m_stGainGLSet.u32MinValue = u32TmpCfgData[2];
-		m_stGainGLSet.u32MaxValue = u32TmpCfgData[3];
-	}
+	//if ( CFG_CAMERA_OK == ArduCamCfg_SetCameraConfig( m_cUsbCameraCfgHd, CFG_CAMERA_GL_GAIN, u32TmpCfgData ) )			
+	//{
+	//	m_stGainGLSet.u32Page	 = u32TmpCfgData[0];
+	//	m_stGainGLSet.u32Addr	 = u32TmpCfgData[1];
+	//	m_stGainGLSet.u32MinValue = u32TmpCfgData[2];
+	//	m_stGainGLSet.u32MaxValue = u32TmpCfgData[3];
+	//}
 	//else
 		//InsertText( "GL_Gain configuration error!", OUTPUT_RED );
 
@@ -1295,7 +1344,7 @@ void CUSBTestDlg::OnBnClickedButtonRefresh()
 
 void CUSBTestDlg::OnBnClickedButtonPlay()
 {
-	// TODO: 在此添加控件通知处理程序代码
+
 	if ( m_u8PlayState != STATE_PLAY )
 	{		
 		m_u8PlayState = STATE_PLAY;
@@ -1312,7 +1361,6 @@ void CUSBTestDlg::OnBnClickedButtonPlay()
 
 void CUSBTestDlg::OnBnClickedButtonStop()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	if ( m_u8PlayState != STATE_STOP )
 	{
 		m_u8PlayState = STATE_STOP;
@@ -1333,14 +1381,13 @@ void CUSBTestDlg::OnBnClickedButtonStop()
 
 void CUSBTestDlg::OnBnClickedButtonShot()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	m_u32ShotTimeFlag = 1;
 } 
   
 
 void CUSBTestDlg::OnBnClickedButtonClose()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	while ( m_u32CaptFlag == 1 )		Sleep(10);
 	
 	m_u32ReadFlag = 1;
@@ -1387,12 +1434,13 @@ void CUSBTestDlg::OnBnClickedButtonClose()
 
 	( ( CButton* )GetDlgItem( IDC_RADIO_MODE_HORIZONTAL ) )->EnableWindow( FALSE );
 	( ( CButton* )GetDlgItem( IDC_RADIO_MODE_VERTICAL   ) )->EnableWindow( FALSE );
+	KillTimer(DISP_INF_TIMER);
 }
  
 
 void CUSBTestDlg::OnBnClickedButtonRegRead()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	CString csTmpString;
 	Uint32 u32TmpAddr;
 	Uint32 u32TmpValue;
@@ -1411,7 +1459,7 @@ void CUSBTestDlg::OnBnClickedButtonRegRead()
 
 void CUSBTestDlg::OnBnClickedButtonRegWrite()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	CString csTmpString;
 	Uint32 u32TmpAddr;
 	Uint32 u32TmpValue;
@@ -1433,7 +1481,6 @@ void CUSBTestDlg::OnDestroy()
 {
 	CDialog::OnDestroy();
 
-	// TODO: 在此处添加消息处理程序代码
 	if ( m_u8PlayState != STATE_STOP )
 	{
 		m_u8PlayState = STATE_STOP;
@@ -1448,7 +1495,7 @@ void CUSBTestDlg::OnDestroy()
 
 void CUSBTestDlg::OnBnClickedButtonByteConv()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	if ( ( m_cmbImgFormat.GetCurSel() == 0 ) || ( m_cmbImgFormat.GetCurSel() == 5 ) )
 	{
 		if ( m_u32RawMode == RAW_RG )
@@ -1513,7 +1560,6 @@ void CUSBTestDlg::OnBnClickedButtonByteConv()
 
 void CUSBTestDlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值	
 	/* ----- 如鼠标位置在显示区域内，读取当前鼠标位置，并保存，用于鼠标弹起时拖动处理	----- */
 	/* ----- 如鼠标位置不在显示区域内，将当前鼠标位置置为（0,0），不做拖动处理			----- */
 	if (    ( point.x >= m_sttDisplay_rect.left   )
@@ -1540,7 +1586,6 @@ void CUSBTestDlg::OnLButtonDown(UINT nFlags, CPoint point)
 
 void CUSBTestDlg::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	if (    ( point.x >= m_sttDisplay_rect.left   )
 		 && ( point.x <= m_sttDisplay_rect.right  ) 
 		 && ( point.y >= m_sttDisplay_rect.top    )
@@ -1622,7 +1667,6 @@ void CUSBTestDlg::OnLButtonUp(UINT nFlags, CPoint point)
 
 BOOL CUSBTestDlg::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	/* ----- 将屏幕位置转换为控件内的位置 ----- */
 	ScreenToClient( &pt );
 
@@ -1798,18 +1842,31 @@ void CUSBTestDlg::OnBnClickedCheckIrcut()
 	if ( m_cUsbCameraHd != NULL )
 	{
 		Uint32 u32TmpData;
-
-		if ( m_chkIRcut.GetCheck() == TRUE )
+		Uint8 data = { 0 };
+		Uint8 pu8DevUsbType;
+		Uint8 pu8InfUsbType;
+		ArduCam_getUsbType(m_cUsbCameraHd, &pu8DevUsbType, &pu8InfUsbType);
+		if (m_chkIRcut.GetCheck() == TRUE)
 		{
-			ArduCam_readReg_8_8( m_cUsbCameraHd, 0x46, 0x01, &u32TmpData );
-			u32TmpData = u32TmpData | 0x10;
-			ArduCam_writeReg_8_8( m_cUsbCameraHd, 0x46, 0x01, u32TmpData );
+			if (pu8DevUsbType == USB_3) {
+				ArduCam_setboardConfig(m_cUsbCameraHd, 0xF4, 0x01, 0, 0, (Uint8*)&data);
+			}
+			else {
+				ArduCam_readReg_8_8(m_cUsbCameraHd, USB_CPLD_I2C_ADDRESS, 0x01, &u32TmpData);
+				u32TmpData = u32TmpData | 0x10;
+				ArduCam_writeReg_8_8(m_cUsbCameraHd, USB_CPLD_I2C_ADDRESS, 0x01, u32TmpData);
+			}
 		}
 		else
 		{
-			ArduCam_readReg_8_8( m_cUsbCameraHd, 0x46, 0x01, &u32TmpData );
-			u32TmpData = u32TmpData & 0xEF;
-			ArduCam_writeReg_8_8( m_cUsbCameraHd, 0x46, 0x01, u32TmpData );
+			if (pu8DevUsbType == USB_3) {
+				ArduCam_setboardConfig(m_cUsbCameraHd, 0xF4, 0x09, 0, 0, (Uint8*)&data);
+			}
+			else {
+				ArduCam_readReg_8_8(m_cUsbCameraHd, USB_CPLD_I2C_ADDRESS, 0x01, &u32TmpData);
+				u32TmpData = u32TmpData & 0xEF;
+				ArduCam_writeReg_8_8(m_cUsbCameraHd, USB_CPLD_I2C_ADDRESS, 0x01, u32TmpData);
+			}
 		}
 	}
 }
@@ -1835,7 +1892,7 @@ void CUSBTestDlg::OnBnClickedCheckWhiteBalance()
 #ifdef	FORCE_DISPLAY
 void CUSBTestDlg::OnBnClickedCheck1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	
 	if ( m_cUsbCameraHd != NULL )
 	{
 		if ( m_chkForceDisp.GetCheck() == TRUE )
@@ -1865,3 +1922,96 @@ void CUSBTestDlg::OnBnClickedRadioModeVertical()
 }
 
   
+
+
+BOOL CUSBTestDlg::PreTranslateMessage(MSG* pMsg)
+{
+	/*if (m_tooltip.m_hWnd != NULL)
+		m_tooltip.RelayEvent(pMsg);*/
+	if (pMsg->message == WM_MOUSEMOVE)
+		m_tooltip.RelayEvent(pMsg);
+
+	if ((pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_RETURN))
+	{
+		if (GetFocus() == GetDlgItem(IDC_EDIT4))
+		{
+			if (m_btRegRead.IsWindowEnabled())
+				OnBnClickedButtonRegRead();
+		}
+		if (GetFocus() == GetDlgItem(IDC_EDIT5))
+		{
+			if (m_btRegWrite.IsWindowEnabled())
+				OnBnClickedButtonRegWrite();
+		}
+	}
+
+
+	return CDialog::PreTranslateMessage(pMsg);
+}
+
+void CUSBTestDlg::OnMouseMove(UINT nFlags, CPoint point) {
+	CString text;
+	m_edtType.GetWindowTextA(text);
+	m_tooltip.UpdateTipText(text, &m_edtType);
+	CDialog::OnMouseMove(nFlags, point);
+}
+void CUSBTestDlg::readUsbVersion(CString &str) {
+	Uint8 pu8DevUsbType;
+	Uint8 pu8InfUsbType;
+	ArduCam_getUsbType(m_cUsbCameraHd, &pu8DevUsbType, &pu8InfUsbType);
+	str.Format(_T("Device: %d\tInterface: %d"), pu8DevUsbType, pu8InfUsbType);
+}
+void CUSBTestDlg::readCpldVersion(CString &str) {
+	Uint32 version;
+	Uint8 pu8DevUsbType;
+	Uint8 pu8InfUsbType;
+	ArduCam_getUsbType(m_cUsbCameraHd, &pu8DevUsbType, &pu8InfUsbType);
+	if (pu8DevUsbType == USB_3) {
+		str.Format(_T("----/--/--"));
+		return;
+	}
+	ArduCam_readReg_8_8(m_cUsbCameraHd,USB_CPLD_I2C_ADDRESS, 00, &version);
+	if (version < 0x23) {
+		str.Format(_T("----/--/--"));
+		return; 
+	}
+
+	Uint32 year, mouth, day, ret_val = 0;
+	ArduCam_readReg_8_8(m_cUsbCameraHd,USB_CPLD_I2C_ADDRESS, 5, &year);
+	ArduCam_readReg_8_8(m_cUsbCameraHd,USB_CPLD_I2C_ADDRESS, 6, &mouth);
+	ArduCam_readReg_8_8(m_cUsbCameraHd,USB_CPLD_I2C_ADDRESS, 7, &day);
+	str.Format(_T("V%d.%d\t20%d/%02d/%02d"), (version & 0xF0) >> 4,version & 0x0F, year, mouth, day);
+}
+void CUSBTestDlg::OnMenuAbout()
+{
+	AboutDlg aboutDlg;
+	if (m_u32FrameReadThreadEn == THREAD_ENABLE && m_cUsbCameraHd) {
+		CString str;
+		readCpldVersion(str);
+		aboutDlg.setCpldVersion(str);
+		readUsbVersion(str);
+		aboutDlg.setUsbVersion(str);
+	}
+	else {
+		aboutDlg.setCpldVersion("----/--/--");
+		aboutDlg.setUsbVersion("Device: --\tInterface: --");
+	}
+	aboutDlg.DoModal();
+}
+
+
+void CUSBTestDlg::OnOK()
+{
+	// CDialog::OnOK();
+}
+
+
+void CUSBTestDlg::OnEnChangeEdit4()
+{
+	// TODO:  如果该控件是 RICHEDIT 控件，它将不
+	// 发送此通知，除非重写 CDialog::OnInitDialog()
+	// 函数并调用 CRichEditCtrl().SetEventMask()，
+	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+
+	// TODO:  在此添加控件通知处理程序代码
+}

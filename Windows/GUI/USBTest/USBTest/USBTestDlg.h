@@ -13,10 +13,7 @@
 
 #include "afxwin.h"
 #include "afxcmn.h"
-
-#include "common.h"
-
-
+#include "TTComboBox.h"
 /* -------------------- DlgFrame -------------------- */
 #define FRAME_W_GAP					20
 #define FRAME_H_GAP					20
@@ -62,6 +59,41 @@
 #define RGB565_RB							0
 #define RGB565_BR							1
 
+/* -- Record -- */
+#define RECORD_NULL					0
+#define RECORD_DATA					1
+#define RECORD_IMAGE				2
+#define RECORD_VIDEO				3
+/* --------------- Record --------------- */
+
+/* -- Double Image display mode -- */
+#define MODE_HORIZONTAL			0
+#define MODE_VERTICAL			1
+#define USB_CPLD_I2C_ADDRESS					0x46
+typedef struct UTC_PARA_IN							// [ C0, U0 ]
+{
+	long long	s64C0;
+	long long	s64U0;
+}UTC_PARA_IN;
+
+typedef struct UTC_PARA_OUT							// [ C0, a, b ]
+{
+	long long	s64C0;
+	double		f64A;
+	double		f64B;
+}UTC_PARA_OUT;
+
+#ifdef _WIN32
+	#define int64 __int64
+	#define uint64 unsigned long long
+#else
+	#include <inttypes.h>
+	#define int64 int64_t
+	#define uint64 uint64_t
+#endif
+
+extern UINT _FrameCaptureThread( LPVOID lParam );						// 图像采集线程
+extern UINT _FrameReadThread( LPVOID lParam );							// 图像读取显示线程
 
 // CUSBTestDlg 对话框
 class CUSBTestDlg : public CDialog
@@ -83,7 +115,8 @@ public:
 	Int8  Num2Asc( Int8 s8Data );
 	
 	void  DlgFrameSet( void );
-
+	CToolTipCtrl  m_tooltip;
+	CMenu m_Menu;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 
@@ -112,14 +145,14 @@ protected:
 
 	Uint32		m_u32TransLvl;
 
-	GainSet		m_stGainGSet;
-	GainSet		m_stGainBSet;
-	GainSet		m_stGainRSet;
-	GainSet		m_stGainG2Set;
-	GainSet		m_stGainYSet;
-	GainSet		m_stGainUSet;
-	GainSet		m_stGainVSet;
-	GainSet		m_stGainGLSet;
+	//GainSet		m_stGainGSet;
+	//GainSet		m_stGainBSet;
+	//GainSet		m_stGainRSet;
+	//GainSet		m_stGainG2Set;
+	//GainSet		m_stGainYSet;
+	//GainSet		m_stGainUSet;
+	//GainSet		m_stGainVSet;
+	//GainSet		m_stGainGLSet;
 
 	Uint32		m_u32ShotTimeFlag;
 	CString		m_csShotPath;
@@ -141,11 +174,11 @@ protected:
 	Uint8		m_u8FullScreenEn;
 	Uint8		m_u8DImageDispMode;
 	Uint8		m_u8WhiteBalanceEn;
-	Uint8		m_u8WhiteBalanceCfgEn;
+	//Uint8		m_u8WhiteBalanceCfgEn;
 
-	Uint32		m_u32TestR;
-	Uint32		m_u32TestG1;
-	Uint32		m_u32TestG2;
+	//Uint32		m_u32TestR;
+	//Uint32		m_u32TestG1;
+	//Uint32		m_u32TestG2;
 
 	/* ----- 图像平移与缩放 ----- */
 	RECT	m_sttDisplay_rect;
@@ -168,6 +201,7 @@ protected:
 	void InsertText( CString str, COLORREF rgb );
 	void DispErrorLog( Uint32 u32ErrorCode );
 
+	int filetime_WIN32(int64 *filetime_int64);
 	void DispInfo( void );
 
 	void FrameDisplayBMP( Uint8* pu8RgbData, Uint32 u32Width, Uint32 u32Height );
@@ -180,6 +214,8 @@ protected:
 
 	void SetWhiteBalanceCfg( Int8 *pf64WBPara );
 
+	UTC_PARA_IN stUtcParaIn;
+	UTC_PARA_OUT stpstUtcParaOut;
 // 实现
 protected:
 	HICON m_hIcon;
@@ -260,7 +296,7 @@ public:
 	CComboBox m_cmbImgFormat;
 	afx_msg void OnCbnSelchangeComboType();
 	CButton m_btCfgLoad;
-	CComboBox m_cmbCfgFileName;
+	CTTComboBox m_cmbCfgFileName;
 	afx_msg void OnBnClickedButtonLoad();
 	CButton m_btCfgFrash;
 	afx_msg void OnBnClickedButtonRefresh();
@@ -282,4 +318,11 @@ public:
 	afx_msg void OnBnClickedRadioModeVertical();
 	CButton m_chkWhiteBalance;
 	afx_msg void OnBnClickedCheckWhiteBalance();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnMenuAbout();
+	void readCpldVersion(CString &str);
+	void readUsbVersion(CString &str);
+	virtual void OnOK();
+	afx_msg void OnEnChangeEdit4();
 };

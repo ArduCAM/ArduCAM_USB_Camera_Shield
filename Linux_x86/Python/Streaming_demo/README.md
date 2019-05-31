@@ -16,33 +16,46 @@ Python demo code for the following cameras:
 - OV7675 （0.36MP Rolling Shutter Camera)
 
 # Install library and OpenCV Environment
-
-Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
-
-Unzip `tar -jxvf  libusb-1.0.21.tar.bz2`
-
-Then configure `./configure` or `./configure --disable-udev`
-
-Install the libusb library `sudo make install` 
-
-Install Python 2.7 `sudo apt-get install python2.7-dev` or Install Python 3.x `sudo apt-get install python3.x-dev`
-
-Install Python Dependence libraries 
-
-`sudo apt-get install python-pip`
-
-`sudo apt-get install python-opencv`
-
-`sudo apt-get install python-imaging`
-
-`sudo pip install evdev`
+## Downlaod and install the latest libusb 
+- Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
+- Copy the libusb-xxx.tar.bz to the Pi then run the following command to unzip it.[xxx：version number]
+```Bash
+tar -jxvf  libusb-xxx.tar.bz2  
+```
+- Before compilation, Run the following commands to config it  
+```Bash
+cd libusb-xxx 
+./configure --disable-udev
+```
+- Install the libusb library 
+```Bash
+sudo make install
+```
+## Install Python 2.7 and python-opencv
+ Notice: On raspberry Pi platform we advise use Python 2.7 
+ ```bash
+ sudo apt-get install python2.7-dev
+ ``` 
+ - For Python3
+```Bash
+sudo apt-get install python3.x-dev
+```
+- Install opencv
+```Bash
+sudo apt-get install python-opencv
+```
 
 # Usuage
-
-`sudo python ArduCam_Py_Demo.py <path/config-file-name>	`
-example: `sudo python ArduCam_Py_Demo.py ../../../python_config/AR0134_960p_Color.json`	
+## For the Streaming_demo 
+```Bash 
+cd ArduCAM_USB_Camera_Shield/RaspberryPi/Python/Streaming_demo/
+```
+sudo python ArduCam_Py_Demo.py <path/config-file-name>
+example:
+```Bash
+sudo python ArduCam_Py_Demo.py ../../../python_config/AR0134_960p_Color.json	
+```
 While the program is running, you can press the following buttons in the terminal:	
-
-    1.'s' + Enter:Save the image to the images folder.	
-    2.'c' + Enter:Stop saving images.	
-    3.'q' + Enter:Stop running the program.	
+  - 's' + Enter:Save the image to the images folder.	
+  - 'c' + Enter:Stop saving images.	
+  - 'q' + Enter:Stop running the program.	

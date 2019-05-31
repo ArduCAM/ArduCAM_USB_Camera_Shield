@@ -18,9 +18,13 @@ board_parameter:
 
 board_parameter_dev2: []
 
-board_parameter_dev3_inf2: []
+board_parameter_dev3_inf2: 
+   - ["0xf3","0x0000","0x0000","0x00",[]]
+   - ["0xf9","0x0000","0x0000","0x00",[]]
 
-board_parameter_dev3_inf3: []
+board_parameter_dev3_inf3: 
+   - ["0xf3","0x0000","0x0000","0x00",[]]
+   - ["0xf9","0x0000","0x0000","0x00",[]]
 
 register_parameter: 
    - ["0x3008","0x0080"]

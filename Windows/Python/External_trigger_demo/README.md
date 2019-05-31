@@ -1,11 +1,6 @@
 # Overview
-This ArduCam_Ext_Trigger_Demo demostrates how to capture a single frame from the camera with external trigger input to USB2 camera shield.
-The purpose of this demo is used for multi-camera synchronized capture, it works for both rolling shutter camera and global shutter camera. 
-If you want to trigger multiple global shutter camera, you have set the global shutter camera into trigger mode and connect the external trigger to both camera board and USB2 camera shield.
 
-Note that this example only works for lastest USB2 camera shield hardware.
-
-Python demo code for the following cameras(but not limited to):
+Python demo code for the following cameras:
 
 - MT9V022 (0.36MP Global Shutter Camera)
 - MT9V034 (0.36MP Global Shutter Camera)

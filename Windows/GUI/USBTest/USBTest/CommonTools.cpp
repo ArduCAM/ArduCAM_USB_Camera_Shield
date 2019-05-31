@@ -182,7 +182,7 @@ CString CUSBTestDlg::CreateDataFileName( ArduCamCfg* pstUseCfg )
 }
 
 
-void CUSBTestDlg::SetWhiteBalanceCfg( Int8 *pf64WBPara )
+/*void CUSBTestDlg::SetWhiteBalanceCfg( Int8 *pf64WBPara )
 {
 	Int32 s32TmpData1 = 0, s32TmpData2 = 0, s32TmpData3 = 0;
 
@@ -217,5 +217,5 @@ void CUSBTestDlg::SetWhiteBalanceCfg( Int8 *pf64WBPara )
 
 	//TRACE( "%d,	%d,	%d\r\n", s32TmpData1, s32TmpData2, s32TmpData3 );
 }
-
+*/
 

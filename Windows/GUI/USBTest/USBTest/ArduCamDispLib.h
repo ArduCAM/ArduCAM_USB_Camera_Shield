@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Common.h"
-
 #ifdef	 USBCAMERADISPLIB_EXPORTS
 #define  ARDUCAMDISP_API extern "C" _declspec(dllexport)
 #else
@@ -24,7 +22,7 @@ ARDUCAMDISP_API Uint32 ArduCamDisp_Yuv422D2rgb24( Uint8* pu8DstBmpData, Uint8* p
 ARDUCAMDISP_API Uint32 ArduCamDisp_Rgb565D2rgb24( Uint8* pu8DstBmpData, Uint8* pu8ResRgbData, Uint32 u32Width, Uint32 u32Height, Uint8 u8RgbMode, Uint8 u8DispMode );
 
 ARDUCAMDISP_API Uint32 ArduCamDisp_RawWhiteBalancePara( Uint8 *pu8ResRawData, Uint32 u32Width, Uint32 u32Height, Uint8 u8RawMode, Uint8 u8PixelBits, Int8* ps8GainOffset );
-
+ARDUCAMDISP_API Uint32 ArduCamDisp_RgbWhiteBalance(Uint8 *pu8SrcBgrData, Uint8 *pu8DstBgrData, Uint32 u32Width, Uint32 u32Height);
 ARDUCAMDISP_API void ArduCamDisp_FrameDisplayBMP( CDC *pcdDC, CRect* pcrRect, Uint8* pu8RgbData, Uint32 u32Width, Uint32 u32Height, 
 	Uint32 u32DispWidth, Uint32 u32DispHeight, Int32 s32locStartX, Int32 s32locStartY, 
 	f64 f64PixScale, Uint8 u8FullScreenEn );
