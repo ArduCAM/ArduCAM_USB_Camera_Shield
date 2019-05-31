@@ -32,7 +32,30 @@ def dBytesToMat(data,bitWidth,Width,Height):
     arr = arr.astype(np.uint8)
     image = arr.reshape(Height,Width,1)
     return image
-    
+def separationImage(data,Width,Height):
+    arr = np.frombuffer(data,dtype=np.uint16)
+    arr1 = arr >> 8
+    arr1 = arr1.astype(np.uint8)
+    arr2 = arr.astype(np.uint8)
+
+    image1 = arr1.reshape(Height,Width,1)
+    image2 = arr2.reshape(Height,Width,1)
+
+    image = np.concatenate([image1, image2], axis=1)
+    return image
+
+def convert_color(image,color_mode):
+    if color_mode == 0:
+        image = cv2.cvtColor(image,COLOR_BayerRG2BGR)
+    if color_mode == 1:
+        image = cv2.cvtColor(image,COLOR_BayerGR2BGR)
+    if color_mode == 2:
+        image = cv2.cvtColor(image,COLOR_BayerGB2BGR)
+    if color_mode == 3:
+        image = cv2.cvtColor(image,COLOR_BayerBG2BGR)
+    if color_mode < 0 and color_mode > 3:
+        image = cv2.cvtColor(image,COLOR_BayerGB2BGR)
+    return image
 def convert_image(data,cfg,color_mode):
     Width = cfg["u32Width"]
     Height = cfg["u32Height"]
@@ -57,14 +80,12 @@ def convert_image(data,cfg,color_mode):
             image = dBytesToMat(data,bitWidth,Width,Height)
         else:
             image = np.frombuffer(data, np.uint8).reshape( Height,Width , 1 )
-        if color_mode == 0:
-            image = cv2.cvtColor(image,COLOR_BayerRG2BGR)
-        if color_mode == 1:
-            image = cv2.cvtColor(image,COLOR_BayerGR2BGR)
-        if color_mode == 2:
-            image = cv2.cvtColor(image,COLOR_BayerGB2BGR)
-        if color_mode == 3:
-            image = cv2.cvtColor(image,COLOR_BayerBG2BGR)
-        if color_mode < 0 and color_mode > 3:
-            image = cv2.cvtColor(image,COLOR_BayerGB2BGR)
+        image = convert_color(image,color_mode)
+    if emImageFmtMode == ArducamSDK.FORMAT_MODE_RAW_D:
+        image = separationImage(data,Width,Height)
+        image = convert_color(image,color_mode)
+        pass
+    if emImageFmtMode == ArducamSDK.FORMAT_MODE_MON_D:
+        image = separationImage(data,Width,Height)
+        pass
     return image
