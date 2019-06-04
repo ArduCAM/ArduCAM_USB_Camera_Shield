@@ -1628,8 +1628,8 @@ void CUSBTestDlg::OnLButtonUp(UINT nFlags, CPoint point)
 				m_s32locStartY = stTmpFramePara.u32Height - m_u32DisplayHeight * m_pixScale;
 		}
 
-		m_s32locStartX = max( 0, m_s32locStartX );
-		m_s32locStartY = max( 0, m_s32locStartY );
+		/*m_s32locStartX = max( 0, m_s32locStartX );
+		m_s32locStartY = max( 0, m_s32locStartY );*/
 
 		FillBlackDisplay();
 		
