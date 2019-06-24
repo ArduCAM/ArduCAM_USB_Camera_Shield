@@ -509,7 +509,9 @@ int main(int argc,char **argv)
 #ifdef linux
 	sleep(2);
 #endif
-
+#ifdef _WIN32
+	Sleep(2000);
+#endif
 	//read config file and open the camera.
 	if (camera_initFromFile(config_file_name, cameraHandle, cameraCfg)) {
 	    ArduCam_setMode(cameraHandle,CONTINUOUS_MODE);
