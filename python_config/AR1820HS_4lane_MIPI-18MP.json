@@ -436,10 +436,14 @@
 		["0x305c","0x2001"],
 		["0x0104","0x0000"],
 		["0x300c","0xa3fc"],
-		["0x3012","0x0500"]
+		["0x3012","0x0500"],
+		["0x0300","0x0005"],
+		["0x300c","0xfffc"]
 	],
 	"register_parameter_dev3_inf2" : [
 	],
-	"register_parameter_dev3_inf3" : [
+	"register_parameter_dev3_inf3" : [	
+		["0x0300","0x0003"],
+		["0x300c","0xa3fc"]
 	]
 }

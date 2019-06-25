@@ -455,8 +455,10 @@ register_parameter:
    - ["0x040a","0x0210"]
    - ["0x0104","0x0000"]
    - ["0x3012","0x0500"]
+   - ["0x300c","0x65a4"]
 
 register_parameter_dev3_inf2: []
 
-register_parameter_dev3_inf3: []
+register_parameter_dev3_inf3: 
+   - ["0x300c","0x21a6"]
 
