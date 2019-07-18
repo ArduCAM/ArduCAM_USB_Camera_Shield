@@ -284,7 +284,21 @@ END
 
 IDR_MENU1 MENU
 BEGIN
+    POPUP "File"
+    BEGIN
+        MENUITEM "Open...",                     ID_MENU_FILE_OPEN
+    END
     MENUITEM "About",                       ID_MENU_ABOUT
+END
+
+IDR_MENU2 MENU
+BEGIN
+    POPUP "MENU"
+    BEGIN
+        MENUITEM "Copy",                        ID_MENU_COPY
+        MENUITEM "Select All",                  ID_MENU_SELECTALL
+        MENUITEM "Clear All",                   ID_MENU_CLEAR
+    END
 END
 
 #endif    // 中文(简体，中国) resources

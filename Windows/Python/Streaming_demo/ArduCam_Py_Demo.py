@@ -156,11 +156,9 @@ def readImage_thread():
         if ArducamSDK.Py_ArduCam_availableImage(handle) > 0:		
             rtn_val,data,rtn_cfg = ArducamSDK.Py_ArduCam_readImage(handle)
             datasize = rtn_cfg['u32Size']
-            if rtn_val != 0:
+            if rtn_val != 0 or datasize == 0:
+                ArducamSDK.Py_ArduCam_del(handle)
                 print("read data fail!")
-                continue
-                
-            if datasize == 0:
                 continue
 
             image = convert_image(data,rtn_cfg,color_mode)
@@ -188,8 +186,8 @@ def readImage_thread():
             time.sleep(0.001);
         
 def showHelp():
-    print(" usage: sudo python3 ArduCam_Py_Demo.py <path/config-file-name>	\
-        \n\n example: sudo python3 ArduCam_Py_Demo.py ../JSON_Config_Files/AR0134_960p_Color.yml	\
+    print(" usage: sudo python ArduCam_Py_Demo.py <path/config-file-name>	\
+        \n\n example: sudo python ArduCam_Py_Demo.py ../../../python_config/AR0134_960p_Color.json	\
         \n\n While the program is running, you can press the following buttons in the terminal:	\
         \n\n 's' + Enter:Save the image to the images folder.	\
         \n\n 'c' + Enter:Stop saving images.	\

@@ -137,6 +137,10 @@ BEGIN_MESSAGE_MAP(CUSBTestDlg, CDialog)
 	ON_BN_CLICKED(IDC_CHECK_WHITE_BALANCE, &CUSBTestDlg::OnBnClickedCheckWhiteBalance)
 	ON_COMMAND(ID_MENU_ABOUT, &CUSBTestDlg::OnMenuAbout)
 	ON_EN_CHANGE(IDC_EDIT4, &CUSBTestDlg::OnEnChangeEdit4)
+	ON_COMMAND(ID_MENU_FILE_OPEN, &CUSBTestDlg::OnFileOpen)
+	ON_MESSAGE(ID_MENU_SELECTALL, &CUSBTestDlg::OnSelectAll)
+	ON_MESSAGE(ID_MENU_COPY, &CUSBTestDlg::OnCopy)
+	ON_MESSAGE(ID_MENU_CLEAR, &CUSBTestDlg::OnClearAll)
 END_MESSAGE_MAP()
 
 
@@ -239,7 +243,7 @@ BOOL CUSBTestDlg::OnInitDialog()
 	m_u8FullScreenEn	  = 1;
 	m_u8WhiteBalanceEn	  = 0;
 	//m_u8WhiteBalanceCfgEn = 0;
-
+	m_reInf.SetEventMask(ENM_MOUSEEVENTS);
 	return TRUE;  
 }
  
@@ -1018,13 +1022,12 @@ void CUSBTestDlg::OnBnClickedButtonLoad()
 {
 	// TODO: Add your control notification handler code here
 	CString csTmpFileName; 
+	CString tmpFileName;
+	m_cmbCfgFileName.GetLBText(m_cmbCfgFileName.GetCurSel(), tmpFileName);
 
-	GetModuleFileName( NULL, csTmpFileName.GetBuffer(512), 512 );									
-	csTmpFileName.ReleaseBuffer();
-	Int32 s32TmpPathSize = csTmpFileName.ReverseFind( '\\' );	
-	csTmpFileName	= csTmpFileName.Left( s32TmpPathSize );	
-
-	csTmpFileName = csTmpFileName + _T("\\Config\\") + m_caCfgFileList.GetAt( m_cmbCfgFileName.GetCurSel() ).cFileName;
+	Int32 s32TmpPathSize = m_csCfgFileName.ReverseFind('\\');
+	csTmpFileName = m_csCfgFileName.Left(s32TmpPathSize + 1);
+	csTmpFileName = csTmpFileName + tmpFileName;
 
 	if ( CFG_NONE_CONTENT == ArduCamCfg_LoadCameraConfig( m_cUsbCameraCfgHd, csTmpFileName ) )
 	{
@@ -2014,4 +2017,69 @@ void CUSBTestDlg::OnEnChangeEdit4()
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
 
 	// TODO:  在此添加控件通知处理程序代码
+}
+
+
+void CUSBTestDlg::OnFileOpen()
+{
+	TCHAR szFilters[] = _T("All Files (*.*)|*.*|Cfg Files (*.cfg)|*.cfg||");
+	// Create an Open dialog; the default file name extension is ".my".
+	CFileDialog fileDlg(TRUE, NULL, NULL,
+		OFN_FILEMUSTEXIST, szFilters);
+
+	// Display the file dialog. When user clicks OK, fileDlg.DoModal() 
+	// returns IDOK.
+	if (fileDlg.DoModal() == IDOK)
+	{
+		CString pathName = fileDlg.GetFolderPath();
+		m_csCfgFileName = pathName + _T("\\*.cfg");
+		OnBnClickedButtonRefresh();
+		m_cmbCfgFileName.SetCurSel(m_cmbCfgFileName.SelectString(0, fileDlg.GetFileName()));
+	}
+}
+
+
+BOOL CUSBTestDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	MSGFILTER * lpMsgFilter = (MSGFILTER *)lParam;
+
+	if ((wParam == IDC_RICHEDIT_LOG) && (lpMsgFilter->nmhdr.code == EN_MSGFILTER)
+		&& (lpMsgFilter->msg == WM_RBUTTONDOWN))
+
+	{
+		//if we get through here, we have trapped the right click event of the richeditctrl! 
+		CPoint point;
+		::GetCursorPos(&point); //where is the mouse?
+		CMenu menu; //lets display out context menu :) 
+		UINT dwSelectionMade;
+		VERIFY(menu.LoadMenu(IDR_MENU2));
+		CMenu *pmenuPopup = menu.GetSubMenu(0);
+		ASSERT(pmenuPopup != NULL);
+		dwSelectionMade = pmenuPopup->TrackPopupMenu((TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_NONOTIFY | TPM_RETURNCMD),
+			point.x, point.y, this
+		);
+
+		pmenuPopup->DestroyMenu();
+		PostMessage(dwSelectionMade, 0, 0);
+	}
+	return CDialog::OnNotify(wParam, lParam, pResult);
+}
+
+LRESULT CUSBTestDlg::OnSelectAll(WPARAM wParam, LPARAM lParam)
+{
+	m_reInf.SetSel(0, -1);
+	return NULL;
+}
+
+LRESULT CUSBTestDlg::OnCopy(WPARAM wParam, LPARAM lParam)
+{
+	m_reInf.Copy();
+	return NULL;
+}
+LRESULT CUSBTestDlg::OnClearAll(WPARAM wParam, LPARAM lParam)
+{
+	m_reInf.SetSel(0, -1);
+	m_reInf.Clear();
+	return NULL;
 }
