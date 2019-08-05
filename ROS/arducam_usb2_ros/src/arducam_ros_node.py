@@ -147,11 +147,9 @@ def captureImage():
     if ArducamSDK.Py_ArduCam_availableImage(handle) > 0:		
         rtn_val,data,rtn_cfg = ArducamSDK.Py_ArduCam_readImage(handle)
         datasize = rtn_cfg['u32Size']
-        if rtn_val != 0:
+        if rtn_val != 0 or datasize == 0:
             print "read data fail!"
-            return
-            
-        if datasize == 0:
+            ArducamSDK.Py_ArduCam_del(handle)
             return
 
         image = convert_image(data,rtn_cfg,color_mode)
