@@ -8,7 +8,7 @@ Note that this example only works for lastest USB2 camera shield hardware.
 This is C/C++ demo code for the AR0134 (1.2MP Global Shutter Camera)
  
 # Install library and OpenCV Environment
-## Downlaod and install the latest libusb 
+## Download and install the latest libusb 
 - Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
 - Copy the libusb-xxx.tar.bz to the Pi then run the following command to unzip it.[xxx：version number]
 ```Bash
