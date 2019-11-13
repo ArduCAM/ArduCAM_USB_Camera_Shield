@@ -15,7 +15,6 @@
 5. Single camera example: roslaunch arducam_usb2_ros arducam_node.launch<br/>
 Multiple cameras example: roslaunch arducam_usb2_ros multiarducam_node.launch<br/>
 External/software trigger image capture example: roslaunch arducam_usb2_ros trigger_capture_node.launch
-6. Display example: rosrun arducam_usb2_ros display_test.py
 
 ## Single camera example
 - ### Topic publish:

@@ -27,9 +27,12 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="arducam_config_parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ArduCam_Single_Demo.cpp">
+    <ClCompile Include="ArduCam_Ext_Trigger_Demo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

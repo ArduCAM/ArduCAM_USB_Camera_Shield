@@ -7,6 +7,7 @@ import numpy as np
 import signal
 import json
 from ImageConvert import *
+import arducam_config_parser
 import ArducamSDK
 
 
@@ -25,54 +26,35 @@ COLOR_BayerRG2BGR = 48
 COLOR_BayerGR2BGR = 49
 
 
-def configBoard(handle,fileNodes):
-    for i in range(0,len(fileNodes)):
-        fileNode = fileNodes[i]
-        buffs = []
-        command = fileNode[0]
-        value = fileNode[1]
-        index = fileNode[2]
-        buffsize = fileNode[3]
-        for j in range(0,len(fileNode[4])):
-            buffs.append(int(fileNode[4][j],16))
-        ArducamSDK.Py_ArduCam_setboardConfig(handle,int(command,16),int(value,16),int(index,16),int(buffsize,16),buffs)
+def configBoard(handle, config):
+    ArducamSDK.Py_ArduCam_setboardConfig(handle, config.params[0], \
+        config.params[1], config.params[2], config.params[3], \
+            config.params[4:config.params_length])
 
 pass
 
 
-def writeSensorRegs(handle,fileNodes):
-    for i in range(0,len(fileNodes)):
-        fileNode = fileNodes[i]      
-        if fileNode[0] == "DELAY":
-            time.sleep(float(fileNode[1])/1000)
-            continue
-        regAddr = int(fileNode[0],16)
-        val = int(fileNode[1],16)
-        ArducamSDK.Py_ArduCam_writeSensorReg(handle,regAddr,val)
-
-pass
-
-def camera_initFromFile(fialeName,index):
+def camera_initFromFile(fileName,index):
     global cfg,Width,Height,color_mode,save_raw
     #load config file
-    config = json.load(open(fialeName,"r"))
+    config = arducam_config_parser.LoadConfigFile(fileName)
 
-    camera_parameter = config["camera_parameter"]
-    Width = int(camera_parameter["SIZE"][0])
-    Height = int(camera_parameter["SIZE"][1])
+    camera_parameter = config.camera_param.getdict()
+    Width = camera_parameter["WIDTH"]
+    Height = camera_parameter["HEIGHT"]
 
     BitWidth = camera_parameter["BIT_WIDTH"]
     ByteLength = 1
     if BitWidth > 8 and BitWidth <= 16:
         ByteLength = 2
         save_raw = True
-    FmtMode = int(camera_parameter["FORMAT"][0])
-    color_mode = (int)(camera_parameter["FORMAT"][1])
+    FmtMode = camera_parameter["FORMAT"][0]
+    color_mode = camera_parameter["FORMAT"][1]
 
     I2CMode = camera_parameter["I2C_MODE"]
-    I2cAddr = int(camera_parameter["I2C_ADDR"],16)
-    TransLvl = int(camera_parameter["TRANS_LVL"])
-    cfg = {"u32CameraType":0x4D091031,
+    I2cAddr = camera_parameter["I2C_ADDR"]
+    TransLvl = camera_parameter["TRANS_LVL"]
+    cfg = {"u32CameraType":0x00,
             "u32Width":Width,"u32Height":Height,
             "usbType":0,
             "u8PixelBytes":ByteLength,
@@ -92,22 +74,18 @@ def camera_initFromFile(fialeName,index):
         #ArducamSDK.Py_ArduCam_writeReg_8_8(handle,0x46,3,0x00)
         usb_version = rtn_cfg['usbType']
         #print("USB VERSION:",usb_version)
-        #config board param
-        configBoard(handle,config["board_parameter"])
-
-        if usb_version == ArducamSDK.USB_1 or usb_version == ArducamSDK.USB_2:
-            configBoard(handle,config["board_parameter_dev2"])
-        if usb_version == ArducamSDK.USB_3:
-            configBoard(handle,config["board_parameter_dev3_inf3"])
-        if usb_version == ArducamSDK.USB_3_2:
-            configBoard(handle,config["board_parameter_dev3_inf2"])
-        
-        writeSensorRegs(handle,config["register_parameter"])
-        
-        if usb_version == ArducamSDK.USB_3:
-            writeSensorRegs(handle,config["register_parameter_dev3_inf3"])
-        if usb_version == ArducamSDK.USB_3_2:
-            writeSensorRegs(handle,config["register_parameter_dev3_inf2"])
+        configs = config.configs
+        configs_length = config.configs_length
+        for i in range(configs_length):
+            type = configs[i].type
+            if ((type >> 16) & 0xFF) != 0 and ((type >> 16) & 0xFF) != usb_version:
+                continue
+            if type & 0xFFFF == arducam_config_parser.CONFIG_TYPE_REG:
+                ArducamSDK.Py_ArduCam_writeSensorReg(handle, configs[i].params[0], configs[i].params[1])
+            elif type & 0xFFFF == arducam_config_parser.CONFIG_TYPE_DELAY:
+                time.sleep(float(configs[i].params[0])/1000)
+            elif type & 0xFFFF == arducam_config_parser.CONFIG_TYPE_VRCMD:
+                configBoard(handle, configs[i])
 
         rtn_val,datas = ArducamSDK.Py_ArduCam_readUserData(handle,0x400-16, 16)
         print("Serial: %c%c%c%c-%c%c%c%c-%c%c%c%c"%(datas[0],datas[1],datas[2],datas[3],
@@ -176,8 +154,8 @@ def getAndDisplaySingleFrame(handle,index):
 
             
 def showHelp():
-    print(" usage: sudo python3 ArduCam_Ext_Trigger_Demo.py <path/config-file-name>	\
-        \n\n example: sudo python3 ArduCam_Ext_Trigger_Demo.py ../python_config/AR0134_960p_Color.json	\
+    print(" usage: sudo python ArduCam_Ext_Trigger_Demo.py <path/config-file-name>	\
+        \n\n example: sudo python ArduCam_Ext_Trigger_Demo.py .../../../python_config/AR0134_960p_Color.json	\
         \n\n")
 
 def sigint_handler(signum, frame):

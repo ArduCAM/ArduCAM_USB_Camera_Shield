@@ -1,6 +1,6 @@
 CC			= g++
 
-LIBS		= -lArduCamLib -lusb-1.0  -lpthread `pkg-config --cflags --libs opencv`
+LIBS		= -lArduCamLib -lusb-1.0 -larducam_config_parser -lpthread `pkg-config --cflags --libs opencv`
 FLAGS		= -L. -I. -std=gnu++11 -g
 LDIR		= ./Arducam_SDK
 

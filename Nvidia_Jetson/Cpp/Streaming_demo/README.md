@@ -15,6 +15,18 @@ This is C/C++ demo code for the following cameras:
 - OV5642 （5MP Rolling Shutter Camera)
 - OV7675 （0.36MP Rolling Shutter Camera)
 # Install library and OpenCV Environment
+## Build and install arducam_config_parser 
+- Build  
+```Bash
+  git clone https://github.com/ArduCAM/arducam_config_parser.git
+  cd arducam_config_parser
+  make clean && make
+```
+- Install  
+```Bash
+  make install
+```
+
 ## Downlaod and install the latest libusb 
 - Download the [libusb](https://sourceforge.net/projects/libusb/files/libusb-1.0/) 
 - Copy the libusb-xxx.tar.bz to the Pi then run the following command to unzip it.[xxx：version number]
@@ -59,7 +71,7 @@ make
  cd ArduCAM_USB_Camera_Shield/RaspberryPi/Cpp/Streaming_demo
  ```
  ```bash
- sudo ./ArduCam_Demo ../../../cpp_config/AR0134_960p_Color.yml
+ sudo ./ArduCam_Demo ../../../Config/USB2.0_UC-391_Rev.D/AR0134_RAW_8b_1280x964_31fps.cfg
  ```
  
  While the program is running, you can press the following buttons in the terminal:	

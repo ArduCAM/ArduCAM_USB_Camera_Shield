@@ -1,0 +1,6 @@
+﻿  ArduCam_Ext_Trigger_Demo.cpp
+f:\arducam_usb_sdk_new\example\windows\cpp\external_trigger_demo\arducam_test\arducam_config_parser.h(28): warning C4005: “ARDUCAM_API”: 宏重定义
+  f:\arducam_usb_sdk_new\example\windows\cpp\external_trigger_demo\arducam_test\arducamlib.h(8): note: 参见“ARDUCAM_API”的前一个定义
+f:\arducam_usb_sdk_new\example\windows\cpp\external_trigger_demo\arducam_test\arducam_ext_trigger_demo.cpp(151): warning C4018: “<”: 有符号/无符号不匹配
+f:\arducam_usb_sdk_new\example\windows\cpp\external_trigger_demo\arducam_test\arducam_ext_trigger_demo.cpp(215): warning C4101: “u8Buf”: 未引用的局部变量
+  ArduCam_test.vcxproj -> F:\arducam_usb_sdk_new\example\Windows\Cpp\External_trigger_demo\x64\Debug\ArduCam_test.exe
