@@ -22,11 +22,11 @@ or for 32bit Windows run the demo excutable file from : ``` \Release\USBTest.exe
 [Demo]:http://www.arducam.com/wp-content/uploads/2017/09/USB_Camera_Demo.jpg "Demo"
 
 
-2. Click "scan" to scan device 
+2. Select the Sensor type from the configuration file drop list.
 
-3. Click "File -> Open -> ArduCAM_USB_Camera_Shield/Config"to choose the configure file. Then click "load" to load the configure file.
+3. Click "auto-Open" or "scan" then "open" button to open the camera.
 
-4. Click the "open" to open the usb camera. Click "play" / "stop" button to start/stop video streaming. 
+4. Click the "play" / "stop" button to start/stop video streaming. 
 
 5. Click the "shot" button to take a snapshot with BMP or JPEG format.
 
