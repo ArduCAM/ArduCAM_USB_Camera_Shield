@@ -12,7 +12,7 @@ extern "C"{
     typedef	unsigned short                      Uint16;
     typedef	unsigned int                        Uint32;
     typedef unsigned long long                  UInt64;
-    typedef unsigned int*                       ArduCamHandle;
+    typedef void*                               ArduCamHandle;
 
     #define RAW_RG                              0
     #define RAW_GR                              1
