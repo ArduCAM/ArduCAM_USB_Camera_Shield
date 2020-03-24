@@ -1,8 +1,8 @@
 <launch>
 
     <group ns="cam0" clear_params="true">
-        <arg name="camera_config" value="MT9N001_9MP.json" /> <!-- Config file in camera_config_files folder of your camera. -->
-        <arg name="serial_number" value="AU2S-1835-0013" /> <!-- Serial number of the camera in the form of "XXXX-XXXX-XXXX", leave it blank "" if there is only one camera. -->
+        <arg name="camera_config" value="AR0134_1280x964_8bit_C.cfg" /> <!-- Config file in camera_config_files folder of your camera. -->
+        <arg name="serial_number" value="AU2S-1846-0017" /> <!-- Serial number of the camera in the form of "XXXX-XXXX-XXXX", leave it blank "" if there is only one camera. -->
         <arg name="horizontal_flip" value="true" /> <!-- Flip image horizontally. -->
         <arg name="vertical_flip" value="false" /> <!-- Flip image vertically. -->
         <arg name="frame_id" value="cam0" /> <!--Topic frame_id. -->
@@ -17,8 +17,8 @@
     </group>
 
     <group ns="cam1" clear_params="true">
-        <arg name="camera_config" value="MT9N001_9MP.json" /> <!-- Config file in camera_config_files folder of your camera. -->
-        <arg name="serial_number" value="AU2S-1838-0003" /> <!-- Serial number of the camera in the form of "XXXX-XXXX-XXXX", leave it blank "" if there is only one camera. -->
+        <arg name="camera_config" value="AR0134_1280x964_8bit_C.cfg" /> <!-- Config file in camera_config_files folder of your camera. -->
+        <arg name="serial_number" value="AU2S-1928-0001" /> <!-- Serial number of the camera in the form of "XXXX-XXXX-XXXX", leave it blank "" if there is only one camera. -->
         <arg name="horizontal_flip" value="true" /> <!-- Flip image horizontally. -->
         <arg name="vertical_flip" value="false" /> <!-- Flip image vertically. -->
         <arg name="frame_id" value="cam1" /> <!--Topic frame_id. -->
@@ -33,7 +33,7 @@
     </group>
 
     <group ns="cam2" clear_params="true">
-        <arg name="camera_config" value="MT9N001_9MP.json" /> <!-- Config file in camera_config_files folder of your camera. -->
+        <arg name="camera_config" value="AR0134_1280x964_8bit_C.cfg" /> <!-- Config file in camera_config_files folder of your camera. -->
         <arg name="serial_number" value="AU2S-1835-0012" /> <!-- Serial number of the camera in the form of "XXXX-XXXX-XXXX", leave it blank "" if there is only one camera. -->
         <arg name="horizontal_flip" value="true" /> <!-- Flip image horizontally. -->
         <arg name="vertical_flip" value="false" /> <!-- Flip image vertically. -->

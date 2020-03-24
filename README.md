@@ -35,7 +35,7 @@ More info can be found from [arducam website](http://www.arducam.com/arducam-usb
 - x86 PC
 - Raspberry Pi
 - Ordiod C2
-- Nvidia Jetson Nano
+- Nvidia Jetson TX1/TX2/Nano
 Contact us for more platform support.
 
 ## Supported OS 

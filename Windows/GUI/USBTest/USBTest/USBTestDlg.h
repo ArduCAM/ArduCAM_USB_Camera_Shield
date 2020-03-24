@@ -325,4 +325,9 @@ public:
 	void readUsbVersion(CString &str);
 	virtual void OnOK();
 	afx_msg void OnEnChangeEdit4();
+	afx_msg void OnFileOpen();
+	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
+	LRESULT CUSBTestDlg::OnSelectAll(WPARAM wParam, LPARAM lParam);
+	LRESULT CUSBTestDlg::OnCopy(WPARAM wParam, LPARAM lParam);
+	LRESULT CUSBTestDlg::OnClearAll(WPARAM wParam, LPARAM lParam);
 };

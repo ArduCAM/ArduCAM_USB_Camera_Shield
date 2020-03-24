@@ -25,6 +25,7 @@
 
 #include <signal.h>
 
+#include "arducam_config_parser.h"
 //#define USE_SOFT_TRIGGER
 
 using namespace std;
@@ -145,47 +146,13 @@ cv::Mat BytestoMat(Uint8* bytes, int width, int height)
 	return image;
 }
 
-void configBoard(ArduCamHandle &cameraHandle,cv::FileNode bp){
-	std::string hexStr;
-	for (int i = 0; i < bp.size(); i++) {
-		uint8_t u8Buf[10];
-		for (int j = 0; j < bp[i][4].size(); j++){
-			bp[i][4][j] >> hexStr;
-			u8Buf[j] = std::stoul(hexStr, nullptr, 16);
-		}
-			
-		bp[i][0] >> hexStr;
-		Uint8 u8Command = std::stoul(hexStr, nullptr, 16);
-		bp[i][1] >> hexStr;
-		Uint16 u16Value = std::stoul(hexStr, nullptr, 16);
-		bp[i][2] >> hexStr;
-		Uint16 u16Index = std::stoul(hexStr, nullptr, 16);
-		bp[i][3] >> hexStr;
-		Uint32 u32BufSize = std::stoul(hexStr, nullptr, 16);
-		ArduCam_setboardConfig(cameraHandle, u8Command,u16Value,u16Index, u32BufSize, u8Buf);
+void configBoard(ArduCamHandle &cameraHandle, Config config) {
+	uint8_t u8Buf[10];
+	for (int n = 0; n < config.params[3]; n++) {
+		u8Buf[n] = config.params[4 + n];
 	}
-}
-void writeSensorRegs(ArduCamHandle &cameraHandle,cv::FileNode rp){
-	std::string hexStr;
-	int value;
-	for (int i = 0; i < rp.size(); i++) {
-		rp[i][0] >> hexStr;
-		if(hexStr.compare("DELAY") == 0){
-			rp[i][1] >> hexStr;
-			Uint32 delay_time = std::stoul(hexStr, nullptr, 10);
-#ifdef linux
-            usleep(1000 * delay_time);
-#endif
-#ifdef _WIN32
-	        Sleep(delay_time);
-#endif
-			continue;
-		}
-		Uint32 addr = std::stoul(hexStr, nullptr, 16);
-		rp[i][1] >> hexStr;
-		Uint32 val = std::stoul(hexStr, nullptr, 16);
-		ArduCam_writeSensorReg(cameraHandle, addr, val);
-	}
+	ArduCam_setboardConfig(cameraHandle, config.params[0], config.params[1],
+		config.params[2], config.params[3], u8Buf);
 }
 
 /**
@@ -195,94 +162,91 @@ void writeSensorRegs(ArduCamHandle &cameraHandle,cv::FileNode rp){
  * @param cameraCfg :camera config struct
  * @return TURE or FALSE
  * */
-bool camera_initFromFile(std::string filename, ArduCamHandle &cameraHandle, ArduCamCfg &cameraCfg,int index) {
-	cv::FileStorage cfg;
-	if (cfg.open(filename, cv::FileStorage::READ)) {
-		cv::FileNode cp = cfg["camera_parameter"];
-		int value;
-		std::string hexStr;
-
-		cp["I2C_MODE"] >> value;
-		switch (value) {
-		case 0: cameraCfg.emI2cMode = I2C_MODE_8_8; break;
-		case 1: cameraCfg.emI2cMode = I2C_MODE_8_16; break;
-		case 2: cameraCfg.emI2cMode = I2C_MODE_16_8; break;
-		case 3: cameraCfg.emI2cMode = I2C_MODE_16_16; break;
-		default: break;
-		}
-
-		cp["FORMAT"][0] >> value;
-		cp["FORMAT"][1] >> color_mode;
-		switch (value) {
-		case 0: cameraCfg.emImageFmtMode = FORMAT_MODE_RAW; break;
-		case 1: cameraCfg.emImageFmtMode = FORMAT_MODE_RGB; break;
-		case 2: cameraCfg.emImageFmtMode = FORMAT_MODE_YUV; break;
-		case 3: cameraCfg.emImageFmtMode = FORMAT_MODE_JPG; break;
-		case 4: cameraCfg.emImageFmtMode = FORMAT_MODE_MON; break;
-		case 5: cameraCfg.emImageFmtMode = FORMAT_MODE_RAW_D; break;
-		case 6: cameraCfg.emImageFmtMode = FORMAT_MODE_MON_D; break;
-		default: break;
-		}
-
-		cp["SIZE"][0] >> value; cameraCfg.u32Width = value;
-		cp["SIZE"][1] >> value; cameraCfg.u32Height = value;
-		cp["I2C_ADDR"] >> hexStr; cameraCfg.u32I2cAddr = std::stoul(hexStr, nullptr, 16);
-		cp["BIT_WIDTH"] >> value; cameraCfg.u8PixelBits = value;
-		cp["TRANS_LVL"] >> value; cameraCfg.u32TransLvl = value;
-		if(cameraCfg.u8PixelBits <= 8){
-		    cameraCfg.u8PixelBytes = 1;
-		}else if(cameraCfg.u8PixelBits > 8 && cameraCfg.u8PixelBits <= 16){
-		    cameraCfg.u8PixelBytes = 2;
-		    save_raw = true;
-		}
-
-        int ret_val = ArduCam_open(cameraHandle, &cameraCfg,index);
-        //int ret_val = ArduCam_autoopen(cameraHandle, &cameraCfg);
-		if (ret_val == USB_CAMERA_NO_ERROR) {
-			//ArduCam_enableForceRead(cameraHandle);	//Force display image
-			cv::FileNode board_param = cfg["board_parameter"];
-			cv::FileNode bp = cfg["board_parameter_dev2"];
-
-			configBoard(cameraHandle,board_param);
-			
-			//confirm usb model  (usbType will be assigned after calling the ArduCam_autoopen or ArduCam_open method)
-			switch(cameraCfg.usbType){
-			case USB_1:
-			case USB_2:configBoard(cameraHandle,cfg["board_parameter_dev2"]);			break;
-			case USB_3:configBoard(cameraHandle,cfg["board_parameter_dev3_inf3"]);		break;
-			case USB_3_2:configBoard(cameraHandle,cfg["board_parameter_dev3_inf2"]);	break;
-			}
-			// usleep(1000 * 300);
-			writeSensorRegs(cameraHandle,cfg["register_parameter"]);
-			
-			switch(cameraCfg.usbType){
-			case USB_1:
-			case USB_2:break;
-			case USB_3:writeSensorRegs(cameraHandle,cfg["register_parameter_dev3_inf3"]);	break;
-			case USB_3_2:writeSensorRegs(cameraHandle,cfg["register_parameter_dev3_inf2"]);	break;
-			}
-
-			unsigned char u8TmpData[16];
-			ArduCam_readUserData( cameraHandle, 0x400-16, 16, u8TmpData );
-			printf( "Serial: %c%c%c%c-%c%c%c%c-%c%c%c%c\n",  
-			      u8TmpData[0], u8TmpData[1], u8TmpData[2], u8TmpData[3], 
-			      u8TmpData[4], u8TmpData[5], u8TmpData[6], u8TmpData[7], 
-			      u8TmpData[8], u8TmpData[9], u8TmpData[10], u8TmpData[11] );
-		}
-		else {
-			std::cout << "Cannot open camera.rtn_val = "<< ret_val << std::endl;
-			cfg.release();
-			return false;
-		}
-
-		cfg.release();
-		return true;
-	}
-	else {
+bool camera_initFromFile(std::string filename, ArduCamHandle &cameraHandle, ArduCamCfg &cameraCfg, int index) {
+	CameraConfigs cam_cfgs;
+	memset(&cam_cfgs, 0x00, sizeof(CameraConfigs));
+	if (arducam_parse_config(filename.c_str(), &cam_cfgs)) {
 		std::cout << "Cannot find configuration file." << std::endl << std::endl;
 		showHelp();
 		return false;
 	}
+	CameraParam *cam_param = &cam_cfgs.camera_param;
+	Config *configs = cam_cfgs.configs;
+	int configs_length = cam_cfgs.configs_length;
+
+	switch (cam_param->i2c_mode) {
+	case 0: cameraCfg.emI2cMode = I2C_MODE_8_8; break;
+	case 1: cameraCfg.emI2cMode = I2C_MODE_8_16; break;
+	case 2: cameraCfg.emI2cMode = I2C_MODE_16_8; break;
+	case 3: cameraCfg.emI2cMode = I2C_MODE_16_16; break;
+	default: break;
+	}
+
+	color_mode = cam_param->format & 0xFF;
+	switch (cam_param->format >> 8) {
+	case 0: cameraCfg.emImageFmtMode = FORMAT_MODE_RAW; break;
+	case 1: cameraCfg.emImageFmtMode = FORMAT_MODE_RGB; break;
+	case 2: cameraCfg.emImageFmtMode = FORMAT_MODE_YUV; break;
+	case 3: cameraCfg.emImageFmtMode = FORMAT_MODE_JPG; break;
+	case 4: cameraCfg.emImageFmtMode = FORMAT_MODE_MON; break;
+	case 5: cameraCfg.emImageFmtMode = FORMAT_MODE_RAW_D; break;
+	case 6: cameraCfg.emImageFmtMode = FORMAT_MODE_MON_D; break;
+	default: break;
+	}
+
+	cameraCfg.u32Width = cam_param->width;
+	cameraCfg.u32Height = cam_param->height;
+
+	cameraCfg.u32I2cAddr = cam_param->i2c_addr;
+	cameraCfg.u8PixelBits = cam_param->bit_width;
+	cameraCfg.u32TransLvl = cam_param->trans_lvl;
+
+	if (cameraCfg.u8PixelBits <= 8) {
+		cameraCfg.u8PixelBytes = 1;
+	}
+	else if (cameraCfg.u8PixelBits > 8 && cameraCfg.u8PixelBits <= 16) {
+		cameraCfg.u8PixelBytes = 2;
+		save_raw = true;
+	}
+
+	int ret_val = ArduCam_open(cameraHandle, &cameraCfg, index);
+	if (ret_val == USB_CAMERA_NO_ERROR) {
+		//ArduCam_enableForceRead(cameraHandle);	//Force display image
+		Uint8 u8Buf[8];
+		for (int i = 0; i < configs_length; i++) {
+			uint32_t type = configs[i].type;
+			if (((type >> 16) & 0xFF) && ((type >> 16) & 0xFF) != cameraCfg.usbType)
+				continue;
+			switch (type & 0xFFFF) {
+			case CONFIG_TYPE_REG:
+				ArduCam_writeSensorReg(cameraHandle, configs[i].params[0], configs[i].params[1]);
+				break;
+			case CONFIG_TYPE_DELAY:
+#ifdef linux
+				usleep(1000 * configs[i].params[0]);
+#endif
+#ifdef _WIN32
+				Sleep(configs[i].params[0]);
+#endif	
+				break;
+			case CONFIG_TYPE_VRCMD:
+				configBoard(cameraHandle, configs[i]);
+				break;
+			}
+		}
+		unsigned char u8TmpData[16];
+		ArduCam_readUserData(cameraHandle, 0x400 - 16, 16, u8TmpData);
+		printf("Serial: %c%c%c%c-%c%c%c%c-%c%c%c%c\n",
+			u8TmpData[0], u8TmpData[1], u8TmpData[2], u8TmpData[3],
+			u8TmpData[4], u8TmpData[5], u8TmpData[6], u8TmpData[7],
+			u8TmpData[8], u8TmpData[9], u8TmpData[10], u8TmpData[11]);
+	}
+	else {
+		std::cout << "Cannot open camera.rtn_val = " << ret_val << std::endl;
+		return false;
+	}
+
+	return true;
 }
 
 

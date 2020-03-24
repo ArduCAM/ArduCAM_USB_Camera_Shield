@@ -4,6 +4,7 @@ import rosbag, sys, yaml, os, cv2
 import numpy as np
 from sensor_msgs.msg import CompressedImage, Image
 from std_msgs.msg import String
+import sys
 
 class ImageConversions():
     # We only instantiate the bridge once
@@ -31,7 +32,7 @@ def callback(data):
     
     #rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
     
-def listener():
+def listener(index):
 
     # In ROS, nodes are uniquely named. If two nodes with the same
     # node are launched, the previous one is kicked off. The
@@ -41,10 +42,13 @@ def listener():
     
     rospy.init_node('listener', anonymous=True)
 
-    rospy.Subscriber("/cam0/arducam/camera/image_raw", Image, callback)
+    rospy.Subscriber("/cam{}/arducam/camera/image_raw".format(index), Image, callback)
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
 if __name__ == '__main__':
-    listener()
+    index = 0
+    if len(sys.argv) ==  2:
+        index = int(sys.argv[1])
+    listener(index)

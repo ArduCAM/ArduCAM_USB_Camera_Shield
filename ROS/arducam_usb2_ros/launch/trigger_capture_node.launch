@@ -1,7 +1,7 @@
 <launch>
 
     <group ns="cam0" clear_params="true">
-        <arg name="camera_config" value="OV5642_JPEG_QSXGA.json" /> <!-- Config file in camera_config_files folder of your camera. -->
+        <arg name="camera_config" value="AR0134_1280x964_8bit_C.cfg" /> <!-- Config file in camera_config_files folder of your camera. -->
         <arg name="serial_number" value="" /> <!-- Serial number of the camera in the form of "XXXX-XXXX-XXXX", leave it blank "" if there is only one camera. -->
         <arg name="horizontal_flip" value="false" /> <!-- Flip image horizontally. -->
         <arg name="vertical_flip" value="false" /> <!-- Flip image vertically. -->
