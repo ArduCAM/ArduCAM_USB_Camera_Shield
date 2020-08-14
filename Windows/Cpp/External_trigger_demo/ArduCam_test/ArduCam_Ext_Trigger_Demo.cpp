@@ -447,7 +447,9 @@ int main(int argc,char **argv)
 #ifdef linux
     sleep(2);
 #endif
-	
+#ifdef _WIN32
+	Sleep(2000);
+#endif	
 	printf("Found %d devices.\n",camera_num);
 	ArduCamHandle cameraHandles[16];
 	long sTriggerSendTime[16];
