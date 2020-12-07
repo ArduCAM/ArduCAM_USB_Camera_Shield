@@ -23,6 +23,7 @@
 #define min(a,b)    (((a) < (b)) ? (a) : (b))
 #endif
 
+#include <stdint.h>
 /* -------------------- Type Standardize -------------------- */
 typedef		float			f32;		// 32位浮点型
 typedef		double			f64;		// 16位浮点型
@@ -278,6 +279,20 @@ typedef struct
 	Uint32		u32MinValue;
 	Uint32		u32MaxValue;
 }GainSet;
+
+#if !defined(__ARDUCAM_STRUCT_CONTROL__)
+#define __ARDUCAM_STRUCT_CONTROL__
+typedef struct {
+    int64_t min;
+    int64_t max;
+    int32_t step;
+    int64_t def;
+    uint32_t flags;
+    char name[128];
+    char func[128];
+    char *code;
+} Control;
+#endif
 
 
 //extern UINT _FrameCaptureThread( LPVOID lParam );						// 图像采集线程

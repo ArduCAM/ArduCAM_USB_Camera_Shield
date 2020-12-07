@@ -33,7 +33,16 @@
     <ClCompile Include="TTComboBox.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TTEdit.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="AboutDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DataInfoDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -66,6 +75,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="AboutDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ArduCamConfigLib.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DataInfoDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

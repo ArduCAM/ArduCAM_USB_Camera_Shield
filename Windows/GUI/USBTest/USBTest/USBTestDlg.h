@@ -10,6 +10,7 @@
 #include "ArduCamConfiglib.h"
 #pragma comment(lib,"ArduCamDisplib.lib")
 #include "ArduCamDisplib.h"
+#include "ControlDlg.h"
 
 #include "afxwin.h"
 #include "afxcmn.h"
@@ -117,6 +118,7 @@ public:
 	void  DlgFrameSet( void );
 	CToolTipCtrl  m_tooltip;
 	CMenu m_Menu;
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Ö§³Ö
 
@@ -205,6 +207,7 @@ protected:
 	void DispInfo( void );
 
 	void FrameDisplayBMP( Uint8* pu8RgbData, Uint32 u32Width, Uint32 u32Height );
+	void FrameDisplayBMPMirror(Uint8* pu8RgbData, Uint32 u32Width, Uint32 u32Height);
 	void FrameDisplayJPG( Uint8* pu8JpgData, Uint32 u32JpgSize );
 
 	void FillBlackDisplay( void );
@@ -280,6 +283,7 @@ public:
 public:
 	afx_msg void OnDestroy();
 public:
+	ControlDlg *m_ControlDlg;
 	CButton m_btClose;
 	CButton m_btRawMode;
 	afx_msg void OnBnClickedButtonByteConv();
@@ -325,9 +329,13 @@ public:
 	void readUsbVersion(CString &str);
 	virtual void OnOK();
 	afx_msg void OnEnChangeEdit4();
-	afx_msg void OnFileOpen();
+	afx_msg void OnBnClickedOpenFile();
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	LRESULT CUSBTestDlg::OnSelectAll(WPARAM wParam, LPARAM lParam);
 	LRESULT CUSBTestDlg::OnCopy(WPARAM wParam, LPARAM lParam);
 	LRESULT CUSBTestDlg::OnClearAll(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnStnClickedStaticUuid();
+	afx_msg void OnBnClickedButton1();
+	afx_msg void OnToolsControls();
+	afx_msg void OnToolsDatainfo();
 };

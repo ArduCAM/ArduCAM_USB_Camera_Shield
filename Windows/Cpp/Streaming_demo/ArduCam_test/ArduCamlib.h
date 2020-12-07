@@ -58,3 +58,5 @@ ARDUCAM_API Uint32 ArduCam_softTrigger(ArduCamHandle useHandle);
 ARDUCAM_API Uint32 ArduCam_isFrameReady(ArduCamHandle useHandle);
 ARDUCAM_API Uint32 ArduCam_getSingleFrame(ArduCamHandle useHandle, ArduCamOutData* &pstFrameData,int time_out = 1500);
 ARDUCAM_API Uint32 ArduCam_setMode(ArduCamHandle useHandle, int mode);
+ARDUCAM_API Int32 ArduCam_registerCtrls(ArduCamHandle useHandle, Control *controls, Uint32 controls_length);
+ARDUCAM_API Int32 ArduCam_setCtrl(ArduCamHandle useHandle, const char *func_name, Int64 val);

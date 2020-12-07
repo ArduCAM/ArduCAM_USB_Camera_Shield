@@ -18,7 +18,6 @@ save_raw = False
 cfg = {}
 handle = {}
 
-
 def configBoard(config):
     global handle
     ArducamSDK.Py_ArduCam_setboardConfig(handle, config.params[0], \
@@ -26,6 +25,8 @@ def configBoard(config):
             config.params[4:config.params_length])
 
 pass
+
+
 
 
 def camera_initFromFile(fileName):
@@ -81,6 +82,9 @@ def camera_initFromFile(fileName):
             elif type & 0xFFFF == arducam_config_parser.CONFIG_TYPE_VRCMD:
                 configBoard(configs[i])
 
+        ArducamSDK.Py_ArduCam_registerCtrls(handle, config.controls, config.controls_length)
+        ArducamSDK.Py_ArduCam_setCtrl(handle, "setFramerate", 5)
+
         rtn_val,datas = ArducamSDK.Py_ArduCam_readUserData(handle,0x400-16, 16)
         print("Serial: %c%c%c%c-%c%c%c%c-%c%c%c%c"%(datas[0],datas[1],datas[2],datas[3],
                                                     datas[4],datas[5],datas[6],datas[7],
@@ -90,7 +94,6 @@ def camera_initFromFile(fileName):
     else:
         print("open fail,rtn_val = ",ret)
         return False
-
 pass
        
 def captureImage_thread():
@@ -111,7 +114,7 @@ def captureImage_thread():
             print("Error capture image, rtn_val = ",rtn_val)
             if rtn_val == ArducamSDK.USB_CAMERA_USB_TASK_ERROR:
                 break
-        # time.sleep(0.005)
+        time.sleep(0.005)
         
     running = False
     ArducamSDK.Py_ArduCam_endCaptureImage(handle)

@@ -5,6 +5,8 @@
 #include "USBTest.h"
 #include "USBTestDlg.h"
 #include "AboutDlg.h"
+#include "ControlDlg.h"
+#include "DataInfoDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -23,6 +25,8 @@ CUSBTestDlg::CUSBTestDlg(CWnd* pParent /*=NULL*/)
 	m_cUsbCameraHd       = NULL;
 	m_cUsbCameraCfgHd    = NULL;
 	m_cUsbCameraRecordHd = NULL;
+
+	m_ControlDlg = NULL;
 
 	GetModuleFileName( NULL, m_csCfgFileName.GetBuffer(512), 512 );									
 	m_csCfgFileName.ReleaseBuffer();
@@ -137,10 +141,13 @@ BEGIN_MESSAGE_MAP(CUSBTestDlg, CDialog)
 	ON_BN_CLICKED(IDC_CHECK_WHITE_BALANCE, &CUSBTestDlg::OnBnClickedCheckWhiteBalance)
 	ON_COMMAND(ID_MENU_ABOUT, &CUSBTestDlg::OnMenuAbout)
 	ON_EN_CHANGE(IDC_EDIT4, &CUSBTestDlg::OnEnChangeEdit4)
-	ON_COMMAND(ID_MENU_FILE_OPEN, &CUSBTestDlg::OnFileOpen)
+	ON_BN_CLICKED(IDC_OPEN_FILE, &CUSBTestDlg::OnBnClickedOpenFile)
+	ON_COMMAND(ID_FILE_OPEN32775, &CUSBTestDlg::OnBnClickedOpenFile)
 	ON_MESSAGE(ID_MENU_SELECTALL, &CUSBTestDlg::OnSelectAll)
 	ON_MESSAGE(ID_MENU_COPY, &CUSBTestDlg::OnCopy)
 	ON_MESSAGE(ID_MENU_CLEAR, &CUSBTestDlg::OnClearAll)
+	ON_COMMAND(ID_TOOLS_CONTROLS, &CUSBTestDlg::OnToolsControls)
+	ON_COMMAND(ID_TOOLS_DATAINFO, &CUSBTestDlg::OnToolsDatainfo)
 END_MESSAGE_MAP()
 
 
@@ -220,7 +227,6 @@ BOOL CUSBTestDlg::OnInitDialog()
 		m_cmbCfgFileName.AddString( m_caCfgFileList.GetAt( u32Index ).cFileName );
 	}
 	m_cmbCfgFileName.SetCurSel( 0 );
-
 	//SetTimer( DISP_INF_TIMER, 1000, NULL );
 	SetTimer( SCAN_TIMER,     2000, NULL );
 
@@ -464,6 +470,21 @@ void CUSBTestDlg::FrameDisplayBMP( Uint8* pu8RgbData, Uint32 u32Width, Uint32 u3
 }
 
 
+void CUSBTestDlg::FrameDisplayBMPMirror(Uint8* pu8RgbData, Uint32 u32Width, Uint32 u32Height)
+{
+	CDC		*pcdDC;
+	CRect	crRect;
+	CWnd	*pcwWnd = GetDlgItem(IDC_STATIC_DISPLAY);
+	pcwWnd->GetClientRect(&crRect);
+	pcdDC = pcwWnd->GetDC();
+
+	ArduCamDisp_FrameDisplayBMPMirror( pcdDC, &crRect, pu8RgbData, u32Width, u32Height,
+									   m_u32DisplayWidth, m_u32DisplayHeight, m_s32locStartX, m_s32locStartY,
+									   m_pixScale, m_u8FullScreenEn);
+
+	ReleaseDC(pcdDC);
+}
+
 void CUSBTestDlg::FrameDisplayJPG( Uint8* pu8JpgData, Uint32 u32Size )
 {
 	CDC	*pcdDC;
@@ -602,6 +623,10 @@ void CUSBTestDlg::ReadFrame( void )
 						if ( m_u8DImageDispMode == MODE_HORIZONTAL ) FrameDisplayBMP( m_pu8OutRgb24, pstTmpFrameData->stImagePara.u32Width*2, pstTmpFrameData->stImagePara.u32Height   );
 						if ( m_u8DImageDispMode == MODE_VERTICAL )   FrameDisplayBMP( m_pu8OutRgb24, pstTmpFrameData->stImagePara.u32Width,   pstTmpFrameData->stImagePara.u32Height*2 );
 						break;
+					case FORMAT_MODE_TOF:
+						ArduCamDisp_Tof2rgb24(m_pu8OutRgb24, pstTmpFrameData->pu8ImageData, pstTmpFrameData->stImagePara.u32Width, pstTmpFrameData->stImagePara.u32Height, pstTmpFrameData->stImagePara.u8PixelBits);
+						FrameDisplayBMP(m_pu8OutRgb24, pstTmpFrameData->stImagePara.u32Width * 2, pstTmpFrameData->stImagePara.u32Height * 2);
+						break;
 					}
 				}
 				else if ( m_u8RecordEn == RECORD_IMAGE )
@@ -641,6 +666,10 @@ void CUSBTestDlg::ReadFrame( void )
 						if ( m_u8DImageDispMode == MODE_HORIZONTAL ) ArduCamDisp_RecordImageBMP( csTmpString, m_pu8OutRgb24, pstTmpFrameData->stImagePara.u32Width*2, pstTmpFrameData->stImagePara.u32Height   );
 						if ( m_u8DImageDispMode == MODE_VERTICAL )   ArduCamDisp_RecordImageBMP( csTmpString, m_pu8OutRgb24, pstTmpFrameData->stImagePara.u32Width,   pstTmpFrameData->stImagePara.u32Height*2 );
 						break;
+					case FORMAT_MODE_TOF:
+						ArduCamDisp_Tof2rgb24(m_pu8OutRgb24, pstTmpFrameData->pu8ImageData, pstTmpFrameData->stImagePara.u32Width, pstTmpFrameData->stImagePara.u32Height, pstTmpFrameData->stImagePara.u8PixelBits);
+						ArduCamDisp_RecordImageBMP(csTmpString, m_pu8OutRgb24, pstTmpFrameData->stImagePara.u32Width * 2, pstTmpFrameData->stImagePara.u32Height * 2);
+						break;
 					}
 				}
 				else if ( m_u8RecordEn == RECORD_DATA )
@@ -679,6 +708,11 @@ void CUSBTestDlg::ReadFrame( void )
 						ArduCamDisp_MonoD2rgb24( m_pu8OutRgb24, pstTmpFrameData->pu8ImageData, pstTmpFrameData->stImagePara.u32Width, pstTmpFrameData->stImagePara.u32Height, pstTmpFrameData->stImagePara.u8PixelBits, m_u8DImageDispMode );
 						if ( m_u8DImageDispMode == MODE_HORIZONTAL ) stTmpCfg.u32Width  = stTmpCfg.u32Width  * 2;
 						if ( m_u8DImageDispMode == MODE_VERTICAL )   stTmpCfg.u32Height = stTmpCfg.u32Height * 2;
+						break;
+					case FORMAT_MODE_TOF:
+						ArduCamDisp_Tof2rgb24(m_pu8OutRgb24, pstTmpFrameData->pu8ImageData, pstTmpFrameData->stImagePara.u32Width, pstTmpFrameData->stImagePara.u32Height, pstTmpFrameData->stImagePara.u8PixelBits);
+						stTmpCfg.u32Width *= 2;
+						stTmpCfg.u32Height *= 2;
 						break;
 					}
 					ArduCamDisp_RecordVideo( m_cUsbCameraRecordHd, m_pu8OutRgb24, &stTmpCfg );
@@ -817,6 +851,7 @@ void CUSBTestDlg::OnBnClickedButtonOpen()
 		case 4:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_MON;		break;
 		case 5:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_RAW_D;	break;
 		case 6:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_MON_D;	break;
+		case 7:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_TOF;		break;
 		default:	stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_RAW;		break;
 	}
 
@@ -853,7 +888,7 @@ void CUSBTestDlg::OnBnClickedButtonOpen()
 		
 		m_btPlay.EnableWindow( TRUE );
 		m_btStop.EnableWindow( FALSE );
-		m_btShot.EnableWindow( TRUE );
+		m_btShot.EnableWindow(FALSE);
 
 		m_btInit.EnableWindow( FALSE );
 		m_btOpen.EnableWindow( FALSE );
@@ -941,6 +976,7 @@ void CUSBTestDlg::OnBnClickedButtonInit()
 		case 4:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_MON;		break;
 		case 5:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_RAW_D;	break;
 		case 6:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_MON_D;	break;
+		case 7:		stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_TOF;		break;
 		default:	stTmpUsbCameraCfg.emImageFmtMode = FORMAT_MODE_RAW;		break;
 	}
 
@@ -1028,7 +1064,8 @@ void CUSBTestDlg::OnBnClickedButtonLoad()
 	Int32 s32TmpPathSize = m_csCfgFileName.ReverseFind('\\');
 	csTmpFileName = m_csCfgFileName.Left(s32TmpPathSize + 1);
 	csTmpFileName = csTmpFileName + tmpFileName;
-
+	//csTmpFileName = csTmpFileName + _T("\\Config\\") + m_caCfgFileList.GetAt(m_cmbCfgFileName.GetCurSel()).cFileName;
+	
 	if ( CFG_NONE_CONTENT == ArduCamCfg_LoadCameraConfig( m_cUsbCameraCfgHd, csTmpFileName ) )
 	{
 		InsertText( "Config file Open failed!", OUTPUT_RED );
@@ -1154,6 +1191,7 @@ void CUSBTestDlg::OnBnClickedButtonLoad()
 		case 3:			m_btRawMode.SetWindowTextA( "JPGMod" );							break;
 		case 4:
 		case 6:			m_btRawMode.SetWindowTextA( "MONOMod" );						break;
+		case 7:			m_btRawMode.SetWindowTextA( "TOF" );							break;
 		default:	InsertText( "Unsupported image format load!", OUTPUT_RED );			break;
 		}
 	}
@@ -1174,6 +1212,7 @@ void CUSBTestDlg::OnBnClickedButtonLoad()
 		case 2:			 m_u32YuvMode = YUV422_YU;	m_btRawMode.SetWindowTextA( "YUVMod(YU)" );		break;
 		case 3:										m_btRawMode.SetWindowTextA( "JPGMod" );			break;
 		case 4:	case 6:								m_btRawMode.SetWindowTextA( "MONOMod" );		break;
+		case 7:										m_btRawMode.SetWindowTextA( "TOF" );			break;
 		}
 		if ( u32TmpCfgData[0] != 3 )	InsertText( "Image format load incompletely!", OUTPUT_RED );	
 	}
@@ -1356,6 +1395,7 @@ void CUSBTestDlg::OnBnClickedButtonPlay()
 		m_ptdFrameCaptureThread   = AfxBeginThread( _FrameCaptureThread, this );
 
 		m_btPlay.EnableWindow( FALSE );
+		m_btShot.EnableWindow(TRUE);
 		m_btStop.EnableWindow( TRUE );
 		m_btClose.EnableWindow( FALSE );
 	}
@@ -1377,6 +1417,7 @@ void CUSBTestDlg::OnBnClickedButtonStop()
 
 		m_btPlay.EnableWindow( TRUE );
 		m_btStop.EnableWindow( FALSE );
+		m_btShot.EnableWindow(FALSE);
 		m_btClose.EnableWindow( TRUE );
 	}
 }
@@ -1411,6 +1452,8 @@ void CUSBTestDlg::OnBnClickedButtonClose()
 	m_btOpen.EnableWindow( TRUE );
 	m_btInit.EnableWindow( TRUE );
 	m_btClose.EnableWindow( FALSE );
+	if (m_ControlDlg != NULL)
+		m_ControlDlg->ShowWindow(SW_HIDE);
 
 	m_btRegRead.EnableWindow( FALSE );
 	m_btRegWrite.EnableWindow( FALSE );
@@ -1631,8 +1674,8 @@ void CUSBTestDlg::OnLButtonUp(UINT nFlags, CPoint point)
 				m_s32locStartY = stTmpFramePara.u32Height - m_u32DisplayHeight * m_pixScale;
 		}
 
-		/*m_s32locStartX = max( 0, m_s32locStartX );
-		m_s32locStartY = max( 0, m_s32locStartY );*/
+		//m_s32locStartX = max( 0, m_s32locStartX );
+		//m_s32locStartY = max( 0, m_s32locStartY );
 
 		FillBlackDisplay();
 		
@@ -1964,12 +2007,28 @@ void CUSBTestDlg::readUsbVersion(CString &str) {
 	ArduCam_getUsbType(m_cUsbCameraHd, &pu8DevUsbType, &pu8InfUsbType);
 	str.Format(_T("Device: %d\tInterface: %d"), pu8DevUsbType, pu8InfUsbType);
 }
+
+BOOL haveCpld(ArduCamHandle useHandle) {
+	Uint32 defData = 0, data = 0;
+	ArduCam_readReg_8_8(useHandle, USB_CPLD_I2C_ADDRESS, 0x04, &defData);
+	srand(time(NULL));
+	int rand_data = 0;
+	while ((rand_data = (rand() % 255)) == defData);
+
+	ArduCam_writeReg_8_8(useHandle, USB_CPLD_I2C_ADDRESS, 0x04, rand_data);
+	ArduCam_readReg_8_8(useHandle, USB_CPLD_I2C_ADDRESS, 0x04, &data);
+	if (data == rand_data) {
+		ArduCam_writeReg_8_8(useHandle, USB_CPLD_I2C_ADDRESS, 0x04, defData);
+		return TRUE;
+	}
+	return FALSE;
+}
 void CUSBTestDlg::readCpldVersion(CString &str) {
 	Uint32 version;
 	Uint8 pu8DevUsbType;
 	Uint8 pu8InfUsbType;
 	ArduCam_getUsbType(m_cUsbCameraHd, &pu8DevUsbType, &pu8InfUsbType);
-	if (pu8DevUsbType == USB_3) {
+	if (pu8DevUsbType == USB_3 && !haveCpld(m_cUsbCameraHd)) {
 		str.Format(_T("----/--/--"));
 		return;
 	}
@@ -2020,8 +2079,9 @@ void CUSBTestDlg::OnEnChangeEdit4()
 }
 
 
-void CUSBTestDlg::OnFileOpen()
+void CUSBTestDlg::OnBnClickedOpenFile()
 {
+	// TODO: 在此添加控件通知处理程序代码
 	TCHAR szFilters[] = _T("All Files (*.*)|*.*|Cfg Files (*.cfg)|*.cfg||");
 	// Create an Open dialog; the default file name extension is ".my".
 	CFileDialog fileDlg(TRUE, NULL, NULL,
@@ -2037,7 +2097,6 @@ void CUSBTestDlg::OnFileOpen()
 		m_cmbCfgFileName.SetCurSel(m_cmbCfgFileName.SelectString(0, fileDlg.GetFileName()));
 	}
 }
-
 
 BOOL CUSBTestDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
@@ -2082,4 +2141,28 @@ LRESULT CUSBTestDlg::OnClearAll(WPARAM wParam, LPARAM lParam)
 	m_reInf.SetSel(0, -1);
 	m_reInf.Clear();
 	return NULL;
+}
+
+void CUSBTestDlg::OnToolsControls()
+{
+	if (m_ControlDlg == NULL) {
+		m_ControlDlg = new ControlDlg(m_cUsbCameraHd, m_cUsbCameraCfgHd);
+		BOOL ret = m_ControlDlg->Create(IDD_CONTROL_DIALOG, this);
+		if (!ret)   //Create failed.
+			AfxMessageBox(_T("Error creating Dialog"));
+	}
+	if (m_ControlDlg != NULL) {
+		m_ControlDlg->InitWeights(m_cUsbCameraHd, m_cUsbCameraCfgHd);
+		m_ControlDlg->ShowWindow(SW_SHOW);
+	}
+}
+
+
+void CUSBTestDlg::OnToolsDatainfo()
+{
+	DataInfoDlg dataInfoDlg;
+	if (m_u32FrameReadThreadEn == THREAD_ENABLE && m_cUsbCameraHd) {
+		dataInfoDlg.SetUsbCameraHandle(m_cUsbCameraHd);
+	}
+	dataInfoDlg.DoModal();
 }

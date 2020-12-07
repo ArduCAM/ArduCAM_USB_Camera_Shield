@@ -18,10 +18,23 @@
 
 typedef  Uint32* ArduCamCfgHandle;
 
+typedef struct
+{
+	Uint32	u32Type;
+	Int8	s8CtrlName[128];
+	Int8	s8FuncName[128];
+	Int32	s32Min;
+	Int32	s32Max;
+	Int32	s32Step;
+	Int32	s32Def;
+	Int32	s32Val;
+} CtrlConfigPara;
+
 #define CFG_TITLE_ERROR					0x10
 #define CFG_TITLE_CAMERA				0x11
 #define CFG_TITLE_BOARD					0x12
 #define CFG_TITLE_REGISTER				0x13
+#define CFG_TITLE_CONTROL				0x14
 
 #define CFG_TITLE_BOARD_2_2				0x52
 #define CFG_TITLE_REGISTER_2_2			0x53
@@ -66,6 +79,19 @@ typedef  Uint32* ArduCamCfgHandle;
 #define CFG_REGISTER_WRITE_16_16		0x1308
 #define CFG_REGISTER_OK					0x13FF
 
+#define CFG_CONTROL_ERROR				0x1400
+#define CFG_CONTROL_MIN					0x1401
+#define CFG_CONTROL_MAX					0x1402
+#define CFG_CONTROL_STEP				0x1403
+#define CFG_CONTROL_ID					0x1404
+#define CFG_CONTROL_CODE_START			0x1405
+#define CFG_CONTROL_CODE_END			0x1406
+
+#define CFG_CONTROL_EXPOSURE			0x1410
+#define CFG_CONTROL_GAIN				0x1411
+#define CFG_CONTROL_OK					0x14FF
+
+
 #define CFG_NONE_CONTENT				0
 #define CFG_OK							0xFF
 
@@ -75,3 +101,5 @@ ARDUCAMCFG_API Uint32 ArduCamCfg_LoadCameraConfig( ArduCamCfgHandle &useHandle, 
 ARDUCAMCFG_API Uint32 ArduCamCfg_SetCameraConfig( ArduCamCfgHandle useHandle, Uint32 u32ConfigType, Uint32* pu32ConfigData );
 ARDUCAMCFG_API Uint32 ArduCamCfg_SetBoardConfig( ArduCamCfgHandle useHandle, ArduCamHandle cUsbCameraHd );
 ARDUCAMCFG_API Uint32 ArduCamCfg_SetRegisterConfig( ArduCamCfgHandle useHandle, ArduCamHandle cUsbCameraHd );
+ARDUCAMCFG_API Uint32 ArduCamCfg_SetControl(ArduCamCfgHandle useHandle, ArduCamHandle cUsbCameraHd, Uint32 u32Index, Uint32 u32Value);
+ARDUCAMCFG_API Uint32 ArduCamCfg_GetControl(ArduCamCfgHandle useHandle, ArduCamHandle cUsbCameraHd, Uint32 u32Index, CtrlConfigPara **pu32ConfigData);

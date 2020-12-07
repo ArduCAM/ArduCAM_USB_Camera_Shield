@@ -176,6 +176,7 @@ CString CUSBTestDlg::CreateDataFileName( ArduCamCfg* pstUseCfg )
 	case FORMAT_MODE_MON :		csTmpString = m_csRecordPath + m_csRecordSubPath + csTmpString + "mono";			break;
 	case FORMAT_MODE_RAW_D :	csTmpString = m_csRecordPath + m_csRecordSubPath + csTmpString + "raw_stereo";		break;
 	case FORMAT_MODE_MON_D :	csTmpString = m_csRecordPath + m_csRecordSubPath + csTmpString + "mono_stereo";		break;
+	case FORMAT_MODE_TOF:		csTmpString = m_csRecordPath + m_csRecordSubPath + csTmpString + "raw";				break;
 	}
 
 	return csTmpString;

@@ -39,17 +39,26 @@ extern "C" {
 #define SECTION_TYPE_CAMERA     (0x01 << 24)
 #define SECTION_TYPE_BOARD      (0x02 << 24)
 #define SECTION_TYPE_REG        (0x03 << 24)
+#define SECTION_TYPE_CONTROL    (0x04 << 24)
 
-#define SECTION_TYPE_BOARD_2    SECTION_TYPE_BOARD | (0x02 << 16)
-#define SECTION_TYPE_BOARD_3_2  SECTION_TYPE_BOARD | (0x04 << 16)
-#define SECTION_TYPE_BOARD_3_3  SECTION_TYPE_BOARD | (0x03 << 16)
+#define SECTION_TYPE_BOARD_2    (SECTION_TYPE_BOARD | (0x02 << 16))
+#define SECTION_TYPE_BOARD_3_2  (SECTION_TYPE_BOARD | (0x04 << 16))
+#define SECTION_TYPE_BOARD_3_3  (SECTION_TYPE_BOARD | (0x03 << 16))
 
-#define SECTION_TYPE_REG_3_2    SECTION_TYPE_REG | (0x04 << 16)
-#define SECTION_TYPE_REG_3_3    SECTION_TYPE_REG | (0x03 << 16)
+#define SECTION_TYPE_REG_3_2    (SECTION_TYPE_REG | (0x04 << 16))
+#define SECTION_TYPE_REG_3_3    (SECTION_TYPE_REG | (0x03 << 16))
 
 #define CONFIG_TYPE_REG     0x0001
 #define CONFIG_TYPE_VRCMD   0x0002
 #define CONFIG_TYPE_DELAY   0x0003
+
+#define CONTROL_TYPE_MIN    0x0001
+#define CONTROL_TYPE_MAX    0x0002
+#define CONTROL_TYPE_STEP   0x0003
+#define CONTROL_TYPE_DEF    0x0004
+#define CONTROL_TYPE_NAME   0x0005
+#define CONTROL_TYPE_FUNC   0x0006
+
 
 // 
 // +───────────────+───────────+──────────────+
@@ -62,6 +71,20 @@ typedef struct {
     const char *name;
     int type;
 } TypeMap;
+
+#if !defined(__ARDUCAM_STRUCT_CONTROL__)
+#define __ARDUCAM_STRUCT_CONTROL__
+typedef struct {
+    int64_t min;
+    int64_t max;
+    int32_t step;
+    int64_t def;
+    uint32_t flags;
+    char name[128];
+    char func[128];
+    char *code;
+} Control;
+#endif
 
 typedef struct {
     uint32_t type;
@@ -83,8 +106,10 @@ typedef struct {
 
 typedef struct {
     CameraParam camera_param;
-    Config configs[MAX_CONFIGS];
+    Config *configs;
     uint32_t configs_length;
+    Control *controls;
+    uint32_t controls_length;
 } CameraConfigs;
 
 
