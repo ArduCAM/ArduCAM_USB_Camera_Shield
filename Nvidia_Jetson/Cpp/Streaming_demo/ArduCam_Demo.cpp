@@ -249,6 +249,7 @@ bool camera_initFromFile(std::string filename, ArduCamHandle &cameraHandle, Ardu
 		showHelp();
 		return false;
 	}
+
 	CameraParam *cam_param = &cam_cfgs.camera_param;
 	Config *configs = cam_cfgs.configs;
 	int configs_length = cam_cfgs.configs_length;
@@ -314,6 +315,7 @@ bool camera_initFromFile(std::string filename, ArduCamHandle &cameraHandle, Ardu
 				break;
 			}
 		}
+		ArduCam_registerCtrls(cameraHandle, cam_cfgs.controls, cam_cfgs.controls_length);
 		unsigned char u8TmpData[16];
 		ArduCam_readUserData(cameraHandle, 0x400 - 16, 16, u8TmpData);
 		printf("Serial: %c%c%c%c-%c%c%c%c-%c%c%c%c\n",
@@ -325,6 +327,7 @@ bool camera_initFromFile(std::string filename, ArduCamHandle &cameraHandle, Ardu
 		std::cout << "Cannot open camera.rtn_val = " << ret_val << std::endl;
 		return false;
 	}
+	ArduCam_setCtrl(cameraHandle, "setFramerate", 5);
 
 	return true;
 }

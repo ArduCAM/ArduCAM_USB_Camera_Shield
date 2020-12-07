@@ -106,6 +106,21 @@ extern "C"{
         Uint8*		pu8ImageData;
     }ArduCamOutData;
 
+#if !defined(__ARDUCAM_STRUCT_CONTROL__)
+#define __ARDUCAM_STRUCT_CONTROL__
+#include <stdint.h>
+    typedef struct {
+        int64_t min;
+        int64_t max;
+        int32_t step;
+        int64_t def;
+        uint32_t flags;
+        char name[128];
+        char func[128];
+        char *code;
+    } Control;
+#endif
+
     unsigned int ArduCam_autoopen( ArduCamHandle &useHandle, ArduCamCfg *useCfg );
     unsigned int ArduCam_close( ArduCamHandle useHandle);
     void ArduCam_setForceOutput(ArduCamHandle useHandle,bool value);
@@ -140,6 +155,8 @@ extern "C"{
     unsigned int ArduCam_isFrameReady(ArduCamHandle useHandle);
     unsigned int ArduCam_getSingleFrame(ArduCamHandle useHandle, ArduCamOutData* &pstFrameData,int time_out = 1500);
     unsigned int ArduCam_setMode(ArduCamHandle useHandle, int mode);
+    int ArduCam_registerCtrls(ArduCamHandle useHandle, Control *controls, Uint32 controls_length);
+    int ArduCam_setCtrl(ArduCamHandle useHandle, const char *func_name, Int64 val);
 }
 
 #endif // ARDUCAMLIB_H

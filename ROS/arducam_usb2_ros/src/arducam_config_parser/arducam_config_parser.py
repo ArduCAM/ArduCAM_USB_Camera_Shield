@@ -1,14 +1,23 @@
 # -*- coding: utf-8 -*- 
 from ctypes import *
-import sys
+import sys, os
 import platform
 try:
+    abs_path = os.path.dirname(os.path.abspath(__file__))
     if platform.system() == "Windows":
-        _lib = cdll.LoadLibrary("arducam_config_parser.dll")
+        lib_name = "arducam_config_parser.dll"
     elif platform.system() == "Linux":
-        _lib = cdll.LoadLibrary("libarducam_config_parser.so")
+        lib_name = "libarducam_config_parser.so"
+    
+    abs_lib_name = os.path.join(abs_path, lib_name)
+    if os.path.exists(abs_lib_name):
+        _lib = cdll.LoadLibrary(abs_lib_name)
+    else:
+        _lib = cdll.LoadLibrary(lib_name)
 except Exception as e:
     print("Load libarducam_config_parser fail.")
+    print("Make sure you have arducam_config_parser installed.")
+    print("For more information, please visit: https://github.com/ArduCAM/arducam_config_parser")
     print(e)
     sys.exit(0)
 
@@ -42,6 +51,18 @@ class Config(Structure):
         ("params_length",c_uint8),
     ]
 
+class Control(Structure):
+    _fields_ = [
+        ("min",c_int64),
+        ("max",c_int64),
+        ("step",c_int32),
+        ("def",c_int64),
+        ("flags",c_uint32),
+        ("name",c_char * 128),
+        ("func",c_char * 128),
+        ("code",c_char_p),
+    ]
+
 class CameraParam(Structure):
     _fields_ = [
         ("cfg_mode",c_uint32),
@@ -61,8 +82,10 @@ class CameraParam(Structure):
 class CameraConfigs(Structure):
     _fields_ = [
         ("camera_param", CameraParam),
-        ("configs", Config * MAX_CONFIGS),
+        ("configs", POINTER(Config)),
         ("configs_length", c_uint32),
+        ("controls", POINTER(Control)),
+        ("controls_length", c_uint32),
     ]
 
 

@@ -51,6 +51,18 @@ class Config(Structure):
         ("params_length",c_uint8),
     ]
 
+class Control(Structure):
+    _fields_ = [
+        ("min",c_int64),
+        ("max",c_int64),
+        ("step",c_int32),
+        ("def",c_int64),
+        ("flags",c_uint32),
+        ("name",c_char * 128),
+        ("func",c_char * 128),
+        ("code",c_char_p),
+    ]
+
 class CameraParam(Structure):
     _fields_ = [
         ("cfg_mode",c_uint32),
@@ -70,8 +82,10 @@ class CameraParam(Structure):
 class CameraConfigs(Structure):
     _fields_ = [
         ("camera_param", CameraParam),
-        ("configs", Config * MAX_CONFIGS),
+        ("configs", POINTER(Config)),
         ("configs_length", c_uint32),
+        ("controls", POINTER(Control)),
+        ("controls_length", c_uint32),
     ]
 
 
