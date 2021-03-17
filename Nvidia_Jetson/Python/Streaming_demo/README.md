@@ -5,6 +5,7 @@ Python demo code for the following cameras:
 - MT9V022 (0.36MP Global Shutter Camera)
 - MT9V034 (0.36MP Global Shutter Camera)
 - AR0134 (1.2MP Global Shutter Camera)
+- AR0135 (1.3MP Global Shutter Camera)
 - MT9N001 (9MP Rolling Shutter Camera)
 - MT9J001 (10MP Rolling Shutter Camera)
 - MT9J003 (10MP Rolling Shutter Camera)
