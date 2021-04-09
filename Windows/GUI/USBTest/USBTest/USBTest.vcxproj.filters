@@ -45,6 +45,9 @@
     <ClCompile Include="DataInfoDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TTStatic.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -86,6 +89,9 @@
     <ClInclude Include="DataInfoDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TTStatic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\USBTest.ico">
@@ -94,7 +100,6 @@
     <None Include="res\USBTest.rc2">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="USBTest.rc">

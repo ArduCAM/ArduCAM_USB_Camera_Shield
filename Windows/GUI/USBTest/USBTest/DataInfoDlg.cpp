@@ -29,6 +29,7 @@ void DataInfoDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MIPI_DATA_ROW_EDIT, m_MIPIDataRow);
 	DDX_Control(pDX, IDC_MIPI_DATA_COL_EDIT, m_MIPIDataCol);
 	DDX_Control(pDX, IDC_MIPI_CLOCK_EDIT, m_MIPIClock);
+	DDX_Control(pDX, IDC_MIPI_WORD_COUNT_ID_EDIT, m_MIPIWordCount);
 }
 
 
@@ -112,7 +113,7 @@ void DataInfoDlg::ReadDataInfo()
 	Uint32 colMSB, colLSB, col;
 	ArduCam_readReg_8_8(usbCameraHd, USB_CPLD_I2C_ADDRESS, 0x1F, &colMSB);
 	ArduCam_readReg_8_8(usbCameraHd, USB_CPLD_I2C_ADDRESS, 0x20, &colLSB);;
-	col = ((colMSB & 0x1F) << 8) | (colLSB & 0xFF);
+	col = ((colMSB & 0xFF) << 8) | (colLSB & 0xFF);
 	csTmpString.Format("%d", col);
 	m_MIPIDataCol.SetWindowTextA(csTmpString);
 
@@ -124,6 +125,19 @@ void DataInfoDlg::ReadDataInfo()
 	ArduCam_readReg_8_8(usbCameraHd, USB_CPLD_I2C_ADDRESS, 0x27, &mipiClk);
 	csTmpString.Format("%d", mipiClk);
 	m_MIPIClock.SetWindowTextA(csTmpString);
+
+	if ((version & 0xF0) == 0x20) {
+		m_MIPIWordCount.EnableWindow(FALSE);
+	}
+
+	if ((version & 0xF0) == 0x30 && date >= (21 * 1000 + 3 * 100 + 1)) {
+		Uint32 mipiWordCount, wordCountMSB, wordCountLSB;
+		ArduCam_readReg_8_8(usbCameraHd, USB_CPLD_I2C_ADDRESS, 0x25, &wordCountMSB);
+		ArduCam_readReg_8_8(usbCameraHd, USB_CPLD_I2C_ADDRESS, 0x26, &wordCountLSB);
+		mipiWordCount = ((wordCountMSB & 0xFF) << 8) | (wordCountLSB & 0xFF);
+		csTmpString.Format("%d", mipiWordCount);
+		m_MIPIWordCount.SetWindowTextA(csTmpString);
+	}
 }
 
 void DataInfoDlg::OnBnClickedOk()

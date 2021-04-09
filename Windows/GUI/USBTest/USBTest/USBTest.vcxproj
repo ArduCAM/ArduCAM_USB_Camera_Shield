@@ -288,6 +288,7 @@
     <ClCompile Include="Thread.cpp" />
     <ClCompile Include="TTComboBox.cpp" />
     <ClCompile Include="TTEdit.cpp" />
+    <ClCompile Include="TTStatic.cpp" />
     <ClCompile Include="USBTest.cpp" />
     <ClCompile Include="USBTestDlg.cpp" />
   </ItemGroup>
@@ -301,6 +302,7 @@
     <ClInclude Include="DataInfoDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TTStatic.h" />
     <ClInclude Include="TTComboBox.h" />
     <ClInclude Include="TTEdit.h" />
     <ClInclude Include="USBTest.h" />
@@ -309,7 +311,6 @@
   <ItemGroup>
     <None Include="res\USBTest.ico" />
     <None Include="res\USBTest.rc2" />
-    <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="USBTest.rc" />

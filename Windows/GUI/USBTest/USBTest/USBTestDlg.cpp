@@ -2053,10 +2053,12 @@ void CUSBTestDlg::OnMenuAbout()
 		aboutDlg.setCpldVersion(str);
 		readUsbVersion(str);
 		aboutDlg.setUsbVersion(str);
+		aboutDlg.showPrompt(SW_HIDE);
 	}
 	else {
 		aboutDlg.setCpldVersion("----/--/--");
 		aboutDlg.setUsbVersion("Device: --\tInterface: --");
+		aboutDlg.showPrompt(SW_SHOW);
 	}
 	aboutDlg.DoModal();
 }
