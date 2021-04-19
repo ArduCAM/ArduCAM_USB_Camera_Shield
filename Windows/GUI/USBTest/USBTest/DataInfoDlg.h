@@ -31,4 +31,5 @@ public:
 	void SetUsbCameraHandle(ArduCamHandle usbCameraHd);
 	virtual BOOL OnInitDialog();
 	CEdit m_MIPIClock;
+	CEdit m_MIPIWordCount;
 };

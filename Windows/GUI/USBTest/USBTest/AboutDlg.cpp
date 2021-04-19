@@ -26,7 +26,8 @@ void AboutDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_STATIC_CPLD_VERSION, m_cpld_version);
 	DDX_Control(pDX, IDC_STATIC_USB_VERSION, m_usb_version);
-	
+
+	DDX_Control(pDX, IDC_STATIC_PROMPT_OPEN_DEVICE, m_static);
 }
 
 void AboutDlg::setCpldVersion(CString str) {
@@ -36,6 +37,9 @@ void AboutDlg::setUsbVersion(CString str) {
 	str_usb_version = str;
 }
 
+void AboutDlg::showPrompt(bool show) {
+	show_prompt = show;
+}
 BEGIN_MESSAGE_MAP(AboutDlg, CDialogEx)
 	ON_STN_CLICKED(IDC_STATIC_WEB_SITE, &AboutDlg::OnStnClickedStaticWebSite)
 	ON_STN_CLICKED(IDC_STATIC_GITHUB, &AboutDlg::OnStnClickedStaticGithub)
@@ -54,7 +58,8 @@ BOOL AboutDlg::OnInitDialog()
 		m_cpld_version.SetWindowTextA(str_cpld_version);
 	if (str_usb_version) 
 		m_usb_version.SetWindowTextA(str_usb_version);
-	
+	m_static.SetTextColor(RGB(255, 0, 0));
+	m_static.ShowWindow(show_prompt);
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
 }

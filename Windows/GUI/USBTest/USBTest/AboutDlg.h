@@ -3,6 +3,8 @@
 
 // AboutDlg 对话框
 #include <afxwin.h>
+#include "TTStatic.h"
+
 class AboutDlg : public CDialogEx
 {
 	DECLARE_DYNAMIC(AboutDlg)
@@ -12,6 +14,7 @@ public:
 	virtual ~AboutDlg();
 	void setCpldVersion(CString str);
 	void setUsbVersion(CString str);
+	void showPrompt(bool show);
 	
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
@@ -22,6 +25,8 @@ private:
 	CString str_usb_version;
 	CStatic m_cpld_version;
 	CStatic m_usb_version;
+	CColorStatic m_static;
+	int show_prompt;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 

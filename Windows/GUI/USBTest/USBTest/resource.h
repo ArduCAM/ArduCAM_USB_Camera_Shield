@@ -50,6 +50,7 @@
 #define IDC_STATIC_IMU_ACCZ             1031
 #define IDC_STATIC_                     1032
 #define IDC_STATIC_IMU_GYROX            1032
+#define IDC_STATIC_PROMPT_OPEN_DEVICE   1032
 #define IDC_STATIC_IMU_GYROY            1033
 #define IDC_STATIC_IMU_GYROZ            1034
 #define IDC_STATIC_IMU_TIMP             1035
@@ -108,6 +109,8 @@
 #define IDC_CTRL_EDIT_3                 1081
 #define IDC_MIPI_CLOCK_LABEL            1081
 #define IDC_MIPI_CLOCK_EDIT             1082
+#define IDC_MIPI_WORD_COUNT_ID_LABEL    1083
+#define IDC_MIPI_WORD_COUNT_ID_EDIT     1084
 #define IDC_CTRL_LABEL_4                1085
 #define IDC_CTRL_SLIDER_4               1086
 #define IDC_CTRL_EDIT_4                 1087
