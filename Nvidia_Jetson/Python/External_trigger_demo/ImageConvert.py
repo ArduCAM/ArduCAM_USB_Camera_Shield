@@ -13,10 +13,16 @@ def JPGToMat(data,datasize):
     image = np.frombuffer(data,np.uint8,count = datasize)
     return cv2.imdecode(image,cv2.IMREAD_ANYCOLOR)
 
-def YUVToMat(data,Width,Height):
+def YUVToMat(data,Width,Height, color_mode):
+    codeMap = {
+        0:cv2.COLOR_YUV2BGR_YUYV,
+        1:cv2.COLOR_YUV2BGR_YVYU,
+        2:cv2.COLOR_YUV2BGR_UYVY,
+        3:cv2.COLOR_YUV2BGR_Y422,
+    }
     image = np.frombuffer(data, np.uint8).reshape( Height,Width , 2 )
-    return cv2.cvtColor(image,cv2.COLOR_YUV2BGR_YUYV)
-    
+    return cv2.cvtColor(image,codeMap[color_mode])
+
 def RGB565ToMat(data,Width,Height):
     arr = np.frombuffer(data,dtype=np.uint16).astype(np.uint32)
     arr = ((arr & 0xFF00) >> 8) + ((arr & 0x00FF) << 8)
@@ -67,7 +73,7 @@ def convert_image(data,cfg,color_mode):
     if emImageFmtMode == ArducamSDK.FORMAT_MODE_JPG:
         image = JPGToMat(data,datasize)
     if emImageFmtMode == ArducamSDK.FORMAT_MODE_YUV:
-        image = YUVToMat(data,Width,Height)
+        image = YUVToMat(data,Width,Height,color_mode)
     if emImageFmtMode == ArducamSDK.FORMAT_MODE_RGB:
         image = RGB565ToMat(data,Width,Height)
     if emImageFmtMode == ArducamSDK.FORMAT_MODE_MON:
