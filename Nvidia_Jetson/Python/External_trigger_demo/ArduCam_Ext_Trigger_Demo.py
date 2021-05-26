@@ -92,6 +92,13 @@ def camera_initFromFile(fileName,index):
                                                     datas[4],datas[5],datas[6],datas[7],
                                                     datas[8],datas[9],datas[10],datas[11]))
 
+        ArducamSDK.Py_ArduCam_registerCtrls(handle, config.controls, config.controls_length)
+        # ArducamSDK.Py_ArduCam_setCtrl(handle, "setFramerate", 5)
+        # ArducamSDK.Py_ArduCam_setCtrl(handle, "setExposure", 5)
+        # ArducamSDK.Py_ArduCam_setCtrl(handle, "setExposureTime", 33000)
+        # ArducamSDK.Py_ArduCam_setCtrl(handle, "setGain", 5)
+        # ArducamSDK.Py_ArduCam_setCtrl(handle, "setAnalogueGain", 100)
+
         return handle
     else:
         print("open fail,ret_val = ",ret)

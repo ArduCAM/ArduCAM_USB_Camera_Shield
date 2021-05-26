@@ -83,7 +83,11 @@ def camera_initFromFile(fileName):
                 configBoard(configs[i])
 
         ArducamSDK.Py_ArduCam_registerCtrls(handle, config.controls, config.controls_length)
-        ArducamSDK.Py_ArduCam_setCtrl(handle, "setFramerate", 5)
+        # ArducamSDK.Py_ArduCam_setCtrl(handle, "setFramerate", 5)
+        # ArducamSDK.Py_ArduCam_setCtrl(handle, "setExposure", 5)
+        # ArducamSDK.Py_ArduCam_setCtrl(handle, "setExposureTime", 33000)
+        # ArducamSDK.Py_ArduCam_setCtrl(handle, "setGain", 5)
+        # ArducamSDK.Py_ArduCam_setCtrl(handle, "setAnalogueGain", 100)
 
         rtn_val,datas = ArducamSDK.Py_ArduCam_readUserData(handle,0x400-16, 16)
         print("Serial: %c%c%c%c-%c%c%c%c-%c%c%c%c"%(datas[0],datas[1],datas[2],datas[3],
