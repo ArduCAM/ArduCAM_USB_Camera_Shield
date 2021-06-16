@@ -118,7 +118,6 @@ def captureImage_thread():
             print("Error capture image, rtn_val = ",rtn_val)
             if rtn_val == ArducamSDK.USB_CAMERA_USB_TASK_ERROR:
                 break
-        time.sleep(0.005)
         
     running = False
     ArducamSDK.Py_ArduCam_endCaptureImage(handle)
