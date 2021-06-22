@@ -44,4 +44,8 @@ Checkthe "Full Screen" to display the video in full window.
 You might come across missing MSVCF100.DLL file or similar.
 Please install the Microsoft Visual C++ 2010 SP1 Redistributable Package from
 [Microsoft](https://www.microsoft.com/en-US/download/details.aspx?id=8328).
+for MSVCF140.DLL
+Please install the Microsoft Visual C++ 2015 Redistributable Package from
+[Microsoft](https://www.microsoft.com/en-us/download/details.aspx?id=48145).
+
 

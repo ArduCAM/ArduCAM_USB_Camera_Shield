@@ -65,7 +65,8 @@ extern "C"{
         I2C_MODE_8_8   = 0,
         I2C_MODE_8_16  = 1,
         I2C_MODE_16_8  = 2,
-        I2C_MODE_16_16 = 3
+        I2C_MODE_16_16 = 3,
+        I2C_MODE_16_32 = 4,
     }i2c_mode;
     typedef enum{
         FORMAT_MODE_RAW = 0,
@@ -145,6 +146,8 @@ extern "C"{
     unsigned int ArduCam_readReg_16_8( ArduCamHandle useHandle, Uint32 shipAddr, Uint32 regAddr, Uint32* pval );
     unsigned int ArduCam_writeReg_16_16( ArduCamHandle useHandle, Uint32 shipAddr, Uint32 regAddr, Uint32 val );
     unsigned int ArduCam_readReg_16_16( ArduCamHandle useHandle, Uint32 shipAddr, Uint32 regAddr, Uint32* pval );
+    unsigned int ArduCam_writeReg_16_32( ArduCamHandle useHandle, Uint32 shipAddr, Uint32 regAddr, Uint32 val );
+    unsigned int ArduCam_readReg_16_32( ArduCamHandle useHandle, Uint32 shipAddr, Uint32 regAddr, Uint32* pval );
     void ArduCam_enableForceRead( ArduCamHandle useHandle );
     void ArduCam_disableForceRead( ArduCamHandle useHandle );
     unsigned int ArduCam_setboardConfig( ArduCamHandle useHandle, Uint8 u8Command, Uint16 u16Value, Uint16 u16Index, Uint32 u32BufSize, Uint8 *pu8Buf );
