@@ -24,7 +24,7 @@ This is C/C++ demo code for the following cameras (but not limited to):
 - Build  
 ```Bash
   git clone https://github.com/ArduCAM/arducam_config_parser.git
-  cd arducam_config_parser
+  cd arducam_config_parser/src
   make clean && make
 ```
 - Install  
