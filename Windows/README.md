@@ -8,20 +8,9 @@ This folder contains MFC GUI example to demonstrate the Arducam USB2/USB3 camera
 For more information please read the [README](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield/tree/master/Windows/GUI/USBTest/README.md) file for the example.
 
 
-# Cpp
-
-This folder contains C++ example to demonstrate the Arducam USB2/USB3 camera shield working in streaming mode.
-For more information please read the [README](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield/tree/master/Windows/Cpp/Streaming_demo/README.md) file for the example.
-
-# Python2
-
-This folder contains Python2.x example to demonstrate the Arducam USB2/USB3 camera shield working in streaming mode.
-For more information please read the [README](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield/tree/master/Windows/Python2/Streaming_demo/README.md) file for the example.
-
-
-# Python3
-
-This folder contains Python3.x example to demonstrate the Arducam USB2/USB3 camera shield working in streaming mode.
-For more information please read the [README](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield/tree/master/Windows/Python3/Streaming_demo/README.md) file for the example.
+# Note
+We have launched a new version of Demo, which is more concise and easy to use, please check for details:  
+[ArduCAM_USB_Camera_Shield_Cpp_Demo](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield_Cpp_Demo)  
+[ArduCAM_USB_Camera_Shield_Python_Demo](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield_Python_Demo)  
 
 

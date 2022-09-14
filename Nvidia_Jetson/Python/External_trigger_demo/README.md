@@ -1,3 +1,9 @@
+# Note
+We have launched a new version of Demo, which is more concise and easy to use, please check for details:  
+[ArduCAM_USB_Camera_Shield_Cpp_Demo](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield_Cpp_Demo)  
+[ArduCAM_USB_Camera_Shield_Python_Demo](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield_Python_Demo)  
+
+
 # Overview
 
 Python demo code for the following cameras:

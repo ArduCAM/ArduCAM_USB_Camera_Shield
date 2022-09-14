@@ -1,3 +1,8 @@
+# Note
+We have launched a new version of Demo, which is more concise and easy to use, please check for details:  
+[ArduCAM_USB_Camera_Shield_Cpp_Demo](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield_Cpp_Demo)  
+[ArduCAM_USB_Camera_Shield_Python_Demo](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield_Python_Demo)  
+
 # Overview
 ArduCAM USB Camera Shield is a general purpose USB camera controller board that can accommodate wide range of CMOS camera module from 0.3MP ~ 21MP.
 By using provided SDK library and demo source code, user can design their own applications.

@@ -1,3 +1,9 @@
+# Note
+We have launched a new version of Demo, which is more concise and easy to use, please check for details:  
+[ArduCAM_USB_Camera_Shield_Cpp_Demo](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield_Cpp_Demo)  
+[ArduCAM_USB_Camera_Shield_Python_Demo](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield_Python_Demo)  
+
+
 # Overview
 This ArduCam_Ext_Trigger_Demo demostrates how to capture a single frame from the camera with external trigger input to USB2 camera shield.
 The purpose of this demo is used for multi-camera synchronized capture, it works for both rolling shutter camera and global shutter camera. 
