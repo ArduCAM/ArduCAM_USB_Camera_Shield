@@ -1,3 +1,8 @@
+# Note2
+We have released an new version of the SDK that addresses the flaws in the current version of the SDK. For more information, please see:
+[ArduCam_EVK_Demo](https://github.com/ArduCAM/ArduCam_EVK_Demo)  
+(the new version will be continuously updated, and the old version will be gradually abandoned for maintenance) 
+
 # Note
 We have launched a new version of Demo, which is more concise and easy to use, please check for details:  
 [ArduCAM_USB_Camera_Shield_Cpp_Demo](https://github.com/ArduCAM/ArduCAM_USB_Camera_Shield_Cpp_Demo)  
