@@ -15,6 +15,7 @@ Python demo code for the following cameras:
 - MT9J003 (10MP Rolling Shutter Camera)
 - MT9F002 （14MP Rolling Shutter Camera)
 - MT9F001 （14MP Rolling Shutter Camera)
+- MT9M001 (1.3MP Rolling Shutter Camera)
 - OV2640 （1.9MP Rolling Shutter Camera)
 - OV5640 （5MP Rolling Shutter Camera)
 - OV5642 （5MP Rolling Shutter Camera)
